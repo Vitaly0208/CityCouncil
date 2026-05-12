@@ -1,0 +1,40 @@
+﻿services:
+  api:
+    build:
+      context: ./backend/MyCityCouncil
+      dockerfile: Dockerfile
+    container_name: mycitycouncil-api
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - JwtOptions__SecretKey=${JwtOptions__SecretKey}
+      - JwtOptions__TokenExpiresHours=${JwtOptions__TokenExpiresHours}
+      - JwtOptions__RefreshTokenExpiresHours=${JwtOptions__RefreshTokenExpiresHours}
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: mycitycouncil-db
+    environment:
+      - POSTGRES_DB=mycitycouncil_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=28sql31
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "15432:5432"
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
