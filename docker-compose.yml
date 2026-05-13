@@ -18,6 +18,18 @@
     networks:
       - app-network
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - app-network
+    restart: unless-stopped
+
   db:
     image: postgres:15-alpine
     container_name: mycitycouncil-db

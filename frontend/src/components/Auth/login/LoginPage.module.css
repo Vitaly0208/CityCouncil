@@ -1,0 +1,148 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Градиент светлого красного фона */
+    background: linear-gradient(135deg, #ffeaea 0%, #fff5f5 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 1rem;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 24px; /* Более сильное скругление как на референсе */
+    box-shadow: 0 10px 40px rgba(207, 34, 46, 0.15); /* Красноватая тень */
+    width: 100%;
+    max-width: 380px;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Место для логотипа/картинки */
+.logoContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.logoImage {
+    width: 80px; /* Размер картинки */
+    height: 80px;
+    object-fit: contain;
+}
+
+.header {
+    margin-bottom: 4rem;
+
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #8b949e;
+    text-align: left;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Группа инпута с иконкой */
+.inputGroup {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #e1e4e8;
+    transition: border-color 0.3s;
+    padding-bottom: 0.5rem;
+}
+
+.inputGroup:focus-within {
+    border-color: #cf222e; /* Красный при фокусе */
+}
+
+.icon {
+    color: #8b949e;
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    color: #24292f;
+    background: transparent;
+    padding: 4px 0;
+}
+
+.input::placeholder {
+    color: #8b949e;
+}
+
+.error {
+    background: #ffebe9;
+    color: #cf222e;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    border: 1px solid #ffcccc;
+}
+
+.button {
+    margin-top: 1rem;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: #e8646d;
+    border: none;
+    border-radius: 50px; /* Овальная кнопка как на референсе */
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 4px 12px rgba(207, 34, 46, 0.3);
+}
+
+.button:hover:not(:disabled) {
+    background: #c35560;
+    transform: translateY(-1px);
+}
+
+.button:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.button:disabled {
+    background: #d0d7de;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #656d76;
+}
+
+.link {
+    color: #cf222e;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.link:hover {
+    text-decoration: underline;
+}

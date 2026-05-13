@@ -1,0 +1,374 @@
+:root {
+    --bg: #0d1117;
+    --card-bg: #161b22;
+    --border: #30363d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent: #cf222e;
+    --accent-hover: #a41926;
+    --success: #238636;
+    --warning: #9e6a03;
+    --neutral: #30363d;
+    --hover-bg: #1c2128;
+}
+.body{
+    margin: 0;
+}
+.container {
+    min-height: 100vh;
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+/* --- Header --- */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 0.85rem 1.75rem;
+    background-color: var(--accent);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.logo {
+    font-size: 1.6rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.2);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.headerTitle {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.headerSubtitle {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.searchBar {
+    flex: 1;
+    max-width: 450px;
+    position: relative;
+}
+
+.searchBar input {
+    width: 100%;
+    padding: 0.6rem 0.85rem 0.6rem 2.4rem;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.searchBar input::placeholder { color: rgba(255,255,255,0.7); }
+
+.searchBar span {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.7;
+    font-size: 1rem;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    font-size: 0.9rem;
+}
+
+.userName { font-weight: 500; }
+.userRole { color: rgba(255,255,255,0.8); }
+
+.logoutBtn {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+.logoutBtn:hover { background: rgba(255,255,255,0.3); }
+
+/* --- Grid Layout --- */
+.gridLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    padding: 1.75rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+    .gridLayout { grid-template-columns: 1fr; }
+}
+
+/* --- Карточки --- */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.85rem;
+}
+
+.cardTitle {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.cardLink {
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration: none;
+}
+.cardLink:hover { text-decoration: underline; }
+
+/* --- Приветственная карточка (полная ширина) --- */
+.welcomeCard {
+    grid-column: 1 / -1; /* Растянуть на все колонки */
+}
+
+.welcomeContent {
+    padding: 0.5rem 0;
+}
+
+.welcomeText {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 800px;
+}
+
+/* --- Lists --- */
+.list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.listItem {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+.listItem:last-child { border-bottom: none; padding-bottom: 0; }
+
+.listDate { font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.35rem; }
+.listTitle { margin: 0 0 0.35rem; font-size: 1.05rem; font-weight: 500; }
+.listText { margin: 0 0 0.65rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+.listLink { font-size: 0.85rem; color: var(--accent); text-decoration: none; }
+
+/* --- Sessions --- */
+.sessionItem {
+    display: flex;
+    gap: 0.85rem;
+    align-items: center;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+.sessionItem:last-child { border-bottom: none; }
+
+/* Ближайшее заседание — выделяем бордером вместо заливки */
+.sessionItemFeatured {
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: -0.25rem;
+    background: transparent;
+}
+
+.dateBadge {
+    background: var(--border); /* Заменил яркую заливку на цвет бордера */
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+    text-align: center;
+    min-width: 52px;
+    transition: transform 0.2s;
+}
+
+.dateBadgeFeatured {
+    background: var(--accent); /* Для ближайшего — акцент допустим */
+    color: #fff;
+}
+
+.dateDay { display: block; font-size: 1.2rem; font-weight: 700; line-height: 1; }
+.dateMonth { display: block; font-size: 0.75rem; text-transform: uppercase; opacity: 0.9; }
+
+.sessionInfo { display: flex; flex-direction: column; flex: 1; }
+
+.sessionTag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.15rem;
+}
+
+.sessionTime { font-size: 0.85rem; color: var(--text-secondary); }
+.sessionTimeFeatured { font-weight: 600; color: var(--text-primary); }
+
+.sessionTitle { margin: 0.2rem 0; font-size: 0.95rem; font-weight: 500; }
+.sessionTitleFeatured { font-size: 1.05rem; font-weight: 600; }
+
+.sessionLink { font-size: 0.8rem; color: var(--accent); text-decoration: none; margin-top: 0.25rem; }
+
+/* --- Calendar --- */
+.calendarCard {
+    max-width: 320px;
+    width: 100%;
+    justify-self: end;
+}
+
+.calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.85rem;
+}
+.calendarMonth { font-weight: 600; font-size: 1rem; }
+.calendarNav {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+.calendarNav:hover { background: var(--hover-bg); }
+
+.calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.35rem;
+    text-align: center;
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+}
+
+.calendarWeekday { color: var(--text-secondary); font-size: 0.8rem; padding: 0.35rem 0; font-weight: 500; }
+.calendarDay {
+    padding: 0.5rem;
+    border-radius: 6px;
+    position: relative;
+    cursor: default;
+}
+.calendarDay:hover { background: var(--hover-bg); }
+.calendarDot {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.calendarLegend { display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.8rem; color: var(--text-secondary); }
+.legendItem { display: flex; align-items: center; gap: 0.6rem; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.dotRed { background: var(--accent); }
+.dotOrange { background: var(--warning); }
+.dotGreen { background: var(--success); }
+
+/* --- Initiatives Section --- */
+.initiativesSection {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.75rem;
+}
+
+.sectionTitle {
+    margin: 0 0 1.25rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.initiativesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.initiativeCard {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+.initiativeCard:hover { background: var(--hover-bg); }
+
+.badge {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.7rem;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.badgeApproved { background: var(--success); color: #fff; }
+.badgeReview { background: var(--warning); color: #fff; }
+.badgeDraft { background: var(--neutral); color: var(--text-secondary); }
+
+.initiativeTitle {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.initiativeMeta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: auto;
+    gap: 1rem;
+}

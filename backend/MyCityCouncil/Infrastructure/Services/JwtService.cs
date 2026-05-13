@@ -42,7 +42,7 @@ public class JwtService : IJwtService
 
         Claim[] claims =
         [
-            new("userId", user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new("role", role.Name)
         ];
         

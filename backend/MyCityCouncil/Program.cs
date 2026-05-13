@@ -9,6 +9,15 @@ using MyCityCouncil.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+        policy.WithOrigins("http://localhost:3000") // Порт фронтенда в Docker
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()); // Важно для токенов/куки
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -79,7 +88,7 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger
     dbContext.Database.Migrate();
 }
 
-
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
