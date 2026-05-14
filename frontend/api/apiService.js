@@ -47,6 +47,13 @@ export const committeeService = {
     dismissMember: (committeeId, userId) =>
         axiosInstance.delete(`${ENDPOINTS.COMMITTEES.MEMBERS(committeeId)}/${userId}`),
 };
-// ============ COMMITTEES ============
 
-// ============ SESSIONS ============
+export const initiativeService = {
+    getAll: (params) => axiosInstance.get(ENDPOINTS.INITIATIVES.BASE, { params }),
+    create: (data) => axiosInstance.post(ENDPOINTS.INITIATIVES.CREATE, data),
+    review: (id, data) => axiosInstance.put(ENDPOINTS.INITIATIVES.REVIEW(id), data),
+};
+
+export const sessionService = {
+    createWithQueue: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE_WITH_QUEUE, data),
+};

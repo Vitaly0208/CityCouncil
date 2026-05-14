@@ -78,6 +78,12 @@ const DashboardPage = () => {
                         Комиссии
                     </NavLink>
                     <NavLink
+                        to="/initiatives"
+                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+                    >
+                        Инициативы
+                    </NavLink>
+                    <NavLink
                         to="/parties"
                         className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
                     >

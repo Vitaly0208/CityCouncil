@@ -5,6 +5,8 @@ import { tokenService} from "../api/tokenService.js";
 import DashboardPage from "./components/Home/DashboardPage.jsx";
 import ProfilePage from "./components/Profile/ProfilePage.jsx";
 import CommitteesPage from "./components/CommitteesPage/CommitteesPage.jsx";
+import AdminPage from "./components/Admin/AdminPage.jsx";
+import InitiativesPage from "./components/InitiativesPage/InitiativesPage.jsx";
 
 const ProtectedRoute = ({ children }) =>
     tokenService.isAuthenticated() ? children : <Navigate to="/login" replace />;
@@ -32,6 +34,10 @@ function App() {
                 <Route path="/deputies" element={<ProtectedRoute><div>Страница депутатов</div></ProtectedRoute>} />
                 <Route path="/elections" element={<ProtectedRoute><div>Страница выборов</div></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to="/login" replace />} />
+                <Route path="/initiatives" element={<ProtectedRoute><InitiativesPage /></ProtectedRoute>} />
+                <Route path="/admin" element={
+                    <ProtectedRoute requiredRole="Admin"><AdminPage /></ProtectedRoute>
+                } />
             </Routes>
         </BrowserRouter>
     );

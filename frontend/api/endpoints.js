@@ -17,4 +17,13 @@ export const ENDPOINTS = {
         MEMBERS: (id) => `/api/committees/${id}/members`,
         CHAIRMAN: (id) => `/api/committees/${id}/chairman`,
     },
+    INITIATIVES: {
+        BASE: '/api/initiatives',
+        CREATE: '/api/initiatives',
+        REVIEW: (id) => `/api/initiatives/${id}/review`,
+    },
+    SESSIONS: {
+        BASE: '/api/sessions',
+        CREATE_WITH_QUEUE: '/api/sessions/create-with-queue',
+    }
 };

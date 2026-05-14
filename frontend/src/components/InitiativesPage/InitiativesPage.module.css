@@ -1,0 +1,45 @@
+:root {
+    --bg: #0d1117; --card-bg: #161b22; --border: #30363d;
+    --text-primary: #c9d1d9; --text-secondary: #8b949e;
+    --accent: #cf222e; --accent-hover: #a41926; --success: #238636; --warning: #9e6a03;
+}
+.container { min-height: 100vh; background: var(--bg); color: var(--text-primary); font-family: system-ui, sans-serif; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); }
+.headerLeft { display: flex; align-items: center; gap: 1rem; }
+.backBtn { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+.backBtn:hover { color: var(--text-primary); }
+.headerTitle { margin: 0; font-size: 1.2rem; }
+.logoutBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; }
+.logoutBtn:hover { background: var(--border); color: var(--text-primary); }
+
+.main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.topBar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.topBar h2 { margin: 0; font-size: 1.4rem; }
+.primaryBtn { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
+.primaryBtn:hover { background: var(--accent-hover); }
+.primaryBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.formCard { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+.formCard h3 { margin-top: 0; }
+.formCard input, .formCard textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); padding: 0.7rem; border-radius: 6px; margin-bottom: 1rem; font-family: inherit; }
+.formCard input:focus, .formCard textarea:focus { outline: none; border-color: var(--accent); }
+.formActions { display: flex; gap: 1rem; justify-content: flex-end; }
+.secondaryBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.cardHeader { display: flex; justify-content: space-between; align-items: center; }
+.date { font-size: 0.8rem; color: var(--text-secondary); }
+.cardTitle { margin: 0; font-size: 1.1rem; }
+.cardDesc { margin: 0; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; flex: 1; }
+.cardFooter { border-top: 1px solid var(--border); padding-top: 0.8rem; font-size: 0.85rem; color: var(--text-secondary); }
+
+.badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600; text-transform: uppercase; }
+.badgePending { background: rgba(158, 106, 3, 0.2); color: #d29922; }
+.badgeQueue { background: rgba(56, 139, 253, 0.2); color: #58a6ff; }
+.badgeHearing { background: rgba(188, 140, 255, 0.2); color: #bc8cff; }
+.badgeAccepted { background: rgba(35, 134, 54, 0.2); color: #3fb950; }
+.badgeRejected { background: rgba(207, 34, 46, 0.2); color: #f85149; }
+
+.loading, .empty { text-align: center; padding: 3rem; color: var(--text-secondary); }
+.error { color: var(--accent); text-align: center; padding: 2rem; }

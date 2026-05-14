@@ -15,4 +15,12 @@ export const queryKeys = {
         details: () => [...queryKeys.committees.all, 'detail'],
         detail: (id) => [...queryKeys.committees.details(), id],
     },
+    initiatives: {
+        all: ['initiatives'],
+        lists: () => [...queryKeys.initiatives.all, 'list'],
+        list: (filters) => [...queryKeys.initiatives.lists(), { filters }],
+    },
+    sessions: {
+        all: ['sessions'],
+    }
 };
