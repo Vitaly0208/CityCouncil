@@ -1,6 +1,6 @@
 import React from 'react';
-import {Link, useNavigate} from 'react-router-dom';
-import { tokenService} from "../../../api/tokenService.js";
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { tokenService } from "../../../api/tokenService.js";
 import styles from './DashboardPage.module.css';
 
 const NEWS = [
@@ -41,7 +41,6 @@ const DashboardPage = () => {
             {/* Шапка */}
             <header className={styles.header}>
                 <div className={styles.headerLeft}>
-                    <div className={styles.logo}>★</div>
                     <div>
                         <h1 className={styles.headerTitle}>Городская Дума</h1>
                         <span className={styles.headerSubtitle}>Система обеспечения законодательной деятельности</span>
@@ -64,6 +63,40 @@ const DashboardPage = () => {
 
             {/* Основная сетка */}
             <main className={styles.gridLayout}>
+                {/*  НАВИГАЦИОННАЯ ПАНЕЛЬ (перенесена в main) */}
+                <nav className={`${styles.card} ${styles.subNavCard}`}>
+                    <NavLink
+                        to="/news"
+                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+                    >
+                        Новости
+                    </NavLink>
+                    <NavLink
+                        to="/committees"
+                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+                    >
+                        Комиссии
+                    </NavLink>
+                    <NavLink
+                        to="/parties"
+                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+                    >
+                        Партии
+                    </NavLink>
+                    <NavLink
+                        to="/deputies"
+                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+                    >
+                        Депутаты
+                    </NavLink>
+                    <NavLink
+                        to="/elections"
+                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+                    >
+                        Выборы
+                    </NavLink>
+                </nav>
+
                 {/* Полноширинная карточка приветствия */}
                 <section className={`${styles.card} ${styles.welcomeCard}`}>
                     <div className={styles.cardHeader}>

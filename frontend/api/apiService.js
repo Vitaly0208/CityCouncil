@@ -36,7 +36,7 @@ export const userService = {
 
 // ============ COMMITTEES ============
 export const committeeService = {
-    getAll: (params) => axiosInstance.get(ENDPOINTS.COMMITTEES.BASE, { params }),
+    getAll: () => axiosInstance.get(ENDPOINTS.COMMITTEES.BASE),
     getById: (id) => axiosInstance.get(ENDPOINTS.COMMITTEES.DETAILS(id)),
     create: (data) => axiosInstance.post(ENDPOINTS.COMMITTEES.BASE, data),
     update: (id, data) => axiosInstance.put(ENDPOINTS.COMMITTEES.DETAILS(id), data),

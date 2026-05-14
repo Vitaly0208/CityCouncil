@@ -30,11 +30,19 @@
     justify-content: space-between;
     gap: 1.5rem;
     padding: 0.85rem 1.75rem;
-    background-color: var(--accent);
-    color: #fff;
+    background: linear-gradient(135deg, rgb(253 16 30 / 0.4) 0%, rgb(237 37 56 / 0.3) 100%);
+    border: 1px solid rgb(232 11 26 / 0.4);
+    border-radius: 8px;
+    color: #ffffff;
     position: sticky;
     top: 0;
     z-index: 10;
+
+    /* Лёгкая граница снизу для чёткого визуального отделения */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+    /* Плавное появление при скролле (опционально) */
+    transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
 .headerLeft {
@@ -118,11 +126,13 @@
 /* --- Grid Layout --- */
 .gridLayout {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    /* Пропорции: Новости(1) | Заседания(1.5) | Календарь(0.8) */
+    grid-template-columns: 1fr 1.5fr 0.8fr;
     gap: 1.5rem;
     padding: 1.75rem;
     max-width: 1400px;
     margin: 0 auto;
+    align-items: start; /* Важно: карточки не растягиваются по высоте соседей */
 }
 
 @media (max-width: 1024px) {
@@ -371,4 +381,41 @@
     color: var(--text-secondary);
     margin-top: auto;
     gap: 1rem;
+}
+/* === Навигационная панель под хедером === */
+.subNavCard {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row; /* Горизонтальное расположение */
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center; /* Центрирование по вертикали */
+    gap: 2rem; /* Отступы между элементами */
+    padding: 1.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;;
+}
+
+.navItem {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    text-align: center;
+    white-space: nowrap; /* Запрет переноса текста */
+    display: inline-block;
+}
+
+.navItem:hover {
+    color: var(--text-primary);
+    background-color: var(--hover-bg);
+}
+
+.navItemActive {
+    color: var(--accent);
+    background-color: rgba(207, 34, 46, 0.15);
+    font-weight: 600;
+    border: 1px solid var(--accent);
 }

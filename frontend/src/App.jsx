@@ -28,6 +28,9 @@ function App() {
                 <Route path="/committees" element={
                     <ProtectedRoute><CommitteesPage /></ProtectedRoute>
                 } />
+                <Route path="/parties" element={<ProtectedRoute><div>Страница партий</div></ProtectedRoute>} />
+                <Route path="/deputies" element={<ProtectedRoute><div>Страница депутатов</div></ProtectedRoute>} />
+                <Route path="/elections" element={<ProtectedRoute><div>Страница выборов</div></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </BrowserRouter>
