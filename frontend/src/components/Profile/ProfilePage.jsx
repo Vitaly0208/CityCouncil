@@ -1,16 +1,17 @@
-import React from 'react';
+
 import {Link, useNavigate} from 'react-router-dom';
 import { tokenService } from '../../../api/tokenService';
 import { useUserProfile} from "../../hooks/useUserProfile.js";
+import { getUserRole } from '../../utils/jwt';
 import styles from './ProfilePage.module.css';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
+    const isAdmin = getUserRole() === 'Admin';
     const { profile, isLoading, isError, refetch } = useUserProfile();
 
     const handleLogout = () => {
         tokenService.clearTokens();
-        // Инвалидируем кеш профиля при выходе, чтобы при следующем входе были свежие данные
         navigate('/login');
     };
 
@@ -45,9 +46,7 @@ const ProfilePage = () => {
         return fullName.slice(0, 2).toUpperCase();
     };
 
-    // Нормализация данных: гарантируем массивы и camelCase
     const commissions = profile?.commissions || profile?.Commissions || [];
-    const partyActivities = profile?.partyActivities || profile?.PartyActivities || [];
 
     if (isLoading) {
         return (
@@ -94,8 +93,16 @@ const ProfilePage = () => {
                 </div>
 
                 <div className={styles.headerRight}>
-                    <span className={styles.userName}>{profile.fullName}</span>
                     <span className={styles.userRole}>{profile.roleName}</span>
+                    {isAdmin && (
+                        <button
+                            onClick={() => navigate('/admin')}
+                            className={styles.adminButton}
+                        >
+                            <span className={styles.adminIcon}>Админ-панель</span>
+                            Панель администратора
+                        </button>
+                    )}
                     <button className={styles.logoutBtn} onClick={handleLogout}>Выйти</button>
                 </div>
             </header>

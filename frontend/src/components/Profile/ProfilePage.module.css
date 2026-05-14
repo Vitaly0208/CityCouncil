@@ -396,3 +396,34 @@
     margin: 0;
     font-size: 0.95rem;
 }
+.adminButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+    background: linear-gradient(135deg, rgba(207, 34, 46, 0.15) 0%, rgba(164, 25, 38, 0.1) 100%);
+    border: 1px solid rgba(207, 34, 46, 0.4);
+    border-left: 4px solid var(--accent, #cf222e);
+    border-radius: 8px;
+    color: #ff7b72;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(6px);
+}
+
+.adminButton:hover {
+    background: linear-gradient(135deg, rgba(207, 34, 46, 0.25) 0%, rgba(164, 25, 38, 0.15) 100%);
+    border-color: var(--accent, #cf222e);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(207, 34, 46, 0.2);
+}
+
+.adminButton:active {
+    transform: translateY(0);
+}
