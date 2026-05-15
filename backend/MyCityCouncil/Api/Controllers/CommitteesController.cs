@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using MyCityCouncil.Application.Features.Committees.Create;
 using MyCityCouncil.Application.Features.Committees.GetDetails;
-
+using MyCityCouncil.Application.Features.Committees.GetList;
 using MyCityCouncil.Application.Features.Committees.Members;
 using MyCityCouncil.Application.Features.Committees.Members.AddMember;
 using MyCityCouncil.Application.Features.Committees.Members.AppointChairman;
@@ -21,7 +21,15 @@ public class CommitteesController : ControllerBase
 
     public CommitteesController(IMediator mediator) => _mediator = mediator;
 
-
+    [HttpGet]
+    [ProducesResponseType(typeof(List<CommitteesListDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<CommitteesListDto>>> GetAll(CancellationToken ct)
+    {
+        var query = new GetCommitteesListQuery();
+        var result = await _mediator.Send(query, ct);
+        return Ok(result);
+    }
+    
     /// <summary>
     /// Получить детальную информацию о комиссии: профиль, текущий состав, история за 10 лет
     /// </summary>

@@ -43,7 +43,7 @@ public class JwtService : IJwtService
         Claim[] claims =
         [
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new("role", role.Name)
+            new Claim(ClaimTypes.NameIdentifier, role.Name)
         ];
         
         var tokenExpires = DateTime.UtcNow.AddHours(_jwtOptions.TokenExpiresHours);

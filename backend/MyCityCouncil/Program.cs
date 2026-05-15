@@ -6,6 +6,7 @@ using Microsoft.OpenApi;
 using MyCityCouncil.Application;
 using MyCityCouncil.Infrastructure;
 using MyCityCouncil.Infrastructure.Persistence;
+using System.Security.Claims; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,18 +61,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["JwtOptions:SecretKey"])),
             
-            NameClaimType = "userId", 
-            RoleClaimType = "role"
+            NameClaimType = ClaimTypes.NameIdentifier,  // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+            RoleClaimType = ClaimTypes.Role, 
         };
     });
 
 builder.Services.AddAuthorizationBuilder()
-    // Политика: только админы
-    .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"))
-    // Политика: пользователи или админы
-    .AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"))
-    // Политика: обязательно наличие userId в токене
-    .AddPolicy("RequireUserId", policy => policy.RequireClaim("userId"));
+    .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"))  // ✅ Теперь работает!
+    .AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using MyCityCouncil.Domain.Enums;
 
 namespace MyCityCouncil.Domain.Models;
 

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using MyCityCouncil.Domain.Enums;
 
 namespace MyCityCouncil.Domain.Models;
 
@@ -20,13 +21,5 @@ public class Initiative
     [JsonIgnore] public List<VotingInfo> VotingHistory { get; set; } = new();
 }
 
-public enum InitiativeStatus 
-{ 
-    PendingReview,    // Ждёт админа
-    InQueue,          // Пройдена, ждёт заседания
-    InFirstHearing,   // На первом слушании
-    InSecondHearing,  // На втором слушании
-    Accepted,         // Утверждена, в базе действующих
-    Rejected          // Отклонена (вместо жёсткого удаления)
-}
+
 
