@@ -32,9 +32,7 @@
     padding: 0.85rem 1.75rem;
     background: linear-gradient(135deg, rgb(253 16 30 / 0.4) 0%, rgb(237 37 56 / 0.3) 100%);
     border: 1px solid rgb(232 11 26 / 0.4);
-    border-radius: 8px;
     color: #ffffff;
-    position: sticky;
     top: 0;
     z-index: 10;
 
@@ -418,4 +416,172 @@
     background-color: rgba(207, 34, 46, 0.15);
     font-weight: 600;
     border: 1px solid var(--accent);
+}
+/* === Секция инициатив (полноширинная) === */
+.initiativesSection {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 2rem 3rem;
+}
+
+.initiativesHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.sectionTitle {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 0 0.35rem;
+    color: var(--text-primary);
+}
+
+.sectionSubtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.viewAllLink {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.viewAllLink:hover {
+    background: var(--accent-light);
+    border-color: var(--accent-hover);
+}
+
+/* Список инициатив */
+.initiativesList {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.initiativeRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.1rem 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border);
+}
+
+.initiativeRow:last-child {
+    border-bottom: none;
+}
+
+.initiativeRow:hover {
+    background: var(--accent-light);
+    padding-left: 1.75rem;
+}
+
+.initiativeRow.even {
+    background: rgba(139, 148, 158, 0.03);
+}
+
+.initiativeRow.odd {
+    background: transparent;
+}
+
+.initiativeContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.initiativeTitle {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.initiativeMeta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.metaIcon {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.metaDivider {
+    color: var(--text-tertiary);
+}
+
+.arrow {
+    color: var(--accent);
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-left: 1rem;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.initiativeRow:hover .arrow {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .initiativesSection {
+        padding: 1.5rem 1rem 2rem;
+    }
+
+    .initiativesHeader {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .sectionTitle {
+        font-size: 1.2rem;
+    }
+
+    .initiativeRow {
+        padding: 1rem 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .initiativeRow:hover {
+        padding-left: 1.25rem;
+    }
+
+    .arrow {
+        align-self: flex-end;
+        margin-left: 0;
+    }
+
+    .initiativeMeta {
+        flex-wrap: wrap;
+    }
 }

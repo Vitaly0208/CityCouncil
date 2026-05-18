@@ -41,7 +41,15 @@ export const useCommittee = (committeeId) => {
         committee: query.data,
     };
 };
-
+export const useCommitteeDetails = (id) => {
+    const query = useQuery({
+        queryKey: queryKeys.committees.details(id),
+        queryFn: () => committeeService.getById(id).then(res => res.data),
+        enabled: !!id,
+        staleTime: 2 * 60 * 1000,
+    });
+    return {...query, committee: query.data};
+}
 /**
  * Хук для вступления в комиссию.
  * @returns {Object} mutation

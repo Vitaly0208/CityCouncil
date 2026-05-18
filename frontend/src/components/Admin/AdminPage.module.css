@@ -1,41 +1,251 @@
 :root {
-    --bg: #0d1117; --card-bg: #161b22; --border: #30363d;
-    --text-primary: #c9d1d9; --text-secondary: #8b949e;
-    --accent: #cf222e; --accent-hover: #a41926; --success: #238636;
+    --bg: #0d1117;
+    --card-bg: #161b22;
+    --border: #30363d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --text-tertiary: #6e7681;
+    --accent: #cf222e;
+    --accent-hover: #a41926;
+    --accent-light: rgba(207, 34, 46, 0.15);
+    --success: #238636;
 }
-.container { min-height: 100vh; background: var(--bg); color: var(--text-primary); font-family: system-ui, sans-serif; }
-.header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); }
-.headerLeft { display: flex; align-items: center; gap: 1rem; }
-.backBtn { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
-.headerTitle { margin: 0; font-size: 1.2rem; }
-.logoutBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; }
 
-.main { max-width: 1000px; margin: 0 auto; padding: 2rem; }
-.tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
-.tab { background: transparent; border: none; color: var(--text-secondary); padding: 0.8rem 1.2rem; cursor: pointer; font-size: 0.95rem; border-bottom: 2px solid transparent; transition: 0.2s; }
-.tab:hover { color: var(--text-primary); }
-.tabActive { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.container {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, sans-serif;
+}
 
-.section h2 { margin-top: 0; }
-.hint { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; }
-.list { display: flex; flex-direction: column; gap: 1rem; }
-.reviewCard { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; }
-.reviewInfo { flex: 1; }
-.reviewInfo h3 { margin: 0 0 0.5rem; }
-.reviewInfo p { margin: 0 0 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
-.meta { font-size: 0.8rem; color: var(--text-secondary); }
-.reviewActions { display: flex; flex-direction: column; gap: 0.5rem; min-width: 120px; }
-.approveBtn { background: var(--success); color: #fff; border: none; padding: 0.5rem; border-radius: 6px; cursor: pointer; }
-.approveBtn:hover { opacity: 0.9; }
-.rejectBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.5rem; border-radius: 6px; cursor: pointer; }
-.rejectBtn:hover { border-color: var(--accent); color: var(--accent); }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--card-bg);
+}
 
-.sessionForm { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; }
-.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
-.sessionForm input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); padding: 0.7rem; border-radius: 6px; }
-.sessionForm input:focus { outline: none; border-color: var(--accent); }
-.primaryBtn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 0.8rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 1rem; }
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.backBtn {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.headerTitle {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.logoutBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.logoutBtn:hover {
+    background: var(--border);
+    color: var(--text-primary);
+}
+
+.main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 3rem;
+}
+
+/* === Вкладки === */
+.tabsContainer {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    min-width: max-content;
+    justify-content: center;
+}
+
+.tab {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    color: var(--text-primary);
+}
+
+.tabActive {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+}
+
+/* === Секции === */
+.section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.sectionTitle {
+    margin: 0 0 1.25rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+/* === Формы и инпуты === */
+.sessionForm, .newsForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+}
+
+input, textarea, select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.65rem 0.85rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.primaryBtn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.65rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+    align-self: flex-start;
+}
+
 .primaryBtn:hover { background: var(--accent-hover); }
 .primaryBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* === Карточки модерации === */
+.list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.reviewCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(139, 148, 158, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.reviewInfo h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.reviewInfo p { margin: 0 0 0.5rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
+.meta { font-size: 0.8rem; color: var(--text-tertiary); }
+
+.reviewActions { display: flex; flex-direction: column; gap: 0.5rem; min-width: 110px; }
+.approveBtn { background: var(--success); color: #fff; border: none; padding: 0.5rem; border-radius: 6px; cursor: pointer; }
+.rejectBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.5rem; border-radius: 6px; cursor: pointer; }
+.rejectBtn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* === Новости === */
+.newsList { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+.newsCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    background: rgba(139, 148, 158, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+.newsContent h4 { margin: 0 0 0.4rem; }
+.newsContent p { margin: 0 0 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+.newsContent time { font-size: 0.8rem; color: var(--text-tertiary); }
+.deleteBtn { background: transparent; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 1.1rem; }
+.deleteBtn:hover { color: var(--accent); }
+
+/* === Депутаты === */
+.filters { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+.deputiesGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.deputyCard {
+    padding: 1rem;
+    background: rgba(139, 148, 158, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+.deputyHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.deputyHeader h4 { margin: 0; font-size: 1rem; }
+.roleBadge { font-size: 0.75rem; padding: 0.2rem 0.5rem; background: var(--accent-light); color: var(--accent); border-radius: 4px; }
+.deputyDetails { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 0.5rem; font-size: 0.85rem; margin: 0; }
+.deputyDetails dt { color: var(--text-tertiary); }
+.deputyDetails dd { margin: 0; color: var(--text-primary); }
+
+/* === Инициативы и Комиссии (строгие строки) === */
+.initiativesList, .committeesList { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+.initiativeRow, .committeeRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    background: rgba(139, 148, 158, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s;
+}
+.initiativeRow:hover, .committeeRow:hover { border-color: var(--accent); }
+.initiativeInfo h4, .committeeInfo h4 { margin: 0 0 0.2rem; font-size: 0.95rem; }
+.badgeAccepted { background: var(--accent-light); color: var(--accent); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+.committeeStats { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: var(--text-secondary); }
+.arrow { color: var(--accent); font-weight: bold; }
+
+/* === Утилиты === */
+.hint { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; }
 .loading, .empty { text-align: center; padding: 2rem; color: var(--text-secondary); }
+.searchBar input { width: 100%; margin-bottom: 1rem; }
+
+/* === Адаптивность === */
+@media (max-width: 768px) {
+    .header { padding: 1rem; }
+    .main { padding: 1rem; }
+    .reviewCard, .newsCard { flex-direction: column; }
+    .reviewActions { flex-direction: row; width: 100%; }
+    .filters { flex-direction: column; }
+}

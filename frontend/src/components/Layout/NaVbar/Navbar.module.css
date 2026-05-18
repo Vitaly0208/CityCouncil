@@ -1,0 +1,309 @@
+:root {
+    --bg: #0d1117;
+    --navbar-bg: #161b22;
+    --border: #30363d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --text-tertiary: #6e7681;
+    --accent: #cf222e;
+    --accent-hover: #a41926;
+    --accent-light: rgba(207, 34, 46, 0.15);
+    --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* === Базовая структура === */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--navbar-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.75rem 2rem;
+    height: 64px;
+}
+
+/* === Бренд / Логотип === */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: color 0.2s ease;
+}
+
+.brand:hover {
+    color: var(--accent);
+}
+
+.brandIcon {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.brandText {
+    letter-spacing: -0.3px;
+}
+
+/* === Десктопное меню === */
+.desktopMenu {
+    display: flex;
+    align-items: center;
+}
+
+.navList {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.navLink:hover {
+    color: var(--text-primary);
+    background: rgba(139, 148, 158, 0.1);
+}
+
+.navLink.active {
+    color: var(--text-primary);
+    background: var(--accent-light);
+    border: 1px solid rgba(207, 34, 46, 0.3);
+}
+
+.adminLink {
+    color: var(--accent);
+}
+
+.adminLink:hover {
+    background: rgba(207, 34, 46, 0.15);
+}
+
+.adminLink.active {
+    background: rgba(207, 34, 46, 0.25);
+    border-color: var(--accent);
+}
+
+/* === Правая секция === */
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.roleBadge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.2rem 0.5rem;
+    background: rgba(139, 148, 158, 0.15);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+}
+
+.logoutButton {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logoutButton:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(207, 34, 46, 0.1);
+}
+
+/* === Кнопка мобильного меню (гамбургер) === */
+.mobileToggle {
+    display: none;
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.mobileToggle:hover {
+    background: rgba(139, 148, 158, 0.1);
+}
+
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 20px;
+    padding: 2px 0;
+}
+
+.hamburgerLine {
+    height: 2px;
+    width: 100%;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger.open .hamburgerLine:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.open .hamburgerLine:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.open .hamburgerLine:nth-child(3) {
+    transform: rotate(-45deg) translate(4px, -4px);
+}
+
+/* === Мобильное меню === */
+.mobileMenu {
+    background: var(--navbar-bg);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 0;
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mobileNavList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobileNavLink {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 2rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.mobileNavLink:hover {
+    color: var(--text-primary);
+    background: rgba(139, 148, 158, 0.1);
+}
+
+.mobileNavLink.active {
+    color: var(--text-primary);
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+}
+
+.mobileNavLink.adminLink {
+    color: var(--accent);
+}
+
+.mobileIcon {
+    font-size: 1rem;
+}
+
+.mobileDivider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.5rem 2rem;
+}
+
+.mobileLogoutButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.85rem 2rem;
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease;
+}
+
+.mobileLogoutButton:hover {
+    background: rgba(207, 34, 46, 0.1);
+}
+
+/* === Адаптивность === */
+@media (max-width: 900px) {
+    .desktopMenu {
+        display: none;
+    }
+
+    .mobileToggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .rightSection {
+        gap: 0.5rem;
+    }
+
+    .roleBadge {
+        display: none; /* Скрываем на мобильных для экономии места */
+    }
+
+    .container {
+        padding: 0.75rem 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .brandText {
+        display: none; /* Показываем только иконку на очень маленьких экранах */
+    }
+
+    .brand {
+        gap: 0;
+    }
+}
