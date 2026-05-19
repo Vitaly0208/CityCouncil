@@ -41,6 +41,7 @@ public class InitiativeRepository : IInitiativeRepository
     public async Task<List<Initiative>> GetByStatusAsync(InitiativeStatus status, CancellationToken ct = default) =>
         await _dbContext.Initiatives
             .AsNoTracking()
+            .Include(i => i.User)
             .Where(i => i.Status == status)
             .OrderByDescending(i => i.ApprovedAt ?? i.CreatedAt)
             .ToListAsync(ct);

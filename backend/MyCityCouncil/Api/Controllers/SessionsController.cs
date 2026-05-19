@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using MyCityCouncil.Application.Features.Sessions;
 using MyCityCouncil.Application.Features.Sessions.Create;
+using MyCityCouncil.Application.Features.Sessions.GetAll;
 
 namespace MyCityCouncil.Api.Controllers;
 
@@ -32,6 +33,20 @@ public class SessionsController : ControllerBase
     {
         var result = await _mediator.Send(command, ct);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<SessionListDto>))]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] Guid? committeeId,
+        [FromQuery] bool? isCompleted,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
+    {
+        var query = new GetAllSessionsQuery(committeeId, isCompleted, page, pageSize);
+        var sessions = await _mediator.Send(query, ct);
+        return Ok(sessions);
     }
     
     [HttpGet("{id}")]

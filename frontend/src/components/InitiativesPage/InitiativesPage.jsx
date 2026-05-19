@@ -4,13 +4,14 @@ import { tokenService } from '../../../api/tokenService';
 import { useInitiatives, useCreateInitiative} from "../../hooks/useInitiatives.js";
 import styles from './InitiativesPage.module.css';
 import {useState} from "react";
+import Navbar from "../Layout/NaVbar/NavBar.jsx";
 
 const InitiativesPage = () => {
     const navigate = useNavigate();
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ title: '', description: '' });
 
-    const { initiatives, isLoading } = useInitiatives({ status: 'Accepted' });
+    const { initiatives, isLoading , isError, error} = useInitiatives({ status: 'Accepted' });
     const createMutation = useCreateInitiative();
 
     const handleLogout = () => {
@@ -41,18 +42,20 @@ const InitiativesPage = () => {
         return <span className={`${styles.badge} ${s.class}`}>{s.text}</span>;
     };
 
-    if (isError) return <div className={styles.error}>Не удалось загрузить инициативы</div>;
+    if (isError) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.error}>
+                    Не удалось загрузить инициативы: {error?.message || 'Проверьте соединение с API'}
+                </div>
+            </div>
+        );
+    }
 
     return (
+        <>
+            <Navbar onLogout={handleLogout} />
         <div className={styles.container}>
-            <header className={styles.header}>
-                <div className={styles.headerLeft}>
-                    <Link to="/dashboard" className={styles.backBtn}>← Назад</Link>
-                    <h1 className={styles.headerTitle}>Инициативы граждан</h1>
-                </div>
-                <button className={styles.logoutBtn} onClick={handleLogout}>Выйти</button>
-            </header>
-
             <main className={styles.main}>
                 <div className={styles.topBar}>
                     <h2>Активные и принятые инициативы</h2>
@@ -112,6 +115,7 @@ const InitiativesPage = () => {
                 )}
             </main>
         </div>
+            </>
     );
 };
 

@@ -1,16 +1,18 @@
+// src/pages/Sessions/SessionDetailPage.jsx
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSessionDetails, useCastVote, useFinalizeSession } from '../../../hooks/useSessions';
-import {getUserId, getUserRole} from '../../../utils/jwt';
-import { tokenService} from "../../../../api/tokenService.js";
+import { getUserId, getUserRole } from '../../../utils/jwt';
+import { tokenService } from "../../../../api/tokenService.js";
 import Navbar from "../../Layout/NaVbar/NavBar.jsx";
 import styles from './SessionDetailPage.module.css';
 
 const SessionDetailPage = () => {
     const { id } = useParams();
+
     const navigate = useNavigate();
     const [selectedInitiative, setSelectedInitiative] = useState(null);
-    const [voteStatus, setVoteStatus] = useState(null); // 'success' | 'error' | null
+    const [voteStatus, setVoteStatus] = useState(null);
 
     const { data: session, isLoading, isError } = useSessionDetails(id);
     const castVote = useCastVote();
@@ -53,13 +55,16 @@ const SessionDetailPage = () => {
 
     const formatDate = (d) => new Date(d).toLocaleString('ru-RU');
     const currentUserId = getUserId();
-    const hasVoted = (init) => init.votes?.some(v => v.voterId === currentUserId);
+
+    const hasVoted = (init) => {
+        const votes = Array.isArray(init?.votes) ? init.votes : [];
+        return votes.some(v => v.voterId === currentUserId);
+    };
 
     return (
         <>
             <Navbar onLogout={handleLogout} />
             <div className={styles.container}>
-                {/* Шапка заседания */}
                 <header className={styles.sessionHeader}>
                     <Link to="/sessions" className={styles.backBtn}>← Назад к списку</Link>
                     <div className={styles.headerContent}>
@@ -71,7 +76,7 @@ const SessionDetailPage = () => {
                                     onClick={handleFinalize}
                                     disabled={finalizeSession.isPending}
                                 >
-                                    {finalizeSession.isPending ? 'Завершение...' : '🔒 Завершить заседание'}
+                                    {finalizeSession.isPending ? 'Завершение...' : 'Завершить заседание'}
                                 </button>
                             )}
                         </div>
@@ -80,8 +85,8 @@ const SessionDetailPage = () => {
                             <span> {session.location || 'Не указано'}</span>
                             <span>🏛️ {session.committeeName}</span>
                             <span className={`${styles.statusBadge} ${session.isCompleted ? styles.statusClosed : styles.statusOpen}`}>
-                {session.isCompleted ? 'Завершено' : 'Активно'}
-              </span>
+                                {session.isCompleted ? 'Завершено' : 'Активно'}
+                            </span>
                         </div>
                     </div>
                 </header>
@@ -92,12 +97,16 @@ const SessionDetailPage = () => {
                         <section className={styles.panel}>
                             <h3 className={styles.panelTitle}>Присутствующие</h3>
                             <ul className={styles.attendeesList}>
-                                {session.attendees?.map(a => (
-                                    <li key={a.id} className={styles.attendeeItem}>
-                                        <span className={styles.attendeeName}>{a.name}</span>
-                                        <span className={styles.attendeeRole}>{a.role}</span>
-                                    </li>
-                                )) || <li className={styles.emptyText}>Список отсутствует</li>}
+                                {session.attendees?.length > 0 ? (
+                                    session.attendees.map(a => (
+                                        <li key={a.id} className={styles.attendeeItem}>
+                                            <span className={styles.attendeeName}>{a.name}</span>
+                                            <span className={styles.attendeeRole}>{a.role}</span>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className={styles.emptyText}>Список отсутствует</li>
+                                )}
                             </ul>
                         </section>
 
@@ -112,7 +121,7 @@ const SessionDetailPage = () => {
                                         disabled={session.isCompleted}
                                     >
                                         <span className={styles.initiativeTitle}>{init.title}</span>
-                                        {hasVoted(init) && <span className={styles.votedBadge}>✓ Голос принят</span>}
+                                        {hasVoted(init) && <span className={styles.votedBadge}>Голос принят</span>}
                                     </button>
                                 ))}
                             </div>
@@ -131,8 +140,8 @@ const SessionDetailPage = () => {
                                         <span>👤 {selectedInitiative.authorName}</span>
                                         <span>📅 {formatDate(selectedInitiative.createdAt)}</span>
                                         <span className={styles.statusBadge}>
-                      {selectedInitiative.status === 'InFirstHearing' ? 'Первое слушание' : selectedInitiative.status}
-                    </span>
+                                            {selectedInitiative.status === 'InFirstHearing' ? 'Первое слушание' : selectedInitiative.status}
+                                        </span>
                                     </div>
                                     <p className={styles.detailDescription}>{selectedInitiative.description}</p>
                                 </div>
@@ -166,22 +175,34 @@ const SessionDetailPage = () => {
                                     </div>
                                 )}
 
-                                {/* Результаты (видны всем) */}
+                                {/* ✅ Результаты — с безопасной фильтрацией */}
                                 <div className={styles.resultsPanel}>
                                     <h3 className={styles.resultsTitle}>Текущие результаты</h3>
                                     <div className={styles.resultsGrid}>
-                                        <div className={styles.resultItem}>
-                                            <span className={styles.resultCount}>{selectedInitiative.votes?.filter(v => v.type === 'For').length || 0}</span>
-                                            <span className={styles.resultLabel}>За</span>
-                                        </div>
-                                        <div className={styles.resultItem}>
-                                            <span className={styles.resultCount}>{selectedInitiative.votes?.filter(v => v.type === 'Against').length || 0}</span>
-                                            <span className={styles.resultLabel}>Против</span>
-                                        </div>
-                                        <div className={styles.resultItem}>
-                                            <span className={styles.resultCount}>{selectedInitiative.votes?.length || 0}</span>
-                                            <span className={styles.resultLabel}>Всего</span>
-                                        </div>
+                                        {(() => {
+                                            // 👇 Вычисляем ТОЛЬКО когда selectedInitiative есть
+                                            const votes = Array.isArray(selectedInitiative.votes) ? selectedInitiative.votes : [];
+                                            const forCount = votes.filter(v => v.type === 'For').length;
+                                            const againstCount = votes.filter(v => v.type === 'Against').length;
+                                            const total = votes.length;
+
+                                            return (
+                                                <>
+                                                    <div className={styles.resultItem}>
+                                                        <span className={styles.resultCount}>{forCount}</span>
+                                                        <span className={styles.resultLabel}>За</span>
+                                                    </div>
+                                                    <div className={styles.resultItem}>
+                                                        <span className={styles.resultCount}>{againstCount}</span>
+                                                        <span className={styles.resultLabel}>Против</span>
+                                                    </div>
+                                                    <div className={styles.resultItem}>
+                                                        <span className={styles.resultCount}>{total}</span>
+                                                        <span className={styles.resultLabel}>Всего</span>
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
                             </>

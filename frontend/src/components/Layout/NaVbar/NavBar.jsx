@@ -7,8 +7,6 @@ const Navbar = ({ onLogout }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
 
-    // ✅ ИСПРАВЛЕНИЕ: вычисляем роль напрямую (без useEffect)
-    // getUserRole() — быстрая синхронная функция, можно вызывать при рендере
     const userRole = useMemo(() => getUserRole(), [location.pathname]);
 
     const handleLinkClick = () => {
@@ -24,10 +22,11 @@ const Navbar = ({ onLogout }) => {
         { to: '/dashboard', label: 'Главная' },
         { to: '/initiatives', label: 'Инициативы' },
         { to: '/committees', label: 'Комиссии' },
+        { to: '/sessions', label: 'Заседания' },
     ];
 
     const adminLinks = [
-        { to: '/admin', label: 'Админ-панель', icon: '🛡️' },
+        { to: '/admin', label: 'Админ-панель' },
     ];
 
     const isActive = (path) => location.pathname === path;
@@ -70,8 +69,8 @@ const Navbar = ({ onLogout }) => {
                 <div className={styles.rightSection}>
                     {userRole && (
                         <span className={styles.roleBadge}>
-              {userRole === 'Admin' ? 'Админ' : userRole === 'Deputy' ? 'Депутат' : 'Пользователь'}
-            </span>
+                        {userRole === 'Admin' ? 'Админ' : userRole === 'Deputy' ? 'Депутат' : 'Пользователь'}
+                        </span>
                     )}
 
                     <button
@@ -81,63 +80,20 @@ const Navbar = ({ onLogout }) => {
                     >
                         Выйти
                     </button>
-
+                    <Link to="/profile" className={styles.brand} onClick={handleLinkClick}>
+                        <span className={styles.logoutButton}>Профиль</span>
+                    </Link>
                     <button
                         className={styles.mobileToggle}
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
                         aria-expanded={isMobileMenuOpen}
                     >
-            <span className={`${styles.hamburger} ${isMobileMenuOpen ? styles.open : ''}`}>
-              <span className={styles.hamburgerLine}></span>
-              <span className={styles.hamburgerLine}></span>
-              <span className={styles.hamburgerLine}></span>
-            </span>
                     </button>
                 </div>
+
             </div>
 
-            {isMobileMenuOpen && (
-                <div className={styles.mobileMenu}>
-                    <ul className={styles.mobileNavList}>
-                        {commonLinks.map((link) => (
-                            <li key={link.to}>
-                                <Link
-                                    to={link.to}
-                                    className={`${styles.mobileNavLink} ${isActive(link.to) ? styles.active : ''}`}
-                                    onClick={handleLinkClick}
-                                >
-                                    {link.label}
-                                </Link>
-                            </li>
-                        ))}
-
-                        {userRole === 'Admin' && adminLinks.map((link) => (
-                            <li key={link.to}>
-                                <Link
-                                    to={link.to}
-                                    className={`${styles.mobileNavLink} ${styles.adminLink} ${isActive(link.to) ? styles.active : ''}`}
-                                    onClick={handleLinkClick}
-                                >
-                                    <span className={styles.mobileIcon}>{link.icon}</span>
-                                    {link.label}
-                                </Link>
-                            </li>
-                        ))}
-
-                        <li className={styles.mobileDivider}></li>
-
-                        <li>
-                            <button
-                                className={styles.mobileLogoutButton}
-                                onClick={handleLogout}
-                            >
-                                🔓 Выйти из аккаунта
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            )}
         </nav>
     );
 };

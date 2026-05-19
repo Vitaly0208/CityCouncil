@@ -1,6 +1,7 @@
-
+// src/pages/Dashboard/DashboardPage.jsx
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { tokenService } from "../../../api/tokenService.js";
+import { useInitiatives } from "../../hooks/useInitiatives.js";
 import styles from './DashboardPage.module.css';
 
 const NEWS = [
@@ -19,21 +20,25 @@ const SESSIONS = [
 const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => i + 1);
 const EVENT_DAYS = [8, 15, 20, 28, 30];
 
-const INITIATIVES = [
-    { id: 1, status: 'approved', title: 'О внесении изменений в программу благоустройства парков', author: 'Петрова А. В.', date: '27.04.2026' },
-    { id: 2, status: 'approved', title: 'О создании единой цифровой платформы для обращений граждан', author: 'Сидоров К. П.', date: '24.04.2026' },
-    { id: 3, status: 'review', title: 'О расширении сети велодорожек в центральной части', author: 'Козлова М. И.', date: '20.04.2026' },
-    { id: 4, status: 'approved', title: 'О повышении доступности образовательных услуг для детей с ОВЗ', author: 'Николаев Д. А.', date: '18.04.2026' },
-    { id: 5, status: 'draft', title: 'О модернизации системы общественного транспорта', author: 'Иванов И. И.', date: '15.04.2026' },
-    { id: 6, status: 'approved', title: 'О введении льготного проезда для пенсионеров', author: 'Белова Е. С.', date: '12.04.2026' },
-];
-
 const DashboardPage = () => {
     const navigate = useNavigate();
+
+    // ✅ 1. Правильно деструктурируем хук + фильтруем только принятые на бэке
+    const { initiatives, isLoading , isError, error} = useInitiatives({ status: 'Accepted' });
 
     const handleLogout = () => {
         tokenService.clearTokens();
         navigate('/login');
+    };
+
+    // ✅ 2. Форматирование даты из ISO-строки
+    const formatDate = (isoString) => {
+        if (!isoString) return '';
+        return new Date(isoString).toLocaleDateString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
     };
 
     return (
@@ -52,8 +57,6 @@ const DashboardPage = () => {
                     <input type="text" placeholder="Поиск инициатив, депутатов..." />
                 </div>
 
-
-
                 <div className={styles.headerRight}>
                     <span className={styles.userName}>Иванов И. И.</span>
                     <span className={styles.userRole}>Комиссия по образованию</span>
@@ -64,50 +67,21 @@ const DashboardPage = () => {
 
             {/* Основная сетка */}
             <main className={styles.gridLayout}>
-                {/*  НАВИГАЦИОННАЯ ПАНЕЛЬ (перенесена в main) */}
+                {/* НАВИГАЦИОННАЯ ПАНЕЛЬ */}
                 <nav className={`${styles.card} ${styles.subNavCard}`}>
-                    <NavLink
-                        to="/news"
-                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                    >
-                        Новости
-                    </NavLink>
-                    <NavLink
-                        to="/committees"
-                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                    >
-                        Комиссии
-                    </NavLink>
-                    <NavLink
-                        to="/initiatives"
-                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                    >
-                        Инициативы
-                    </NavLink>
-                    <NavLink
-                        to="/parties"
-                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                    >
-                        Партии
-                    </NavLink>
-                    <NavLink
-                        to="/deputies"
-                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                    >
-                        Депутаты
-                    </NavLink>
-                    <NavLink
-                        to="/elections"
-                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                    >
-                        Выборы
-                    </NavLink>
+                    <NavLink to="/news" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Новости</NavLink>
+                    <NavLink to="/committees" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Комиссии</NavLink>
+                    <NavLink to="/sessions" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Заседания</NavLink>
+                    <NavLink to="/initiatives" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Инициативы</NavLink>
+                    <NavLink to="/parties" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Партии</NavLink>
+                    <NavLink to="/deputies" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Депутаты</NavLink>
+                    <NavLink to="/elections" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Выборы</NavLink>
                 </nav>
 
-                {/* Полноширинная карточка приветствия */}
+                {/* Приветствие */}
                 <section className={`${styles.card} ${styles.welcomeCard}`}>
                     <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}> Добро пожаловать</h2>
+                        <h2 className={styles.cardTitle}>Добро пожаловать</h2>
                     </div>
                     <div className={styles.welcomeContent}>
                         <p className={styles.welcomeText}>
@@ -118,10 +92,10 @@ const DashboardPage = () => {
                     </div>
                 </section>
 
-                {/* Колонка 1: Новости */}
+                {/* Новости */}
                 <section className={styles.card}>
                     <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}> Новости</h2>
+                        <h2 className={styles.cardTitle}>Новости</h2>
                         <a href="#" className={styles.cardLink}>Все новости →</a>
                     </div>
                     <div className={styles.list}>
@@ -136,10 +110,10 @@ const DashboardPage = () => {
                     </div>
                 </section>
 
-                {/* Колонка 2: Заседания */}
+                {/* Заседания */}
                 <section className={styles.card}>
                     <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}> Ближайшие заседания</h2>
+                        <h2 className={styles.cardTitle}>Ближайшие заседания</h2>
                         <a href="#" className={styles.cardLink}>Расписание →</a>
                     </div>
                     <div className={styles.list}>
@@ -159,7 +133,7 @@ const DashboardPage = () => {
                     </div>
                 </section>
 
-                {/* Колонка 3: Календарь */}
+                {/* Календарь */}
                 <section className={`${styles.card} ${styles.calendarCard}`}>
                     <div className={styles.calendarHeader}>
                         <button className={styles.calendarNav}>‹</button>
@@ -184,23 +158,40 @@ const DashboardPage = () => {
                 </section>
             </main>
 
-            {/* Нижний блок: Инициативы */}
-            {/* Нижний блок: Инициативы */}
+            {/* ✅ 4. Нижний блок: Инициативы — ИСПРАВЛЕННЫЙ */}
             <section className={styles.initiativesSection}>
                 <header className={styles.initiativesHeader}>
                     <div>
                         <h2 className={styles.sectionTitle}>Последние принятые инициативы</h2>
-                        <p className={styles.sectionSubtitle}>
-                            Инициативы, утверждённые городской думой
-                        </p>
+                        <p className={styles.sectionSubtitle}>Инициативы, утверждённые городской думой</p>
                     </div>
-                    <Link to="/initiatives" className={styles.viewAllLink}>
-                        Все инициативы →
-                    </Link>
+                    <Link to="/initiatives" className={styles.viewAllLink}>Все инициативы →</Link>
                 </header>
 
                 <div className={styles.initiativesList}>
-                    {INITIATIVES.filter(i => i.status === 'Accepted').slice(0, 5).map((item, index) => (
+                    {/* Загрузка */}
+                    {isLoading && (
+                        <div className={styles.initiativeRow}>
+                            <span className={styles.initiativeTitle}>Загрузка инициатив...</span>
+                        </div>
+                    )}
+
+                    {/* Ошибка */}
+                    {isError && (
+                        <div className={styles.initiativeRow}>
+                            <span className={styles.initiativeTitle}>Не удалось загрузить инициативы</span>
+                        </div>
+                    )}
+
+                    {/* Пустой список */}
+                    {!isLoading && !isError && initiatives.length === 0 && (
+                        <div className={styles.initiativeRow}>
+                            <span className={styles.initiativeTitle}>Принятых инициатив пока нет</span>
+                        </div>
+                    )}
+
+                    {/* ✅ Список инициатив с правильными полями */}
+                    {!isLoading && !isError && initiatives.map((item, index) => (
                         <Link
                             key={item.id}
                             to={`/initiatives/${item.id}`}
@@ -209,15 +200,15 @@ const DashboardPage = () => {
                             <div className={styles.initiativeContent}>
                                 <h3 className={styles.initiativeTitle}>{item.title}</h3>
                                 <div className={styles.initiativeMeta}>
-            <span className={styles.metaItem}>
-              <span className={styles.metaIcon}>👤</span>
-                {item.author}
-            </span>
+                                    <span className={styles.metaItem}>
+                                        <span className={styles.metaIcon}>👤</span>
+                                        {item.authorName || 'Неизвестный автор'}  {/* ✅ Правильное поле */}
+                                    </span>
                                     <span className={styles.metaDivider}>•</span>
                                     <span className={styles.metaItem}>
-              <span className={styles.metaIcon}></span>
-                                        {item.date}
-            </span>
+                                        <span className={styles.metaIcon}>📅</span>
+                                        {formatDate(item.createdAt)}  {/* ✅ Форматируем ISO-дату */}
+                                    </span>
                                 </div>
                             </div>
                             <span className={styles.arrow}>→</span>

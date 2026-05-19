@@ -51,7 +51,6 @@ const CommitteeDetailsPage = () => {
             <div className={styles.container}>
                 {/* Шапка */}
                 <header className={styles.pageHeader}>
-                    <Link to="/committees" className={styles.backButton}>← Назад</Link>
                     <div className={styles.headerContent}>
                         <div className={styles.headerTop}>
                             <span className={styles.committeeCode}>#{committee.code || id.slice(0, 8).toUpperCase()}</span>

@@ -5,6 +5,7 @@ import { useInitiatives, useReviewInitiative } from "../../hooks/useInitiatives.
 import { useCreateSessionWithQueue } from "../../hooks/useSessions.js";
 import { useCommittees } from "../../hooks/useCommittees.js";
 import styles from './AdminPage.module.css';
+import Navbar from "../Layout/NaVbar/NavBar.jsx";
 
 // 📋 Моковые данные депутатов (заменятся на API-хук при наличии бэка)
 const MOCK_DEPUTIES = [
@@ -123,15 +124,9 @@ const AdminPage = () => {
     ];
 
     return (
+        <>
+            <Navbar onLogout={handleLogout} />
         <div className={styles.container}>
-            <header className={styles.header}>
-                <div className={styles.headerLeft}>
-                    <Link to="/dashboard" className={styles.backBtn}>← На главную</Link>
-                    <h1 className={styles.headerTitle}>Панель администратора</h1>
-                </div>
-                <button className={styles.logoutBtn} onClick={handleLogout}>Выйти</button>
-            </header>
-
             <main className={styles.main}>
                 {/* Навигация по вкладкам */}
                 <nav className={styles.tabsContainer}>
@@ -300,6 +295,7 @@ const AdminPage = () => {
                 )}
             </main>
         </div>
+            </>
     );
 };
 

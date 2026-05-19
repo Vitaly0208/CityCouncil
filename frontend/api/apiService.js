@@ -2,7 +2,6 @@ import axiosInstance from "./axiosInstance";
 import { ENDPOINTS } from "./endpoints";
 import { tokenService } from "./tokenService";
 
-// Утилита для преобразования объекта в FormData (для загрузки файлов)
 export const toFormData = (data) => {
     if (data instanceof FormData) return data;
     const formData = new FormData();
@@ -55,12 +54,14 @@ export const initiativeService = {
 };
 
 export const sessionService = {
-    getAll: (params) => axiosInstance().get('/sessions', { params }),
-    getById: (id) => axiosInstance().get(`/sessions/${id}`),
-    createWithQueue: (data) => axiosInstance().post('/sessions/create-with-queue', data),
+    getAll: (params = {}) => axiosInstance.get(ENDPOINTS.SESSIONS.BASE, { params }),
+    getById: (id) => axiosInstance.get(ENDPOINTS.SESSIONS.DETAILS(id)),
+    create: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE, data),
+    createWithQueue: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE_WITH_QUEUE, data),
 };
 
 export const votingService = {
-    castVote: (data) => axiosInstance().post('/voting/cast', data),
-    finalize: (sessionId) => axiosInstance().post(`/voting/finalize/${sessionId}`),
+    castVote: (data) => axiosInstance.post(ENDPOINTS.VOTING.CAST, data),
+    finalize: (sessionId) => axiosInstance.post(ENDPOINTS.VOTING.FINALIZE(sessionId)),
+    getResults: (sessionId) => axiosInstance.get(ENDPOINTS.VOTING.RESULTS(sessionId)),
 };

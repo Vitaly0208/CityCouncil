@@ -69,12 +69,6 @@
     position: relative;
 }
 
-.card:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-}
-
 .cardHeader {
     display: flex;
     justify-content: space-between;

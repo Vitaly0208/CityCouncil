@@ -23,6 +23,7 @@ public class SessionRepository : ISessionRepository
         await _dbContext.Sessions
             .AsNoTracking()
             .Include(s => s.Committee)
+            .Include(s => s.VotingResults)
             .ToListAsync(ct);
 
     public async Task<List<Session>> GetByCommitteeIdAsync(Guid committeeId, CancellationToken ct = default) =>
