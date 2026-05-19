@@ -99,7 +99,6 @@ const ProfilePage = () => {
                             onClick={() => navigate('/admin')}
                             className={styles.adminButton}
                         >
-                            <span className={styles.adminIcon}>Админ-панель</span>
                             Панель администратора
                         </button>
                     )}

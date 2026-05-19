@@ -52,11 +52,12 @@ const DashboardPage = () => {
                     <input type="text" placeholder="Поиск инициатив, депутатов..." />
                 </div>
 
-                <Link to="/profile" className={styles.profileLink}>Профиль</Link>
+
 
                 <div className={styles.headerRight}>
                     <span className={styles.userName}>Иванов И. И.</span>
                     <span className={styles.userRole}>Комиссия по образованию</span>
+                    <Link to="/profile" className={styles.logoutBtn}>Профиль</Link>
                     <button className={styles.logoutBtn} onClick={handleLogout}>Выйти</button>
                 </div>
             </header>
@@ -149,7 +150,6 @@ const DashboardPage = () => {
                                     <span className={styles.dateMonth}>{item.month}</span>
                                 </div>
                                 <div className={styles.sessionInfo}>
-                                    {item.isNext && <span className={styles.sessionTag}>Ближайшее</span>}
                                     <span className={`${styles.sessionTime} ${item.isNext ? styles.sessionTimeFeatured : ''}`}>{item.time}</span>
                                     <h3 className={`${styles.sessionTitle} ${item.isNext ? styles.sessionTitleFeatured : ''}`}>{item.title}</h3>
                                     <a href="#" className={styles.sessionLink}>Повестка →</a>
@@ -185,20 +185,43 @@ const DashboardPage = () => {
             </main>
 
             {/* Нижний блок: Инициативы */}
+            {/* Нижний блок: Инициативы */}
             <section className={styles.initiativesSection}>
-                <h2 className={styles.sectionTitle}>Последние принятые инициативы</h2>
-                <div className={styles.initiativesGrid}>
-                    {INITIATIVES.map((item) => (
-                        <article key={item.id} className={styles.initiativeCard}>
-              <span className={`${styles.badge} ${styles[`badge${item.status.charAt(0).toUpperCase() + item.status.slice(1)}`]}`}>
-                {item.status === 'approved' ? 'ПРИНЯТА' : item.status === 'review' ? 'НА РАССМОТРЕНИИ' : 'ЧЕРНОВИК'}
-              </span>
-                            <h3 className={styles.initiativeTitle}>{item.title}</h3>
-                            <div className={styles.initiativeMeta}>
-                                <span>👤 {item.author}</span>
-                                <span> {item.date}</span>
+                <header className={styles.initiativesHeader}>
+                    <div>
+                        <h2 className={styles.sectionTitle}>Последние принятые инициативы</h2>
+                        <p className={styles.sectionSubtitle}>
+                            Инициативы, утверждённые городской думой
+                        </p>
+                    </div>
+                    <Link to="/initiatives" className={styles.viewAllLink}>
+                        Все инициативы →
+                    </Link>
+                </header>
+
+                <div className={styles.initiativesList}>
+                    {INITIATIVES.filter(i => i.status === 'approved').map((item, index) => (
+                        <Link
+                            key={item.id}
+                            to={`/initiatives/${item.id}`}
+                            className={`${styles.initiativeRow} ${index % 2 === 0 ? styles.even : styles.odd}`}
+                        >
+                            <div className={styles.initiativeContent}>
+                                <h3 className={styles.initiativeTitle}>{item.title}</h3>
+                                <div className={styles.initiativeMeta}>
+            <span className={styles.metaItem}>
+              <span className={styles.metaIcon}>👤</span>
+                {item.author}
+            </span>
+                                    <span className={styles.metaDivider}>•</span>
+                                    <span className={styles.metaItem}>
+              <span className={styles.metaIcon}>📅</span>
+                                        {item.date}
+            </span>
+                                </div>
                             </div>
-                        </article>
+                            <span className={styles.arrow}>→</span>
+                        </Link>
                     ))}
                 </div>
             </section>
