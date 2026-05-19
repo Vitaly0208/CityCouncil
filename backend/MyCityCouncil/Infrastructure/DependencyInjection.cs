@@ -38,6 +38,8 @@ public static class DependencyInjection
         services.AddScoped<ICommitteeRepository, CommitteeRepository>();
         services.AddScoped<IInitiativeRepository, InitiativeRepository>();
         services.AddScoped<ISessionRepository, SessionRepository>();
+        services.AddScoped<IVoteRepository, VoteRepository>();
+        services.AddScoped<IVotingRepository, VotingRepository>();
     }
     
     private static void AddServices(this IServiceCollection services)

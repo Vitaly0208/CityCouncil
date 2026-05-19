@@ -8,6 +8,7 @@ public class Session
     public string Title { get; set; } = string.Empty;
     public DateTime HeldAt { get; set; }
     public string? Location { get; set; }
+    public bool IsCompleted { get; set; } = false;
     
     public Guid CommitteeId { get; set; }
     [JsonIgnore] 

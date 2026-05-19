@@ -16,9 +16,7 @@ public class SessionRepository : ISessionRepository
 
     public async Task<Session?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         await _dbContext.Sessions
-            .AsNoTracking()
             .Include(s => s.Committee)
-            .Include(s => s.VotingResults)
             .FirstOrDefaultAsync(s => s.Id == id, ct);
 
     public async Task<List<Session>> GetAllAsync(CancellationToken ct = default) =>

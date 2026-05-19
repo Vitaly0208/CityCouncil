@@ -12,6 +12,7 @@ using MyCityCouncil.Application.Features.Initiatives.Review;
 
 namespace MyCityCouncil.Api.Controllers;
 
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]

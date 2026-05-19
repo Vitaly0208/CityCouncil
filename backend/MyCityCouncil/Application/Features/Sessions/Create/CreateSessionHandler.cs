@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using MyCityCouncil.Application.Interfaces;
 using MyCityCouncil.Domain.Enums;
 using MyCityCouncil.Domain.Interfaces;
 using MyCityCouncil.Domain.Models;
@@ -11,15 +12,18 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
     private readonly ISessionRepository _sessionRepository;
     private readonly IInitiativeRepository _initiativeRepository;
     private readonly IVotingRepository _votingRepository;
+    private readonly IUnitOfWork _uow;
 
     public CreateSessionHandler(
         ISessionRepository sessionRepository,
         IInitiativeRepository initiativeRepository,
-        IVotingRepository votingRepository)
+        IVotingRepository votingRepository,
+        IUnitOfWork uow)
     {
         _sessionRepository = sessionRepository;
         _initiativeRepository = initiativeRepository;
         _votingRepository = votingRepository;
+        _uow = uow;
     }
 
     public async Task<SessionDto> Handle(CreateSessionWithQueueCommand request, CancellationToken ct)
@@ -48,15 +52,18 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
                 var votingInfo = new VotingInfo
                 {
                     SessionId = session.Id,
-                    InitiativeId = initiative.Id
+                    InitiativeId = initiative.Id,
+                    SessionTitle = session.Title,
+                    InitiativeTitle = initiative.Title,
+                    Status = initiative.Status,
                 };
                 
                 await _votingRepository.AddAsync(votingInfo, ct);
                 assignedIds.Add(initiative.Id);
             }
         }
-        
-        await _sessionRepository.SaveChangesAsync(ct);
+
+        await _uow.SaveAsync(ct);
 
         return new SessionDto(
             Id: session.Id,

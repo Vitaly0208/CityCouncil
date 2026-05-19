@@ -266,6 +266,9 @@ namespace MyCityCouncil.Migrations
                     b.Property<DateTime>("HeldAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Location")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
@@ -348,6 +351,34 @@ namespace MyCityCouncil.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("MyCityCouncil.Domain.Models.Vote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("VotedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("VoterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VotingInfoId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VotingInfoId", "VoterId")
+                        .IsUnique();
+
+                    b.ToTable("Votes", (string)null);
+                });
+
             modelBuilder.Entity("MyCityCouncil.Domain.Models.VotingInfo", b =>
                 {
                     b.Property<Guid>("Id")
@@ -384,16 +415,6 @@ namespace MyCityCouncil.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
-
-                    b.Property<int>("VotesAgainst")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.Property<int>("VotesFor")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
 
                     b.HasKey("Id");
 
@@ -491,6 +512,17 @@ namespace MyCityCouncil.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("MyCityCouncil.Domain.Models.Vote", b =>
+                {
+                    b.HasOne("MyCityCouncil.Domain.Models.VotingInfo", "VotingInfo")
+                        .WithMany("Votes")
+                        .HasForeignKey("VotingInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VotingInfo");
+                });
+
             modelBuilder.Entity("MyCityCouncil.Domain.Models.VotingInfo", b =>
                 {
                     b.HasOne("MyCityCouncil.Domain.Models.Initiative", "Initiative")
@@ -542,6 +574,11 @@ namespace MyCityCouncil.Migrations
                     b.Navigation("PartyMemberships");
 
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("MyCityCouncil.Domain.Models.VotingInfo", b =>
+                {
+                    b.Navigation("Votes");
                 });
 #pragma warning restore 612, 618
         }

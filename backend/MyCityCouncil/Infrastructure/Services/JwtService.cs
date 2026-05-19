@@ -43,7 +43,7 @@ public class JwtService : IJwtService
         Claim[] claims =
         [
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.NameIdentifier, role.Name)
+            new Claim(ClaimTypes.Role, role.Name)
         ];
         
         var tokenExpires = DateTime.UtcNow.AddHours(_jwtOptions.TokenExpiresHours);
@@ -99,13 +99,12 @@ public class JwtService : IJwtService
         var refresh = await _refreshTokenRepository.GetByTokenAsync(token, ct);
         if (refresh is null || refresh.ExpiresAt < DateTime.UtcNow || refresh.RevokedAt.HasValue)
             return null;
-
-        refresh.RevokedAt = DateTime.UtcNow;
-        await _unitOfWork.SaveAsync(ct);
-
         var user = await _userRepository.GetByIdAsync(refresh.UserId, ct);
         if (user is null) return null;
-
+        
+        refresh.RevokedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveAsync(ct);
+        
         return await GenerateToken(user, ct);
     }
 }

@@ -25,8 +25,6 @@ public class VotingInfoConfiguration : IEntityTypeConfiguration<VotingInfo>
                .HasMaxLength(50);
 
         // 3. Счётчики и даты
-        builder.Property(v => v.VotesFor).HasDefaultValue(0);
-        builder.Property(v => v.VotesAgainst).HasDefaultValue(0);
         builder.Property(v => v.VotedAt).HasDefaultValueSql("NOW()");
         builder.Property(v => v.IsFinalized).HasDefaultValue(false);
 

@@ -20,4 +20,23 @@ public class VotingRepository : IVotingRepository
     {
         await _dbContext.SaveChangesAsync(ct);
     }
+    public void Update(VotingInfo votingInfo) 
+        => _dbContext.VotingInfos.Update(votingInfo);
+    
+    public async Task<VotingInfo?> GetBySessionAndInitiativeAsync(Guid sessionId, Guid initiativeId, CancellationToken ct = default)
+        => await _dbContext.VotingInfos
+            .FirstOrDefaultAsync(vi => vi.SessionId == sessionId && vi.InitiativeId == initiativeId, ct);
+    
+    public async Task<List<VotingInfo>> GetBySessionIdAsync(Guid sessionId, CancellationToken ct = default)
+        => await _dbContext.VotingInfos
+            .Where(vi => vi.SessionId == sessionId)
+            .ToListAsync(ct);
+    
+    public async Task<List<VotingInfo>> GetBySessionIdWithInitiativesAsync(Guid sessionId, CancellationToken ct = default)
+    {
+        return await _dbContext.VotingInfos
+            .Include(vi => vi.Initiative)  // 👈 Ключевое: подгружаем инициативу сразу
+            .Where(vi => vi.SessionId == sessionId)
+            .ToListAsync(ct);
+    }
 }
