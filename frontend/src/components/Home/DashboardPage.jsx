@@ -200,7 +200,7 @@ const DashboardPage = () => {
                 </header>
 
                 <div className={styles.initiativesList}>
-                    {INITIATIVES.filter(i => i.status === 'approved').map((item, index) => (
+                    {INITIATIVES.filter(i => i.status === 'Accepted').slice(0, 5).map((item, index) => (
                         <Link
                             key={item.id}
                             to={`/initiatives/${item.id}`}
@@ -215,7 +215,7 @@ const DashboardPage = () => {
             </span>
                                     <span className={styles.metaDivider}>•</span>
                                     <span className={styles.metaItem}>
-              <span className={styles.metaIcon}>📅</span>
+              <span className={styles.metaIcon}></span>
                                         {item.date}
             </span>
                                 </div>

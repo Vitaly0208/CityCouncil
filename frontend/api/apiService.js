@@ -55,5 +55,12 @@ export const initiativeService = {
 };
 
 export const sessionService = {
-    createWithQueue: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE_WITH_QUEUE, data),
+    getAll: (params) => axiosInstance().get('/sessions', { params }),
+    getById: (id) => axiosInstance().get(`/sessions/${id}`),
+    createWithQueue: (data) => axiosInstance().post('/sessions/create-with-queue', data),
+};
+
+export const votingService = {
+    castVote: (data) => axiosInstance().post('/voting/cast', data),
+    finalize: (sessionId) => axiosInstance().post(`/voting/finalize/${sessionId}`),
 };

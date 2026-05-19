@@ -10,7 +10,7 @@ const InitiativesPage = () => {
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ title: '', description: '' });
 
-    const { initiatives, isLoading, isError } = useInitiatives({ status: 'Accepted,InQueue,InFirstHearing' });
+    const { initiatives, isLoading } = useInitiatives({ status: 'Accepted' });
     const createMutation = useCreateInitiative();
 
     const handleLogout = () => {
