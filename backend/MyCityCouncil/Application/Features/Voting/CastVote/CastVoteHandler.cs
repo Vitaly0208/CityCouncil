@@ -13,9 +13,16 @@ public class CastVoteHandler : IRequestHandler<CastVoteCommand, Unit>
     private readonly IVoteRepository _voteRepo;
     private readonly IUnitOfWork _uow;
 
-    public CastVoteHandler(ISessionRepository sessionRepo, IVotingRepository votingRepo, IVoteRepository voteRepo, IUnitOfWork uow)
+    public CastVoteHandler(
+        ISessionRepository sessionRepo, 
+        IVotingRepository votingRepo, 
+        IVoteRepository voteRepo, 
+        IUnitOfWork uow)
     {
-        _sessionRepo = sessionRepo; _votingRepo = votingRepo; _voteRepo = voteRepo; _uow = uow;
+        _sessionRepo = sessionRepo; 
+        _votingRepo = votingRepo; 
+        _voteRepo = voteRepo; 
+        _uow = uow;
     }
 
     public async Task<Unit> Handle(CastVoteCommand request, CancellationToken ct)

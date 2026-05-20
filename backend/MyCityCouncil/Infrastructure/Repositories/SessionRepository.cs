@@ -17,6 +17,10 @@ public class SessionRepository : ISessionRepository
     public async Task<Session?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         await _dbContext.Sessions
             .Include(s => s.Committee)
+            .Include(s => s.VotingResults)
+                .ThenInclude(vr => vr.Initiative)
+            .Include(s => s.VotingResults)
+                .ThenInclude(vr => vr.Votes) 
             .FirstOrDefaultAsync(s => s.Id == id, ct);
 
     public async Task<List<Session>> GetAllAsync(CancellationToken ct = default) =>

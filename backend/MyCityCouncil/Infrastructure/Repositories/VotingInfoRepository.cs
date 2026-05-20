@@ -25,6 +25,8 @@ public class VotingRepository : IVotingRepository
     
     public async Task<VotingInfo?> GetBySessionAndInitiativeAsync(Guid sessionId, Guid initiativeId, CancellationToken ct = default)
         => await _dbContext.VotingInfos
+            .Include(vi => vi.Initiative)
+            .Include(vi => vi.Votes) 
             .FirstOrDefaultAsync(vi => vi.SessionId == sessionId && vi.InitiativeId == initiativeId, ct);
     
     public async Task<List<VotingInfo>> GetBySessionIdAsync(Guid sessionId, CancellationToken ct = default)
@@ -35,7 +37,7 @@ public class VotingRepository : IVotingRepository
     public async Task<List<VotingInfo>> GetBySessionIdWithInitiativesAsync(Guid sessionId, CancellationToken ct = default)
     {
         return await _dbContext.VotingInfos
-            .Include(vi => vi.Initiative)  // 👈 Ключевое: подгружаем инициативу сразу
+            .Include(vi => vi.Initiative)
             .Where(vi => vi.SessionId == sessionId)
             .ToListAsync(ct);
     }

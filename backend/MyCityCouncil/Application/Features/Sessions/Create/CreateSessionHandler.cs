@@ -71,6 +71,8 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
             HeldAt: session.HeldAt,
             Location: session.Location,
             CommitteeId: session.CommitteeId,
+            CommitteeName: session.Committee.Name,
+            IsCompleted: session.IsCompleted,
             InitiativeIds: assignedIds
         );
     }

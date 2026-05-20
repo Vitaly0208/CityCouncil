@@ -158,9 +158,12 @@ const DashboardPage = () => {
                 </section>
             </main>
 
-            {/* ✅ 4. Нижний блок: Инициативы — ИСПРАВЛЕННЫЙ */}
             <section className={styles.initiativesSection}>
                 <header className={styles.initiativesHeader}>
+                    {/*<img*/}
+                    {/*    src="/initiative.png"*/}
+                    {/*    alt="Логотип инициативы"*/}
+                    {/*/>*/}
                     <div>
                         <h2 className={styles.sectionTitle}>Последние принятые инициативы</h2>
                         <p className={styles.sectionSubtitle}>Инициативы, утверждённые городской думой</p>

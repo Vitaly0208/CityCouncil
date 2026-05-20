@@ -4,6 +4,8 @@ public record SessionDto(
     string Title,
     DateTime HeldAt,
     string? Location,
+    string CommitteeName,
     Guid CommitteeId,
+    bool IsCompleted,
     List<Guid> InitiativeIds
 );

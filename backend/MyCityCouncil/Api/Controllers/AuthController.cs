@@ -12,6 +12,7 @@ namespace MyCityCouncil.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
+
 {
     private readonly IMediator _mediator;
     
@@ -27,6 +28,7 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<LoginDto>> Login([FromBody] LoginCommand command, CancellationToken token)

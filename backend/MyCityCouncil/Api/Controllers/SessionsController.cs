@@ -4,16 +4,17 @@ using MediatR;
 using MyCityCouncil.Application.Features.Sessions;
 using MyCityCouncil.Application.Features.Sessions.Create;
 using MyCityCouncil.Application.Features.Sessions.GetAll;
+using MyCityCouncil.Application.Features.Sessions.GetById;
 
 namespace MyCityCouncil.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class SessionsController : ControllerBase
 {
     private readonly IMediator _mediator;
     public SessionsController(IMediator mediator) => _mediator = mediator;
+    
     
     [HttpPost("create")]
     [Authorize(Roles = "Admin,Chairman")]
@@ -50,5 +51,14 @@ public class SessionsController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    public ActionResult GetById(Guid id) => Ok(); 
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SessionDetailDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+    {
+        var query = new GetSessionDetailsQuery(id);
+        var session = await _mediator.Send(query, ct);
+    
+        return session is null ? NotFound() : Ok(session);
+    }
+    
 }
