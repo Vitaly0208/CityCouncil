@@ -33,6 +33,8 @@ export const ENDPOINTS = {
         DETAILS: (id) => `/api/sessions/${id}`,
         CREATE: '/api/sessions/create',
         CREATE_WITH_QUEUE: '/api/sessions/create-with-queue',
+        JOIN: (id) => `/api/sessions/${id}/join`,
+        ATTENDEES: (id) => `/api/sessions/${id}/attendees`,
     },
 
     VOTING: {

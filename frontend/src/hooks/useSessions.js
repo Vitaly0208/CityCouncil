@@ -2,6 +2,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { sessionService, votingService } from "../../api/apiService.js";
 import { queryKeys } from '../query/keys';
+import {tokenService} from "../../api/tokenService.js";
+import {API_URL} from "../../api/endpoints.js";
 
 /**
  * @typedef {Object} Vote
@@ -79,5 +81,25 @@ export const useFinalizeSession = () => {
         onSuccess: (_, sessionId) => {
             qc.invalidateQueries({ queryKey: queryKeys.sessions.details(sessionId) });
         },
+    });
+};
+
+export const useJoinSession = () => {
+    const qc = useQueryClient();
+
+    return useMutation({
+        mutationFn: (sessionId) => sessionService.join(sessionId),
+        onSuccess: (_, sessionId) => {
+            qc.invalidateQueries({ queryKey: queryKeys.sessions.details(sessionId) });
+        }
+    });
+};
+
+export const useSessionAttendees = (sessionId) => {
+    return useQuery({
+        queryKey: ['sessions', sessionId, 'attendees'],
+        queryFn: () => sessionService.getAttendees(sessionId).then(res => res.data),
+        enabled: !!sessionId,
+        staleTime: 30 * 1000
     });
 };

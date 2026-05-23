@@ -4,6 +4,7 @@ import { tokenService } from '../../../api/tokenService';
 import { useUserProfile} from "../../hooks/useUserProfile.js";
 import { getUserRole } from '../../utils/jwt';
 import styles from './ProfilePage.module.css';
+import Navbar from "../Layout/NaVbar/NavBar.jsx";
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -78,33 +79,7 @@ const ProfilePage = () => {
     return (
         <div className={styles.container}>
             {/* Шапка */}
-            <header className={styles.header}>
-                <div className={styles.headerLeft}>
-                    <div className={styles.logo}>★</div>
-                    <div>
-                        <h1 className={styles.headerTitle}>Городская Дума</h1>
-                        <span className={styles.headerSubtitle}>Система обеспечения законодательной деятельности</span>
-                    </div>
-                </div>
-
-                <div className={styles.searchBar}>
-                    <span>🔍</span>
-                    <input type="text" placeholder="Поиск инициатив, депутатов..." />
-                </div>
-
-                <div className={styles.headerRight}>
-                    <span className={styles.userRole}>{profile.roleName}</span>
-                    {isAdmin && (
-                        <button
-                            onClick={() => navigate('/admin')}
-                            className={styles.adminButton}
-                        >
-                            Панель администратора
-                        </button>
-                    )}
-                    <button className={styles.logoutBtn} onClick={handleLogout}>Выйти</button>
-                </div>
-            </header>
+            <Navbar onLogout={handleLogout} />
 
             {/* Заголовок профиля */}
             <div className={styles.pageHeader}>

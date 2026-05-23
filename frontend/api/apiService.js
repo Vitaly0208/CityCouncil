@@ -58,6 +58,10 @@ export const sessionService = {
     getById: (id) => axiosInstance.get(ENDPOINTS.SESSIONS.DETAILS(id)),
     create: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE, data),
     createWithQueue: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE_WITH_QUEUE, data),
+    join: (sessionId) =>
+        axiosInstance.post(ENDPOINTS.SESSIONS.JOIN(sessionId)),
+    getAttendees: (sessionId) =>
+        axiosInstance.get(ENDPOINTS.SESSIONS.ATTENDEES(sessionId)),
 };
 
 export const votingService = {

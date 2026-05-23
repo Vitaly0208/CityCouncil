@@ -3,16 +3,10 @@
     --text-primary: #c9d1d9; --text-secondary: #8b949e;
     --accent: #cf222e; --accent-hover: #a41926; --success: #238636; --warning: #9e6a03;
 }
-.container { min-height: 100vh; background: var(--bg); color: var(--text-primary); font-family: system-ui, sans-serif; }
-.header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); }
-.headerLeft { display: flex; align-items: center; gap: 1rem; }
-.backBtn { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
-.backBtn:hover { color: var(--text-primary); }
-.headerTitle { margin: 0; font-size: 1.2rem; }
-.logoutBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; }
-.logoutBtn:hover { background: var(--border); color: var(--text-primary); }
 
-.main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.container { min-height: 100vh; background: var(--bg); color: var(--text-primary); font-family: system-ui, sans-serif; }
+
+.main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
 .topBar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .topBar h2 { margin: 0; font-size: 1.4rem; }
 .primaryBtn { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
@@ -21,20 +15,89 @@
 
 .formCard { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
 .formCard h3 { margin-top: 0; }
-.formCard input, .formCard textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); padding: 0.7rem; border-radius: 6px; margin-bottom: 1rem; font-family: inherit; }
+.formCard input, .formCard textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); padding: 0.7rem; border-radius: 6px; margin-bottom: 1rem; font-family: inherit; box-sizing: border-box; }
 .formCard input:focus, .formCard textarea:focus { outline: none; border-color: var(--accent); }
 .formActions { display: flex; gap: 1rem; justify-content: flex-end; }
 .secondaryBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem; }
-.cardHeader { display: flex; justify-content: space-between; align-items: center; }
-.date { font-size: 0.8rem; color: var(--text-secondary); }
-.cardTitle { margin: 0; font-size: 1.1rem; }
-.cardDesc { margin: 0; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; flex: 1; }
-.cardFooter { border-top: 1px solid var(--border); padding-top: 0.8rem; font-size: 0.85rem; color: var(--text-secondary); }
+/* ===== Список инициатив (вертикальный) ===== */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
 
-.badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600; text-transform: uppercase; }
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.card:hover {
+    border-color: var(--text-secondary);
+    background: #1c2128;
+}
+
+.cardContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0; /* Prevents flex overflow */
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.cardTitle {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.cardDesc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    /* Обрезаем длинные описания */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cardMeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+    min-width: 130px;
+    text-align: right;
+}
+
+.date {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.author {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600; text-transform: uppercase; white-space: nowrap; }
 .badgePending { background: rgba(158, 106, 3, 0.2); color: #d29922; }
 .badgeQueue { background: rgba(56, 139, 253, 0.2); color: #58a6ff; }
 .badgeHearing { background: rgba(188, 140, 255, 0.2); color: #bc8cff; }
@@ -43,3 +106,9 @@
 
 .loading, .empty { text-align: center; padding: 3rem; color: var(--text-secondary); }
 .error { color: var(--accent); text-align: center; padding: 2rem; }
+
+/* Адаптив для мобильных */
+@media (max-width: 640px) {
+    .card { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .cardMeta { align-items: flex-start; text-align: left; width: 100%; flex-direction: row; justify-content: space-between; }
+}
