@@ -21,6 +21,9 @@ public class SessionRepository : ISessionRepository
                 .ThenInclude(vr => vr.Initiative)
             .Include(s => s.VotingResults)
                 .ThenInclude(vr => vr.Votes) 
+            .Include(s => s.Attendees)
+                .ThenInclude(a => a.User)
+                    .ThenInclude(u => u.Role)
             .FirstOrDefaultAsync(s => s.Id == id, ct);
 
     public async Task<List<Session>> GetAllAsync(CancellationToken ct = default) =>

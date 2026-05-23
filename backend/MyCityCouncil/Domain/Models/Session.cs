@@ -17,6 +17,7 @@ public class Session
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     [JsonIgnore] public List<VotingInfo> VotingResults { get; set; } = new();
+    public List<SessionAttendee> Attendees { get; set; } = new();
 }
 
 public enum HearingRound { First, Second }

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using MyCityCouncil.Application.Features.Sessions;
 using MyCityCouncil.Application.Features.Sessions.Create;
 using MyCityCouncil.Application.Features.Sessions.GetAll;
 using MyCityCouncil.Application.Features.Sessions.GetById;
+using MyCityCouncil.Application.Features.Sessions.JoinSession;
 
 namespace MyCityCouncil.Api.Controllers;
 
@@ -59,6 +61,43 @@ public class SessionsController : ControllerBase
         var session = await _mediator.Send(query, ct);
     
         return session is null ? NotFound() : Ok(session);
+    }
+    
+    [HttpPost("{id}/join")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> JoinSession(Guid id, CancellationToken ct)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return BadRequest("Не удалось определить пользователя");
+
+        try
+        {
+            var command = new JoinSessionCommand(id, userId);
+            await _mediator.Send(command, ct);
+            
+            return Ok(new { message = "Вы успешно присоединились к заседанию" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+    
+    [HttpGet("{id}/attendees")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AttendeeDto>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAttendees(Guid id, CancellationToken ct)
+    {
+        var session = await _mediator.Send(new GetSessionDetailsQuery(id), ct);
+        
+        if (session == null)
+            return NotFound();
+        
+        return Ok(session.Attendees);
     }
     
 }

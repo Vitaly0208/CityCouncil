@@ -40,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<IVoteRepository, VoteRepository>();
         services.AddScoped<IVotingRepository, VotingRepository>();
+        services.AddScoped<ISessionAttendeeRepository, SessionAttendeeRepository>();
     }
     
     private static void AddServices(this IServiceCollection services)

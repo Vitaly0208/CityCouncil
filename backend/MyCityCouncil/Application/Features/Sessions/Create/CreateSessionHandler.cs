@@ -12,17 +12,20 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
     private readonly ISessionRepository _sessionRepository;
     private readonly IInitiativeRepository _initiativeRepository;
     private readonly IVotingRepository _votingRepository;
+    private readonly ICommitteeRepository _committeeRepository;
     private readonly IUnitOfWork _uow;
 
     public CreateSessionHandler(
         ISessionRepository sessionRepository,
         IInitiativeRepository initiativeRepository,
         IVotingRepository votingRepository,
+        ICommitteeRepository committeeRepository,
         IUnitOfWork uow)
     {
         _sessionRepository = sessionRepository;
         _initiativeRepository = initiativeRepository;
         _votingRepository = votingRepository;
+        _committeeRepository = committeeRepository;
         _uow = uow;
     }
 
@@ -39,7 +42,7 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
         };
 
         await _sessionRepository.AddAsync(session, ct);
-
+        var committee = await _committeeRepository.GetByIdAsync(request.CommitteeId, ct);
         var assignedIds = new List<Guid>();
         
         if (topInitiatives.Any())
@@ -71,7 +74,7 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
             HeldAt: session.HeldAt,
             Location: session.Location,
             CommitteeId: session.CommitteeId,
-            CommitteeName: session.Committee.Name,
+            CommitteeName: committee.Name,
             IsCompleted: session.IsCompleted,
             InitiativeIds: assignedIds
         );

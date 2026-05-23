@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<VotingInfo> VotingInfos => Set<VotingInfo>();
     public  DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Vote> Votes => Set<Vote>();
+    public DbSet<SessionAttendee> SessionAttendees => Set<SessionAttendee>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +34,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new VotingInfoConfiguration());
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         modelBuilder.ApplyConfiguration(new VoteConfiguration());
+        modelBuilder.ApplyConfiguration(new SessionAttendeeConfiguration());
         
         
         base.OnModelCreating(modelBuilder);

@@ -289,6 +289,31 @@ namespace MyCityCouncil.Migrations
                     b.ToTable("Sessions", (string)null);
                 });
 
+            modelBuilder.Entity("MyCityCouncil.Domain.Models.SessionAttendee", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("SessionId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("SessionAttendees", (string)null);
+                });
+
             modelBuilder.Entity("MyCityCouncil.Domain.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -501,6 +526,25 @@ namespace MyCityCouncil.Migrations
                     b.Navigation("Committee");
                 });
 
+            modelBuilder.Entity("MyCityCouncil.Domain.Models.SessionAttendee", b =>
+                {
+                    b.HasOne("MyCityCouncil.Domain.Models.Session", "Session")
+                        .WithMany("Attendees")
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyCityCouncil.Domain.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Session");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MyCityCouncil.Domain.Models.User", b =>
                 {
                     b.HasOne("MyCityCouncil.Domain.Models.Role", "Role")
@@ -564,6 +608,8 @@ namespace MyCityCouncil.Migrations
 
             modelBuilder.Entity("MyCityCouncil.Domain.Models.Session", b =>
                 {
+                    b.Navigation("Attendees");
+
                     b.Navigation("VotingResults");
                 });
 
