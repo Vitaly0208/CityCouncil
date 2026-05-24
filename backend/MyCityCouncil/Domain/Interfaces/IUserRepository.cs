@@ -8,4 +8,8 @@ public interface IUserRepository
     Task AddAsync(User user, CancellationToken ct = default);
     Task<User?> GetByIdAsync(Guid id,  CancellationToken ct = default);
     Task<User?> GetByEmailAsync(string email,  CancellationToken ct = default);
+    
+    Task<List<User>> GetAllAsync(CancellationToken ct = default);
+    Task<List<User>> GetByCommitteeIdAsync(Guid committeeId, CancellationToken ct = default);
+    Task<List<User>> SearchAsync(string searchTerm, CancellationToken ct = default);
 }

@@ -76,3 +76,15 @@ export const useRemoveCommitteeMember = () => {
         }
     });
 };
+
+export const useAppointChairman = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ committeeId, userId }) =>
+            committeeService.appointChairman(committeeId, userId),
+        onSuccess: (_, { committeeId }) => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.committees.detail(committeeId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.users.byCommittee(committeeId) });
+        },
+    });
+};

@@ -4,6 +4,8 @@ import { tokenService } from "../../../api/tokenService.js";
 import Navbar from '../Layout/NaVbar/NavBar.jsx';
 import styles from './CommitteesPage.module.css';
 
+const COMMITTEE_ICON = '/committee.png';
+
 const CommitteesPage = () => {
     const navigate = useNavigate();
     const { committees, isLoading, isError, error } = useCommittees();
@@ -72,45 +74,24 @@ const CommitteesPage = () => {
                             to={`/committees/${committee.id}`}
                             className={styles.card}
                         >
-                            <header className={styles.cardHeader}>
-                                <span className={styles.committeeCode}>
-                                    #{committee.code || committee.id?.slice(0, 6).toUpperCase() || '---'}
-                                </span>
-                                <span className={`${styles.badge} ${styles.badgeActive}`}>
-                                    Активна
-                                </span>
-                            </header>
+                            <div className={styles.cardImageWrapper}>
+                                <img
+                                    src={COMMITTEE_ICON}
+                                    alt=""
+                                    className={styles.cardImage}
+                                />
+                            </div>
 
                             <div className={styles.cardBody}>
                                 <h2 className={styles.cardTitle}>{committee.name || 'Без названия'}</h2>
                                 <p className={styles.specialization}>
                                     {committee.specialization || 'Специализация не указана'}
                                 </p>
-                                <p className={styles.description}>
-                                    {committee.description || 'Описание комиссии не предоставлено'}
-                                </p>
-
-                                <dl className={styles.details}>
-                                    <div className={styles.detailRow}>
-                                        <dt>Председатель</dt>
-                                        <dd>{committee.chairmanName || '—'}</dd>
-                                    </div>
-                                    <div className={styles.detailRow}>
-                                        <dt>Членов</dt>
-                                        <dd>{committee.memberCount ?? 0}</dd>
-                                    </div>
-                                    {committee.meetingSchedule && (
-                                        <div className={styles.detailRow}>
-                                            <dt>Заседания</dt>
-                                            <dd>{committee.meetingSchedule}</dd>
-                                        </div>
-                                    )}
-                                </dl>
                             </div>
 
-                            <footer className={styles.cardFooter}>
+                            <div className={styles.cardFooter}>
                                 <span className={styles.viewDetails}>Подробнее →</span>
-                            </footer>
+                            </div>
                         </Link>
                     ))}
                 </div>

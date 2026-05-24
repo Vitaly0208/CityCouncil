@@ -19,7 +19,6 @@ const Navbar = ({ onLogout }) => {
     };
 
     const commonLinks = [
-        { to: '/dashboard', label: 'Главная' },
         { to: '/initiatives', label: 'Инициативы' },
         { to: '/committees', label: 'Комиссии' },
         { to: '/sessions', label: 'Заседания' },

@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { tokenService } from '../../../api/tokenService';
 import { useInitiatives, useReviewInitiative } from "../../hooks/useInitiatives.js";
 import { useCreateSessionWithQueue } from "../../hooks/useSessions.js";
-import { useCommittees, useCreateCommittee, useDeleteCommittee } from "../../hooks/useCommittees.js";
+import { useCommittees, useCreateCommittee, useDeleteCommittee, useAppointChairman } from "../../hooks/useCommittees.js";
+import { useUsers, useUsersByCommittee, useAddUserToCommittee, useRemoveUserFromCommittee } from "../../hooks/UseUsers.js";
 import styles from './AdminPage.module.css';
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
 
@@ -11,39 +12,66 @@ const AdminPage = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('moderation');
 
-    // 📜 Новости
+    // Состояния для пользователей
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [showCommissionModal, setShowCommissionModal] = useState(false);
+    const [showChairmanModal, setShowChairmanModal] = useState(false);
+
+    // Состояния для новостей
     const [news, setNews] = useState(() => {
         try { return JSON.parse(localStorage.getItem('admin_news')) || []; }
         catch { return []; }
     });
     const [newsForm, setNewsForm] = useState({ title: '', content: '' });
 
-    // 🔍 Инициативы
+    // Фильтры и формы
     const [initSearch, setInitSearch] = useState('');
-
-    // 🏛️ Заседания
     const [sessionForm, setSessionForm] = useState({ title: '', heldAt: '', location: '', committeeId: '' });
-
-    // ➕ Новая комиссия
     const [committeeForm, setCommitteeForm] = useState({ name: '', specialization: '', description: '' });
 
-    // 🪝 Хуки данных
+    const [userFilter, setUserFilter] = useState({ committeeId: '', search: '' });
+    const [visibleUsers, setVisibleUsers] = useState(10);
+
+    // Хуки данных
     const { initiatives: pendingInitiatives, isLoading: loadPending } = useInitiatives({ status: 'PendingReview' });
     const { initiatives: approvedInitiatives, isLoading: loadApproved } = useInitiatives({ status: 'Accepted' });
-    const { committees, isLoading: loadCommittees, refetch: refetchCommittees } = useCommittees();
+    const { committees, isLoading: loadCommittees } = useCommittees();
 
+    const { data: allUsers = [], isLoading: loadUsers } = useUsers({
+        searchTerm: userFilter.search || undefined
+    });
+
+    const { data: committeeUsers = [] } = useUsersByCommittee(userFilter.committeeId || null);
+
+    // Мутации
     const reviewMutation = useReviewInitiative();
     const createSessionMutation = useCreateSessionWithQueue();
     const createCommitteeMutation = useCreateCommittee();
     const deleteCommitteeMutation = useDeleteCommittee();
+    const addUserToCommittee = useAddUserToCommittee();
+    const removeUserFromCommittee = useRemoveUserFromCommittee();
+    const appointChairman = useAppointChairman();
 
-    // 💾 Новости в localStorage
     useEffect(() => {
         localStorage.setItem('admin_news', JSON.stringify(news));
     }, [news]);
 
+    // Логика фильтрации пользователей
+    const filteredUsers = useMemo(() => {
+        let users = userFilter.committeeId ? committeeUsers : allUsers;
+        if (userFilter.search) {
+            const q = userFilter.search.toLowerCase();
+            users = users.filter(u =>
+                u.firstName?.toLowerCase().includes(q) ||
+                u.lastName?.toLowerCase().includes(q) ||
+                u.email?.toLowerCase().includes(q)
+            );
+        }
+        return users;
+    }, [allUsers, committeeUsers, userFilter]);
 
-    // 🔎 Фильтрация утверждённых инициатив
+    const displayedUsers = filteredUsers.slice(0, visibleUsers);
+
     const filteredApproved = useMemo(() => {
         if (!initSearch) return approvedInitiatives || [];
         const q = initSearch.toLowerCase();
@@ -54,7 +82,6 @@ const AdminPage = () => {
         );
     }, [approvedInitiatives, initSearch]);
 
-    // 🛠️ Хэндлеры
     const handleLogout = () => {
         tokenService.clearTokens();
         navigate('/login');
@@ -103,6 +130,34 @@ const AdminPage = () => {
         }
     };
 
+    const handleAddUserToCommittee = async (userId, committeeId) => {
+        try {
+            await addUserToCommittee.mutateAsync({ userId, committeeId });
+            // Не закрываем модалку, чтобы видеть результат
+        } catch (err) {
+            alert('❌ Ошибка: ' + (err.message || 'Не удалось добавить'));
+        }
+    };
+
+    const handleRemoveUserFromCommittee = async (userId, committeeId) => {
+        // if (!confirm('Удалить пользователя из комиссии?')) return; // Можно включить подтверждение
+        try {
+            await removeUserFromCommittee.mutateAsync({ userId, committeeId });
+        } catch (err) {
+            alert('❌ Ошибка: ' + (err.message || 'Не удалось удалить'));
+        }
+    };
+
+    const handleAppointChairman = async (userId, committeeId) => {
+        try {
+            await appointChairman.mutateAsync({ userId, committeeId });
+            setShowChairmanModal(false);
+            alert('✅ Пользователь назначен председателем');
+        } catch (err) {
+            alert('❌ Ошибка: ' + (err.message || 'Не удалось назначить'));
+        }
+    };
+
     const handleAddNews = (e) => {
         e.preventDefault();
         if (!newsForm.title.trim() || !newsForm.content.trim()) return;
@@ -120,17 +175,15 @@ const AdminPage = () => {
         setNews(prev => prev.filter(n => n.id !== id));
     };
 
-    // 🗂️ Вкладки
     const tabs = [
         { id: 'moderation', label: `Модерация (${pendingInitiatives?.length || 0})` },
         { id: 'sessions', label: 'Заседания' },
         { id: 'committees', label: 'Комиссии' },
-        { id: 'deputies', label: 'Депутаты' },
+        { id: 'deputies', label: 'Пользователи' },
         { id: 'approved', label: 'Утверждённые' },
         { id: 'news', label: 'Новости' },
     ];
 
-    // 🎨 Утилиты
     const getStatusBadge = (status) => {
         const map = {
             PendingReview: { text: 'На проверке', class: styles.badgePending },
@@ -150,7 +203,6 @@ const AdminPage = () => {
             <Navbar onLogout={handleLogout} />
             <div className={styles.container}>
                 <main className={styles.main}>
-                    {/* Навигация */}
                     <nav className={styles.tabsContainer}>
                         <div className={styles.tabs}>
                             {tabs.map(tab => (
@@ -165,7 +217,7 @@ const AdminPage = () => {
                         </div>
                     </nav>
 
-                    {/* 📝 Модерация */}
+                    {/* Модерация */}
                     {activeTab === 'moderation' && (
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Ожидают проверки</h2>
@@ -189,42 +241,21 @@ const AdminPage = () => {
                         </section>
                     )}
 
-                    {/* 🏛️ Комиссии — с созданием и удалением */}
+                    {/* Комиссии */}
                     {activeTab === 'committees' && (
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Управление комиссиями</h2>
-
-                            {/* Форма создания */}
                             <form onSubmit={handleCreateCommittee} className={styles.committeeForm}>
                                 <h3>➕ Новая комиссия</h3>
                                 <div className={styles.formGrid}>
-                                    <input
-                                        type="text"
-                                        placeholder="Название комиссии"
-                                        value={committeeForm.name}
-                                        onChange={e => setCommitteeForm({...committeeForm, name: e.target.value})}
-                                        required
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Специализация"
-                                        value={committeeForm.specialization}
-                                        onChange={e => setCommitteeForm({...committeeForm, specialization: e.target.value})}
-                                        required
-                                    />
+                                    <input type="text" placeholder="Название комиссии" value={committeeForm.name} onChange={e => setCommitteeForm({...committeeForm, name: e.target.value})} required />
+                                    <input type="text" placeholder="Специализация" value={committeeForm.specialization} onChange={e => setCommitteeForm({...committeeForm, specialization: e.target.value})} required />
                                 </div>
-                                <textarea
-                                    placeholder="Описание"
-                                    value={committeeForm.description}
-                                    onChange={e => setCommitteeForm({...committeeForm, description: e.target.value})}
-                                    rows={2}
-                                />
+                                <textarea placeholder="Описание" value={committeeForm.description} onChange={e => setCommitteeForm({...committeeForm, description: e.target.value})} rows={2} />
                                 <button type="submit" className={styles.primaryBtn} disabled={createCommitteeMutation.isPending}>
                                     {createCommitteeMutation.isPending ? 'Создание...' : 'Создать комиссию'}
                                 </button>
                             </form>
-
-                            {/* Список комиссий */}
                             {committees?.length === 0 ? <div className={styles.empty}>Комиссии не найдены</div> :
                                 <div className={styles.committeesList}>
                                     {committees?.map(c => (
@@ -236,13 +267,7 @@ const AdminPage = () => {
                                             </div>
                                             <div className={styles.committeeActions}>
                                                 <Link to={`/committees/${c.id}`} className={styles.linkBtn}>Просмотр</Link>
-                                                <button
-                                                    className={styles.deleteBtn}
-                                                    onClick={() => handleDeleteCommittee(c.id, c.name)}
-                                                    disabled={deleteCommitteeMutation.isPending}
-                                                >
-                                                    🗑️ Удалить
-                                                </button>
+                                                <button className={styles.deleteBtn} onClick={() => handleDeleteCommittee(c.id, c.name)} disabled={deleteCommitteeMutation.isPending}>🗑️ Удалить</button>
                                             </div>
                                         </div>
                                     ))}
@@ -251,54 +276,273 @@ const AdminPage = () => {
                         </section>
                     )}
 
-                    {/* 👥 Депутаты — теперь из API */}
-                    {/*{activeTab === 'deputies' && (*/}
-                    {/*    <section className={styles.section}>*/}
-                    {/*        <h2 className={styles.sectionTitle}>Депутаты городского совета</h2>*/}
+                    {/* Пользователи */}
+                    {activeTab === 'deputies' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>Пользователи</h2>
 
-                    {/*        /!* Фильтры *!/*/}
-                    {/*        <div className={styles.filters}>*/}
-                    {/*            <input*/}
-                    {/*                type="text"*/}
-                    {/*                placeholder="🔍 Поиск по имени или email..."*/}
-                    {/*                value={deputyFilter.search}*/}
-                    {/*                onChange={e => setDeputyFilter({...deputyFilter, search: e.target.value})}*/}
-                    {/*                className={styles.searchInput}*/}
-                    {/*            />*/}
-                    {/*            <select*/}
-                    {/*                value={deputyFilter.party}*/}
-                    {/*                onChange={e => setDeputyFilter({...deputyFilter, party: e.target.value})}*/}
-                    {/*            >*/}
-                    {/*                <option value="">Все партии</option>*/}
-                    {/*                {[...new Set(users.map(u => u.partyName).filter(Boolean))].map(party =>*/}
-                    {/*                    <option key={party} value={party}>{party}</option>*/}
-                    {/*                )}*/}
-                    {/*            </select>*/}
-                    {/*        </div>*/}
+                            <div className={styles.filters}>
+                                <select
+                                    value={userFilter.committeeId}
+                                    onChange={e => setUserFilter({...userFilter, committeeId: e.target.value})}
+                                    className={styles.selectInput}
+                                >
+                                    <option value="">Все пользователи</option>
+                                    {committees?.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="text"
+                                    placeholder="🔍 Поиск..."
+                                    value={userFilter.search}
+                                    onChange={e => setUserFilter({...userFilter, search: e.target.value})}
+                                    className={styles.searchInput}
+                                />
+                            </div>
 
-                    {/*        /!* Список *!/*/}
-                    {/*        {loadUsers ? <div className={styles.loading}>Загрузка...</div> :*/}
-                    {/*            filteredDeputies.length === 0 ? <div className={styles.empty}>Депутаты не найдены</div> :*/}
-                    {/*                <div className={styles.deputiesGrid}>*/}
-                    {/*                    {filteredDeputies.map(u => (*/}
-                    {/*                        <div key={u.id} className={styles.deputyCard}>*/}
-                    {/*                            <div className={styles.deputyHeader}>*/}
-                    {/*                                <h4>{u.fullName || u.email}</h4>*/}
-                    {/*                                {u.partyName && <span className={styles.partyBadge}>{u.partyName}</span>}*/}
-                    {/*                            </div>*/}
-                    {/*                            <dl className={styles.deputyDetails}>*/}
-                    {/*                                <dt>Email</dt><dd>{u.email}</dd>*/}
-                    {/*                                {u.commissionName && <><dt>Комиссия</dt><dd>{u.commissionName}</dd></>}*/}
-                    {/*                                {u.role && <><dt>Роль</dt><dd>{u.role}</dd></>}*/}
-                    {/*                            </dl>*/}
-                    {/*                        </div>*/}
-                    {/*                    ))}*/}
-                    {/*                </div>*/}
-                    {/*        }*/}
-                    {/*    </section>*/}
-                    {/*)}*/}
+                            <div className={styles.usersLayout}>
+                                <aside className={styles.usersListPanel}>
+                                    {loadUsers ? (
+                                        <div className={styles.loading}>Загрузка...</div>
+                                    ) : displayedUsers.length === 0 ? (
+                                        <div className={styles.empty}>Пользователи не найдены</div>
+                                    ) : (
+                                        <>
+                                            <div className={styles.usersList}>
+                                                {displayedUsers.map(u => {
+                                                    const isSelected = selectedUser?.id === u.id;
+                                                    const isInCommittee = userFilter.committeeId &&
+                                                        (u.committeesMemberships?.some(m =>
+                                                            m.committeeId === userFilter.committeeId && !m.dismissedAt
+                                                        ) || committeeUsers?.some(cu => cu.id === u.id));
 
-                    {/* 🗓️ Создание заседания */}
+                                                    return (
+                                                        <button
+                                                            key={u.id}
+                                                            className={`${styles.userListItem} ${isSelected ? styles.selected : ''}`}
+                                                            onClick={() => setSelectedUser(u)}
+                                                        >
+                                                            <div className={styles.userListItemContent}>
+                                                                <span className={styles.userName}>
+                                                                    {u.firstName} {u.lastName}
+                                                                </span>
+                                                                <span className={styles.userEmail}>{u.email}</span>
+                                                            </div>
+                                                            {isInCommittee && (
+                                                                <span className={styles.inCommitteeBadge}>✓</span>
+                                                            )}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            {filteredUsers.length > visibleUsers && (
+                                                <button
+                                                    className={styles.loadMoreBtn}
+                                                    onClick={() => setVisibleUsers(prev => prev + 10)}
+                                                >
+                                                    Показать ещё
+                                                </button>
+                                            )}
+                                        </>
+                                    )}
+                                </aside>
+
+                                <aside className={styles.userDetailPanel}>
+                                    {!selectedUser ? (
+                                        <div className={styles.placeholder}>
+                                            <p>Выберите пользователя из списка</p>
+                                            <p className={styles.placeholderHint}>для просмотра информации и управления</p>
+                                        </div>
+                                    ) : (
+                                        <div className={styles.userDetail}>
+                                            <div className={styles.userDetailHeader}>
+                                                <div>
+                                                    <h3>{selectedUser.firstName} {selectedUser.lastName}</h3>
+                                                    {selectedUser.middleName && (
+                                                        <span className={styles.userMiddleName}>{selectedUser.middleName}</span>
+                                                    )}
+                                                </div>
+                                                <span className={styles.roleBadge}>{selectedUser.role?.name || 'Пользователь'}</span>
+                                            </div>
+
+                                            <dl className={styles.userDetailInfo}>
+                                                <dt>Email</dt>
+                                                <dd>{selectedUser.email}</dd>
+
+                                                {(selectedUser.homePhone || selectedUser.workPhone) && (
+                                                    <>
+                                                        <dt>Телефоны</dt>
+                                                        <dd className={styles.phoneList}>
+                                                            {selectedUser.homePhone && (
+                                                                <span className={styles.phoneItem}>🏠 {selectedUser.homePhone}</span>
+                                                            )}
+                                                            {selectedUser.workPhone && (
+                                                                <span className={styles.phoneItem}>💼 {selectedUser.workPhone}</span>
+                                                            )}
+                                                        </dd>
+                                                    </>
+                                                )}
+
+                                                {selectedUser.committeesMemberships?.length > 0 && (
+                                                    <>
+                                                        <dt>Комиссии</dt>
+                                                        <dd className={styles.commissionList}>
+                                                            {selectedUser.committeesMemberships
+                                                                .filter(m => !m.dismissedAt)
+                                                                .map(m => (
+                                                                    <span
+                                                                        key={m.committeeId}
+                                                                        className={`${styles.commissionTag} ${m.isChairman ? styles.chairmanTag : ''}`}
+                                                                    >
+                                                                        {m.committee?.name}
+                                                                        {m.isChairman && ' (пред.)'}
+                                                                    </span>
+                                                                ))}
+                                                        </dd>
+                                                    </>
+                                                )}
+
+                                                {selectedUser.initiatives?.filter(i => i.status === 'Accepted')?.length > 0 && (
+                                                    <>
+                                                        <dt>Принятые инициативы</dt>
+                                                        <dd className={styles.initiativeList}>
+                                                            {selectedUser.initiatives
+                                                                .filter(i => i.status === 'Accepted')
+                                                                .slice(0, 5)
+                                                                .map(i => (
+                                                                    <Link
+                                                                        key={i.id}
+                                                                        to={`/initiatives/${i.id}`}
+                                                                        className={styles.initiativeLink}
+                                                                    >
+                                                                        {i.title}
+                                                                    </Link>
+                                                                ))}
+                                                        </dd>
+                                                    </>
+                                                )}
+                                            </dl>
+
+                                            <div className={styles.userDetailActions}>
+                                                <button
+                                                    className={styles.manageCommitteesBtn}
+                                                    onClick={() => setShowCommissionModal(true)}
+                                                >
+                                                    📋 Управление комиссиями
+                                                </button>
+
+                                                {selectedUser.committeesMemberships?.some(m => !m.dismissedAt) && (
+                                                    <button
+                                                        className={styles.chairmanBtn}
+                                                        onClick={() => setShowChairmanModal(true)}
+                                                        disabled={!selectedUser.committeesMemberships?.some(m => !m.dismissedAt && !m.isChairman)}
+                                                    >
+                                                        👑 Сделать председателем
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </aside>
+                            </div>
+
+                            {/* Модалка управления комиссиями */}
+                            {showCommissionModal && selectedUser && (
+                                <div className={styles.modalOverlay}>
+                                    <div className={styles.modal}>
+                                        <h3 className={styles.modalTitle}>Комиссии: {selectedUser.firstName} {selectedUser.lastName}</h3>
+
+                                        <div className={styles.modalCommissionList}>
+                                            {committees?.map(c => {
+                                                const membership = selectedUser.committeesMemberships?.find(
+                                                    m => m.committeeId === c.id && !m.dismissedAt
+                                                );
+                                                const isChairman = membership?.isChairman;
+
+                                                return (
+                                                    <div key={c.id} className={styles.modalCommissionItem}>
+                                                        <span className={styles.modalCommissionName}>{c.name}</span>
+                                                        <div className={styles.modalCommissionActions}>
+                                                            {membership ? (
+                                                                <>
+                                                                    <span className={styles.memberBadge}>
+                                                                        {isChairman ? 'Председатель' : 'Член'}
+                                                                    </span>
+                                                                    <button
+                                                                        className={styles.removeSmallBtn}
+                                                                        onClick={() => handleRemoveUserFromCommittee(selectedUser.id, c.id)}
+                                                                        disabled={removeUserFromCommittee.isPending}
+                                                                    >
+                                                                        ✕
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                <button
+                                                                    className={styles.addSmallBtn}
+                                                                    onClick={() => handleAddUserToCommittee(selectedUser.id, c.id)}
+                                                                    disabled={addUserToCommittee.isPending}
+                                                                >
+                                                                    + Добавить
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                className={styles.modalCloseBtn}
+                                                onClick={() => setShowCommissionModal(false)}
+                                            >
+                                                Закрыть
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Модалка назначения председателя */}
+                            {showChairmanModal && selectedUser && (
+                                <div className={styles.modalOverlay}>
+                                    <div className={styles.modal}>
+                                        <h3 className={styles.modalTitle}>Назначение председателя</h3>
+                                        <p className={styles.modalText}>
+                                            Выберите комиссию, в которой {selectedUser.firstName} {selectedUser.lastName} станет председателем:
+                                        </p>
+
+                                        <div className={styles.chairmanSelectList}>
+                                            {selectedUser.committeesMemberships
+                                                ?.filter(m => !m.dismissedAt && !m.isChairman)
+                                                .map(m => (
+                                                    <button
+                                                        key={m.committeeId}
+                                                        className={styles.chairmanSelectItem}
+                                                        onClick={() => handleAppointChairman(selectedUser.id, m.committeeId)}
+                                                        disabled={appointChairman.isPending} // ✅ ИСПРАВЛЕНО
+                                                    >
+                                                        {m.committee?.name}
+                                                    </button>
+                                                ))}
+                                        </div>
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                className={styles.modalCloseBtn}
+                                                onClick={() => setShowChairmanModal(false)}
+                                            >
+                                                Отмена
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </section>
+                    )}
+
+                    {/* Заседания */}
                     {activeTab === 'sessions' && (
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Новое заседание</h2>
@@ -316,7 +560,7 @@ const AdminPage = () => {
                         </section>
                     )}
 
-                    {/* ✅ Утверждённые инициативы */}
+                    {/* Утверждённые */}
                     {activeTab === 'approved' && (
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Утверждённые инициативы</h2>
@@ -337,7 +581,7 @@ const AdminPage = () => {
                         </section>
                     )}
 
-                    {/* 📢 Новости */}
+                    {/* Новости */}
                     {activeTab === 'news' && (
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Управление новостями</h2>

@@ -18,33 +18,34 @@
 }
 
 .pageHeader {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 2rem 2rem 1.5rem;
     border-bottom: 1px solid var(--border);
 }
 
 .pageTitle {
-    font-size: 1.75rem;
-    font-weight: 600;
+    font-size: 2rem;
+    font-weight: 700;
     margin: 0 0 0.5rem;
     color: var(--text-primary);
 }
 
 .pageSubtitle {
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--text-secondary);
     margin: 0;
     max-width: 600px;
 }
 
+/* === Сетка 4 колонки === */
 .grid {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 1.5rem 2rem;
+    padding: 2rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
 }
 
 /* === Карточка комиссии === */
@@ -54,55 +55,43 @@
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 1.25rem;
-    min-height: 280px;
+    overflow: hidden;
     text-decoration: none;
     color: inherit;
-    transition: border-left-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-
-.cardHeader {
+/* Изображение */
+.cardImageWrapper {
+    width: 100%;
+    height: 140px;
+    background: #161b22;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
     border-bottom: 1px solid var(--border);
 }
 
-.committeeCode {
-    font-family: monospace;
-    font-size: 0.75rem;
-    color: var(--text-tertiary);
-    letter-spacing: 0.5px;
+.cardImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    opacity: 0.9;
 }
 
-.badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    border: 1px solid;
-}
-
-.badge_active {
-    background: rgba(207, 34, 46, 0.12);
-    border-color: rgba(207, 34, 46, 0.4);
-    color: var(--accent);
-}
-
+/* Тело карточки */
 .cardBody {
+    padding: 1rem;
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .cardTitle {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 600;
     margin: 0;
     color: var(--text-primary);
@@ -110,75 +99,36 @@
 }
 
 .specialization {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--accent);
     font-weight: 500;
     margin: 0;
+    line-height: 1.4;
 }
 
-.description {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.details {
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-.detailRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 0.25rem 0;
-    border-bottom: 1px dashed var(--border);
-}
-
-.detailRow:last-child {
-    border-bottom: none;
-}
-
-.detailRow dt {
-    font-weight: 500;
-    color: var(--text-tertiary);
-    min-width: 100px;
-}
-
-.detailRow dd {
-    margin: 0;
-    text-align: right;
-    color: var(--text-primary);
-    font-weight: 400;
-}
-
+/* Подвал карточки */
 .cardFooter {
-    margin-top: 1rem;
-    padding-top: 0.75rem;
+    padding: 1rem 1.25rem;
     border-top: 1px solid var(--border);
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
 }
 
 .viewDetails {
     font-size: 0.85rem;
-    color: var(--accent);
+    color: var(--text-secondary);
     font-weight: 500;
+    transition: color 0.2s;
 }
 
 .card:hover .viewDetails {
-    color: var(--accent-hover);
+    color: var(--accent);
 }
 
 /* === Состояния === */
 .loading,
-.error {
+.error,
+.empty {
     text-align: center;
     padding: 3rem 2rem;
     color: var(--text-secondary);
@@ -187,89 +137,4 @@
 
 .error {
     color: var(--accent);
-}
-
-/* === Адаптивность === */
-@media (max-width: 768px) {
-    .grid {
-        grid-template-columns: 1fr;
-        padding: 1rem;
-    }
-
-    .card {
-        min-height: auto;
-    }
-
-    .detailRow {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.2rem;
-    }
-
-    .detailRow dd {
-        text-align: left;
-    }
-
-    .pageHeader {
-        padding: 1.5rem 1rem 1rem;
-    }
-}
-/* ===== Кнопка вступления ===== */
-.cardFooter {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-}
-
-.joinBtn {
-    background: var(--success);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.joinBtn:hover:not(:disabled) {
-    opacity: 0.9;
-}
-
-.joinBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.alreadyMember {
-    font-size: 0.875rem;
-    color: var(--success);
-    font-weight: 600;
-}
-
-.viewDetails {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: color 0.2s;
-}
-
-.viewDetails:hover {
-    color: var(--accent);
-}
-
-/* Адаптив для мобильных */
-@media (max-width: 640px) {
-    .cardFooter {
-        flex-direction: column;
-        gap: 0.75rem;
-        align-items: flex-start;
-    }
-
-    .joinBtn {
-        width: 100%;
-    }
 }

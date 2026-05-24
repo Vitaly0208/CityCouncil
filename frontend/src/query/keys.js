@@ -2,10 +2,9 @@
 export const queryKeys = {
     users: {
         all: ['users'],
-        lists: () => [...queryKeys.users.all, 'list'],
-        list: (filters) => [...queryKeys.users.lists(), { filters }],
-        details: () => [...queryKeys.users.all, 'detail'],
-        detail: (id) => [...queryKeys.users.details(), id],
+        list: (filters) => [...queryKeys.users.all, 'list', filters].filter(Boolean),
+        byCommittee: (committeeId) => [...queryKeys.users.all, 'committee', committeeId],
+        details: (id) => [...queryKeys.users.all, 'detail', id],
         me: () => [...queryKeys.users.all, 'me'],
     },
     committees: {

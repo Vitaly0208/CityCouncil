@@ -4,9 +4,10 @@ import { tokenService } from "../../../../api/tokenService.js";
 import Navbar from "../../Layout/NaVbar/NavBar.jsx";
 import styles from './SessionsPage.module.css';
 
+const SESSION_IMAGE_URL = '/session2.png';
+
 const SessionsPage = () => {
     const navigate = useNavigate();
-
     const { data: sessions, isLoading, isError, error } = useSessions();
 
     const handleLogout = () => {
@@ -14,17 +15,22 @@ const SessionsPage = () => {
         navigate('/login');
     };
 
-    const formatDate = (dateStr) => {
-        if (!dateStr) return 'Дата не указана';
-        return new Date(dateStr).toLocaleDateString('ru-RU', {
-            day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
+    const formatDateTime = (dateStr) => {
+        if (!dateStr) return null;
+        const d = new Date(dateStr);
+        return {
+            date: d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }),
+            time: d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+        };
     };
+
     if (isLoading) {
         return (
             <>
                 <Navbar onLogout={handleLogout} />
-                <div className={styles.loading}>Загрузка расписания...</div>
+                <div className={styles.container}>
+                    <div className={styles.loading}>Загрузка расписания...</div>
+                </div>
             </>
         );
     }
@@ -33,8 +39,10 @@ const SessionsPage = () => {
         return (
             <>
                 <Navbar onLogout={handleLogout} />
-                <div className={styles.error}>
-                    Не удалось загрузить заседания: {error?.message || 'Проверьте подключение к API'}
+                <div className={styles.container}>
+                    <div className={styles.error}>
+                        Не удалось загрузить заседания: {error?.message}
+                    </div>
                 </div>
             </>
         );
@@ -50,26 +58,36 @@ const SessionsPage = () => {
                 </header>
 
                 <div className={styles.grid}>
-                    {sessions && sessions.length > 0 ? (
-                        sessions.map(s => (
-                            <Link key={s.id} to={`/sessions/${s.id}`} className={styles.card}>
-                                <div className={styles.cardHeader}>
-                                    <span className={styles.committeeBadge}>{s.committeeName || 'Комиссия'}</span>
-                                    <span className={`${styles.statusBadge} ${s.isCompleted ? styles.statusClosed : styles.statusOpen}`}>
-                                        {s.isCompleted ? 'Завершено' : 'Активно'}
-                                    </span>
-                                </div>
-                                <h2 className={styles.cardTitle}>{s.title}</h2>
-                                <div className={styles.cardMeta}>
-                                    <span>📅 {formatDate(s.heldAt)}</span>
-                                    <span>📍 {s.location || 'Не указано'}</span>
-                                </div>
-                                <div className={styles.cardFooter}>
-                                    <span>Инициатив: {s.initiativesCount || 0}</span>
-                                    <span className={styles.arrow}>→</span>
-                                </div>
-                            </Link>
-                        ))
+                    {sessions?.length > 0 ? (
+                        sessions.map(s => {
+                            const dt = formatDateTime(s.heldAt);
+                            return (
+                                <Link key={s.id} to={`/sessions/${s.id}`} className={styles.card}>
+                                    <div className={styles.cardTop}>
+                                        <div className={styles.dateBlock}>
+                                            <span className={styles.day}>{dt?.date}</span>
+                                            <span className={styles.time}>{dt?.time}</span>
+                                        </div>
+                                        <span className={`${styles.status} ${s.isCompleted ? styles.completed : styles.active}`}>
+                                            {s.isCompleted ? 'Завершено' : 'Активно'}
+                                        </span>
+                                    </div>
+
+                                    <div className={styles.cardImageWrapper}>
+                                        <img src={SESSION_IMAGE_URL} alt="Заседание" className={styles.cardImage} />
+                                    </div>
+
+                                    <div className={styles.cardBody}>
+                                        <h2 className={styles.title}>{s.title}</h2>
+                                        <span className={styles.committee}>{s.committeeName}</span>
+                                    </div>
+
+                                    <div className={styles.cardFooter}>
+                                        <span className={styles.agendaBtn}>ПОВЕСТКА</span>
+                                    </div>
+                                </Link>
+                            );
+                        })
                     ) : (
                         <div className={styles.empty}>Заседаний пока нет</div>
                     )}

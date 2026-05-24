@@ -30,6 +30,18 @@ export const authService = {
 export const userService = {
     getProfile: (id) => axiosInstance.get(ENDPOINTS.USERS.PROFILE(id)),
     getMyProfile: () => axiosInstance.get(ENDPOINTS.USERS.ME),
+    getAll: (params = {}) => {
+        const cleanParams = Object.fromEntries(
+            Object.entries(params).filter(([_, v]) => v != null && v !== '')
+        );
+        return axiosInstance.get(ENDPOINTS.USERS.BASE, { params: cleanParams });
+    },
+    getByCommittee: (committeeId) =>
+        axiosInstance.get(`${ENDPOINTS.USERS.BASE}/by-committee/${committeeId}`),
+    addToCommittee: (userId, committeeId) =>
+        axiosInstance.post(ENDPOINTS.COMMITTEES.MEMBERS(committeeId), { userId }),
+    removeFromCommittee: (userId, committeeId) =>
+        axiosInstance.delete(`${ENDPOINTS.COMMITTEES.MEMBERS(committeeId)}/${userId}`),
 };
 
 // ============ COMMITTEES ============
@@ -67,5 +79,4 @@ export const sessionService = {
 export const votingService = {
     castVote: (data) => axiosInstance.post(ENDPOINTS.VOTING.CAST, data),
     finalize: (sessionId) => axiosInstance.post(ENDPOINTS.VOTING.FINALIZE(sessionId)),
-    getResults: (sessionId) => axiosInstance.get(ENDPOINTS.VOTING.RESULTS(sessionId)),
 };
