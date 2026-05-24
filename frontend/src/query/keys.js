@@ -13,7 +13,7 @@ export const queryKeys = {
         lists: () => [...queryKeys.committees.all, 'list'],
         list: (filters) => [...queryKeys.committees.lists(), { filters }],
         details: () => [...queryKeys.committees.all, 'detail'],
-        detail: (id) => [...queryKeys.committees.details(), id],
+        detail: (id) => ['committees', 'detail', id],
     },
     initiatives: {
         all: ['initiatives'],

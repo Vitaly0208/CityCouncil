@@ -47,8 +47,6 @@ export const useUserProfile = () => {
         queryFn: () => userService.getMyProfile().then((res) => res.data),
         staleTime: 10 * 60 * 1000, // Кеш 10 минут (профиль редко меняется)
         retry: 1,
-        // Не выполнять запрос, если нет токена (опциональная защита)
-        // enabled: !!tokenService.getAccessToken(),
     });
 
     return {

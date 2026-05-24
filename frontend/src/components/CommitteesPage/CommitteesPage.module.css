@@ -214,3 +214,62 @@
         padding: 1.5rem 1rem 1rem;
     }
 }
+/* ===== Кнопка вступления ===== */
+.cardFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.joinBtn {
+    background: var(--success);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.joinBtn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.joinBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.alreadyMember {
+    font-size: 0.875rem;
+    color: var(--success);
+    font-weight: 600;
+}
+
+.viewDetails {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+}
+
+.viewDetails:hover {
+    color: var(--accent);
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 640px) {
+    .cardFooter {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .joinBtn {
+        width: 100%;
+    }
+}

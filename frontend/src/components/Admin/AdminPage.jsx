@@ -3,65 +3,52 @@ import { useNavigate, Link } from 'react-router-dom';
 import { tokenService } from '../../../api/tokenService';
 import { useInitiatives, useReviewInitiative } from "../../hooks/useInitiatives.js";
 import { useCreateSessionWithQueue } from "../../hooks/useSessions.js";
-import { useCommittees } from "../../hooks/useCommittees.js";
+import { useCommittees, useCreateCommittee, useDeleteCommittee } from "../../hooks/useCommittees.js";
 import styles from './AdminPage.module.css';
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
-
-// 📋 Моковые данные депутатов (заменятся на API-хук при наличии бэка)
-const MOCK_DEPUTIES = [
-    { id: 'd1', name: 'Иванов И.И.', party: 'Партия Развития', commission: 'Транспорт', role: 'Председатель', joined: '2024-01-15' },
-    { id: 'd2', name: 'Петрова А.С.', party: 'Гражданский Альянс', commission: 'Экология', role: 'Зам. председателя', joined: '2023-11-02' },
-    { id: 'd3', name: 'Сидоров К.М.', party: 'Партия Развития', commission: 'Транспорт', role: 'Член', joined: '2025-03-10' },
-    { id: 'd4', name: 'Козлова Е.В.', party: 'Независимые', commission: 'Культура', role: 'Член', joined: '2024-06-20' },
-];
 
 const AdminPage = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('moderation');
 
-    // 📜 Новости (хранение в localStorage)
+    // 📜 Новости
     const [news, setNews] = useState(() => {
-        try {
-            return JSON.parse(localStorage.getItem('admin_news')) || [];
-        } catch { return []; }
+        try { return JSON.parse(localStorage.getItem('admin_news')) || []; }
+        catch { return []; }
     });
     const [newsForm, setNewsForm] = useState({ title: '', content: '' });
 
-    // 🏛️ Депутаты
-    const [deputyFilter, setDeputyFilter] = useState({ commission: '', party: '' });
-
-    // 🔍 Утверждённые инициативы
+    // 🔍 Инициативы
     const [initSearch, setInitSearch] = useState('');
 
+    // 🏛️ Заседания
     const [sessionForm, setSessionForm] = useState({ title: '', heldAt: '', location: '', committeeId: '' });
 
-    //  Хуки
+    // ➕ Новая комиссия
+    const [committeeForm, setCommitteeForm] = useState({ name: '', specialization: '', description: '' });
+
+    // 🪝 Хуки данных
     const { initiatives: pendingInitiatives, isLoading: loadPending } = useInitiatives({ status: 'PendingReview' });
     const { initiatives: approvedInitiatives, isLoading: loadApproved } = useInitiatives({ status: 'Accepted' });
-    const { committees, isLoading: loadCommittees } = useCommittees();
+    const { committees, isLoading: loadCommittees, refetch: refetchCommittees } = useCommittees();
 
     const reviewMutation = useReviewInitiative();
     const createSessionMutation = useCreateSessionWithQueue();
+    const createCommitteeMutation = useCreateCommittee();
+    const deleteCommitteeMutation = useDeleteCommittee();
 
-    // 💾 Синхронизация новостей с localStorage
+    // 💾 Новости в localStorage
     useEffect(() => {
         localStorage.setItem('admin_news', JSON.stringify(news));
     }, [news]);
 
-    // 📋 Фильтрация депутатов
-    const filteredDeputies = useMemo(() => {
-        return MOCK_DEPUTIES.filter(d =>
-            (!deputyFilter.commission || d.commission === deputyFilter.commission) &&
-            (!deputyFilter.party || d.party === deputyFilter.party)
-        );
-    }, [deputyFilter]);
 
     // 🔎 Фильтрация утверждённых инициатив
     const filteredApproved = useMemo(() => {
-        if (!initSearch) return approvedInitiatives;
+        if (!initSearch) return approvedInitiatives || [];
         const q = initSearch.toLowerCase();
-        return approvedInitiatives.filter(i =>
-            i.title.toLowerCase().includes(q) ||
+        return (approvedInitiatives || []).filter(i =>
+            i.title?.toLowerCase().includes(q) ||
             i.authorName?.toLowerCase().includes(q) ||
             i.description?.toLowerCase().includes(q)
         );
@@ -89,10 +76,30 @@ const AdminPage = () => {
                 heldAt: new Date(sessionForm.heldAt).toISOString()
             });
             setSessionForm({ title: '', heldAt: '', location: '', committeeId: '' });
-            alert('✅ Заседание создано! Топ-3 инициативы добавлены в повестку.');
+            alert('✅ Заседание создано!');
         } catch (err) {
-            console.error('Ошибка создания заседания:', err);
-            alert('❌ Не удалось создать заседание. Проверьте данные.');
+            alert('❌ Ошибка: ' + err.message);
+        }
+    };
+
+    const handleCreateCommittee = async (e) => {
+        e.preventDefault();
+        try {
+            await createCommitteeMutation.mutateAsync(committeeForm);
+            setCommitteeForm({ name: '', specialization: '', description: '' });
+            alert('✅ Комиссия создана');
+        } catch (err) {
+            alert('❌ Ошибка: ' + err.message);
+        }
+    };
+
+    const handleDeleteCommittee = async (id, name) => {
+        if (!confirm(`Удалить комиссию "${name}"?\nЭто действие необратимо.`)) return;
+        try {
+            await deleteCommitteeMutation.mutateAsync(id);
+            alert('✅ Комиссия удалена');
+        } catch (err) {
+            alert('❌ Ошибка: ' + err.message);
         }
     };
 
@@ -113,44 +120,58 @@ const AdminPage = () => {
         setNews(prev => prev.filter(n => n.id !== id));
     };
 
-    // 🗂️ Список вкладок
+    // 🗂️ Вкладки
     const tabs = [
-        { id: 'moderation', label: `Модерация (${pendingInitiatives.length})` },
-        { id: 'sessions', label: 'Создание заседания' },
-        { id: 'news', label: 'Новости' },
+        { id: 'moderation', label: `Модерация (${pendingInitiatives?.length || 0})` },
+        { id: 'sessions', label: 'Заседания' },
+        { id: 'committees', label: 'Комиссии' },
         { id: 'deputies', label: 'Депутаты' },
         { id: 'approved', label: 'Утверждённые' },
-        { id: 'committees', label: 'Комиссии' },
+        { id: 'news', label: 'Новости' },
     ];
+
+    // 🎨 Утилиты
+    const getStatusBadge = (status) => {
+        const map = {
+            PendingReview: { text: 'На проверке', class: styles.badgePending },
+            Accepted: { text: 'Принята', class: styles.badgeAccepted },
+            Rejected: { text: 'Отклонена', class: styles.badgeRejected },
+        };
+        const s = map[status] || { text: status, class: '' };
+        return <span className={`${styles.badge} ${s.class}`}>{s.text}</span>;
+    };
+
+    if (loadPending || loadCommittees) {
+        return <div className={styles.container}><div className={styles.loading}>Загрузка панели...</div></div>;
+    }
 
     return (
         <>
             <Navbar onLogout={handleLogout} />
-        <div className={styles.container}>
-            <main className={styles.main}>
-                {/* Навигация по вкладкам */}
-                <nav className={styles.tabsContainer}>
-                    <div className={styles.tabs}>
-                        {tabs.map(tab => (
-                            <button
-                                key={tab.id}
-                                className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-                                onClick={() => setActiveTab(tab.id)}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
-                </nav>
+            <div className={styles.container}>
+                <main className={styles.main}>
+                    {/* Навигация */}
+                    <nav className={styles.tabsContainer}>
+                        <div className={styles.tabs}>
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+                                    onClick={() => setActiveTab(tab.id)}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
 
-                {/* 📝 Модерация */}
-                {activeTab === 'moderation' && (
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Ожидают проверки</h2>
-                        {loadPending ? <div className={styles.loading}>Загрузка...</div> :
-                            pendingInitiatives.length === 0 ? <div className={styles.empty}>Все инициативы обработаны</div> :
+                    {/* 📝 Модерация */}
+                    {activeTab === 'moderation' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>Ожидают проверки</h2>
+                            {pendingInitiatives?.length === 0 ? <div className={styles.empty}>Все инициативы обработаны</div> :
                                 <div className={styles.list}>
-                                    {pendingInitiatives.map(init => (
+                                    {pendingInitiatives?.map(init => (
                                         <div key={init.id} className={styles.reviewCard}>
                                             <div className={styles.reviewInfo}>
                                                 <h3>{init.title}</h3>
@@ -164,138 +185,186 @@ const AdminPage = () => {
                                         </div>
                                     ))}
                                 </div>
-                        }
-                    </section>
-                )}
-
-                {/*  Создание заседания */}
-                {activeTab === 'sessions' && (
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Новое заседание с очередью</h2>
-                        <p className={styles.hint}>При создании автоматически добавятся 3 самые старые одобренные инициативы.</p>
-                        <form onSubmit={handleCreateSession} className={styles.sessionForm}>
-                            <div className={styles.formGrid}>
-                                <input type="text" placeholder="Название заседания" value={sessionForm.title} onChange={e => setSessionForm({...sessionForm, title: e.target.value})} required />
-                                <input type="datetime-local" value={sessionForm.heldAt} onChange={e => setSessionForm({...sessionForm, heldAt: e.target.value})} required />
-                                <input type="text" placeholder="Место проведения" value={sessionForm.location} onChange={e => setSessionForm({...sessionForm, location: e.target.value})} />
-                                <input type="text" placeholder="ID Комиссии (GUID)" value={sessionForm.committeeId} onChange={e => setSessionForm({...sessionForm, committeeId: e.target.value})} required />
-                            </div>
-                            <button type="submit" className={styles.primaryBtn} disabled={createSessionMutation.isPending}>
-                                {createSessionMutation.isPending ? 'Создание...' : '🚀 Создать и добавить топ-3 из очереди'}
-                            </button>
-                        </form>
-                    </section>
-                )}
-
-                {activeTab === 'news' && (
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Управление новостями</h2>
-                        <form onSubmit={handleAddNews} className={styles.newsForm}>
-                            <input type="text" placeholder="Заголовок новости" value={newsForm.title} onChange={e => setNewsForm({...newsForm, title: e.target.value})} required />
-                            <textarea placeholder="Содержание новости" value={newsForm.content} onChange={e => setNewsForm({...newsForm, content: e.target.value})} rows={3} required />
-                            <button type="submit" className={styles.primaryBtn}>📢 Опубликовать</button>
-                        </form>
-                        <div className={styles.newsList}>
-                            {news.length === 0 ? <div className={styles.empty}>Новостей пока нет</div> :
-                                news.map(item => (
-                                    <div key={item.id} className={styles.newsCard}>
-                                        <div className={styles.newsContent}>
-                                            <h4>{item.title}</h4>
-                                            <p>{item.content}</p>
-                                            <time>{new Date(item.createdAt).toLocaleString('ru-RU')}</time>
-                                        </div>
-                                        <button className={styles.deleteBtn} onClick={() => handleDeleteNews(item.id)}>🗑️</button>
-                                    </div>
-                                ))
                             }
-                        </div>
-                    </section>
-                )}
+                        </section>
+                    )}
 
-                {/*  Депутаты */}
-                {activeTab === 'deputies' && (
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Список депутатов</h2>
-                        <div className={styles.filters}>
-                            <select value={deputyFilter.commission} onChange={e => setDeputyFilter({...deputyFilter, commission: e.target.value})}>
-                                <option value="">Все комиссии</option>
-                                {[...new Set(MOCK_DEPUTIES.map(d => d.commission))].map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                            <select value={deputyFilter.party} onChange={e => setDeputyFilter({...deputyFilter, party: e.target.value})}>
-                                <option value="">Все партии</option>
-                                {[...new Set(MOCK_DEPUTIES.map(d => d.party))].map(p => <option key={p} value={p}>{p}</option>)}
-                            </select>
-                        </div>
-                        <div className={styles.deputiesGrid}>
-                            {filteredDeputies.map(d => (
-                                <div key={d.id} className={styles.deputyCard}>
-                                    <div className={styles.deputyHeader}>
-                                        <h4>{d.name}</h4>
-                                        <span className={styles.roleBadge}>{d.role}</span>
-                                    </div>
-                                    <dl className={styles.deputyDetails}>
-                                        <dt>Партия</dt><dd>{d.party}</dd>
-                                        <dt>Комиссия</dt><dd>{d.commission}</dd>
-                                        <dt>С</dt><dd>{new Date(d.joined).toLocaleDateString('ru-RU')}</dd>
-                                    </dl>
+                    {/* 🏛️ Комиссии — с созданием и удалением */}
+                    {activeTab === 'committees' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>Управление комиссиями</h2>
+
+                            {/* Форма создания */}
+                            <form onSubmit={handleCreateCommittee} className={styles.committeeForm}>
+                                <h3>➕ Новая комиссия</h3>
+                                <div className={styles.formGrid}>
+                                    <input
+                                        type="text"
+                                        placeholder="Название комиссии"
+                                        value={committeeForm.name}
+                                        onChange={e => setCommitteeForm({...committeeForm, name: e.target.value})}
+                                        required
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Специализация"
+                                        value={committeeForm.specialization}
+                                        onChange={e => setCommitteeForm({...committeeForm, specialization: e.target.value})}
+                                        required
+                                    />
                                 </div>
-                            ))}
-                            {filteredDeputies.length === 0 && <div className={styles.empty}>Депутаты не найдены</div>}
-                        </div>
-                    </section>
-                )}
+                                <textarea
+                                    placeholder="Описание"
+                                    value={committeeForm.description}
+                                    onChange={e => setCommitteeForm({...committeeForm, description: e.target.value})}
+                                    rows={2}
+                                />
+                                <button type="submit" className={styles.primaryBtn} disabled={createCommitteeMutation.isPending}>
+                                    {createCommitteeMutation.isPending ? 'Создание...' : 'Создать комиссию'}
+                                </button>
+                            </form>
 
-                {/* ✅ Утверждённые инициативы */}
-                {activeTab === 'approved' && (
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Утверждённые инициативы</h2>
-                        <div className={styles.searchBar}>
-                            <input type="text" placeholder="🔍 Поиск по названию, автору или описанию..." value={initSearch} onChange={e => setInitSearch(e.target.value)} />
-                        </div>
-                        {loadApproved ? <div className={styles.loading}>Загрузка...</div> :
-                            filteredApproved.length === 0 ? <div className={styles.empty}>Инициативы не найдены</div> :
+                            {/* Список комиссий */}
+                            {committees?.length === 0 ? <div className={styles.empty}>Комиссии не найдены</div> :
+                                <div className={styles.committeesList}>
+                                    {committees?.map(c => (
+                                        <div key={c.id} className={styles.committeeRow}>
+                                            <div className={styles.committeeInfo}>
+                                                <h4>{c.name}</h4>
+                                                <span className={styles.meta}>{c.specialization}</span>
+                                                {c.description && <p className={styles.desc}>{c.description}</p>}
+                                            </div>
+                                            <div className={styles.committeeActions}>
+                                                <Link to={`/committees/${c.id}`} className={styles.linkBtn}>Просмотр</Link>
+                                                <button
+                                                    className={styles.deleteBtn}
+                                                    onClick={() => handleDeleteCommittee(c.id, c.name)}
+                                                    disabled={deleteCommitteeMutation.isPending}
+                                                >
+                                                    🗑️ Удалить
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            }
+                        </section>
+                    )}
+
+                    {/* 👥 Депутаты — теперь из API */}
+                    {/*{activeTab === 'deputies' && (*/}
+                    {/*    <section className={styles.section}>*/}
+                    {/*        <h2 className={styles.sectionTitle}>Депутаты городского совета</h2>*/}
+
+                    {/*        /!* Фильтры *!/*/}
+                    {/*        <div className={styles.filters}>*/}
+                    {/*            <input*/}
+                    {/*                type="text"*/}
+                    {/*                placeholder="🔍 Поиск по имени или email..."*/}
+                    {/*                value={deputyFilter.search}*/}
+                    {/*                onChange={e => setDeputyFilter({...deputyFilter, search: e.target.value})}*/}
+                    {/*                className={styles.searchInput}*/}
+                    {/*            />*/}
+                    {/*            <select*/}
+                    {/*                value={deputyFilter.party}*/}
+                    {/*                onChange={e => setDeputyFilter({...deputyFilter, party: e.target.value})}*/}
+                    {/*            >*/}
+                    {/*                <option value="">Все партии</option>*/}
+                    {/*                {[...new Set(users.map(u => u.partyName).filter(Boolean))].map(party =>*/}
+                    {/*                    <option key={party} value={party}>{party}</option>*/}
+                    {/*                )}*/}
+                    {/*            </select>*/}
+                    {/*        </div>*/}
+
+                    {/*        /!* Список *!/*/}
+                    {/*        {loadUsers ? <div className={styles.loading}>Загрузка...</div> :*/}
+                    {/*            filteredDeputies.length === 0 ? <div className={styles.empty}>Депутаты не найдены</div> :*/}
+                    {/*                <div className={styles.deputiesGrid}>*/}
+                    {/*                    {filteredDeputies.map(u => (*/}
+                    {/*                        <div key={u.id} className={styles.deputyCard}>*/}
+                    {/*                            <div className={styles.deputyHeader}>*/}
+                    {/*                                <h4>{u.fullName || u.email}</h4>*/}
+                    {/*                                {u.partyName && <span className={styles.partyBadge}>{u.partyName}</span>}*/}
+                    {/*                            </div>*/}
+                    {/*                            <dl className={styles.deputyDetails}>*/}
+                    {/*                                <dt>Email</dt><dd>{u.email}</dd>*/}
+                    {/*                                {u.commissionName && <><dt>Комиссия</dt><dd>{u.commissionName}</dd></>}*/}
+                    {/*                                {u.role && <><dt>Роль</dt><dd>{u.role}</dd></>}*/}
+                    {/*                            </dl>*/}
+                    {/*                        </div>*/}
+                    {/*                    ))}*/}
+                    {/*                </div>*/}
+                    {/*        }*/}
+                    {/*    </section>*/}
+                    {/*)}*/}
+
+                    {/* 🗓️ Создание заседания */}
+                    {activeTab === 'sessions' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>Новое заседание</h2>
+                            <form onSubmit={handleCreateSession} className={styles.sessionForm}>
+                                <div className={styles.formGrid}>
+                                    <input type="text" placeholder="Название" value={sessionForm.title} onChange={e => setSessionForm({...sessionForm, title: e.target.value})} required />
+                                    <input type="datetime-local" value={sessionForm.heldAt} onChange={e => setSessionForm({...sessionForm, heldAt: e.target.value})} required />
+                                    <input type="text" placeholder="Место" value={sessionForm.location} onChange={e => setSessionForm({...sessionForm, location: e.target.value})} />
+                                    <input type="text" placeholder="ID Комиссии" value={sessionForm.committeeId} onChange={e => setSessionForm({...sessionForm, committeeId: e.target.value})} required />
+                                </div>
+                                <button type="submit" className={styles.primaryBtn} disabled={createSessionMutation.isPending}>
+                                    {createSessionMutation.isPending ? 'Создание...' : '🚀 Создать заседание'}
+                                </button>
+                            </form>
+                        </section>
+                    )}
+
+                    {/* ✅ Утверждённые инициативы */}
+                    {activeTab === 'approved' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>Утверждённые инициативы</h2>
+                            <input type="text" placeholder="🔍 Поиск..." value={initSearch} onChange={e => setInitSearch(e.target.value)} className={styles.searchInput} />
+                            {filteredApproved.length === 0 ? <div className={styles.empty}>Инициативы не найдены</div> :
                                 <div className={styles.initiativesList}>
                                     {filteredApproved.map(init => (
                                         <div key={init.id} className={styles.initiativeRow}>
                                             <div className={styles.initiativeInfo}>
                                                 <h4>{init.title}</h4>
-                                                <span className={styles.meta}>Автор: {init.authorName} • {new Date(init.createdAt).toLocaleDateString('ru-RU')}</span>
+                                                <span className={styles.meta}>Автор: {init.authorName}</span>
                                             </div>
-                                            <span className={`${styles.badge} ${styles.badgeAccepted}`}>Принята</span>
+                                            {getStatusBadge(init.status)}
                                         </div>
                                     ))}
                                 </div>
-                        }
-                    </section>
-                )}
+                            }
+                        </section>
+                    )}
 
-                {/* 🏛️ Комиссии */}
-                {activeTab === 'committees' && (
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Комиссии городского совета</h2>
-                        {loadCommittees ? <div className={styles.loading}>Загрузка...</div> :
-                            committees.length === 0 ? <div className={styles.empty}>Комиссии не найдены</div> :
-                                <div className={styles.committeesList}>
-                                    {committees.map(c => (
-                                        <Link key={c.id} to={`/committees/${c.id}`} className={styles.committeeRow}>
-                                            <div className={styles.committeeInfo}>
-                                                <h4>{c.name}</h4>
-                                                <span className={styles.meta}>{c.specialization} • {c.memberCount ?? 0} членов</span>
+                    {/* 📢 Новости */}
+                    {activeTab === 'news' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>Управление новостями</h2>
+                            <form onSubmit={handleAddNews} className={styles.newsForm}>
+                                <input type="text" placeholder="Заголовок" value={newsForm.title} onChange={e => setNewsForm({...newsForm, title: e.target.value})} required />
+                                <textarea placeholder="Содержание" value={newsForm.content} onChange={e => setNewsForm({...newsForm, content: e.target.value})} rows={3} required />
+                                <button type="submit" className={styles.primaryBtn}>📢 Опубликовать</button>
+                            </form>
+                            <div className={styles.newsList}>
+                                {news.length === 0 ? <div className={styles.empty}>Новостей нет</div> :
+                                    news.map(item => (
+                                        <div key={item.id} className={styles.newsCard}>
+                                            <div className={styles.newsContent}>
+                                                <h4>{item.title}</h4>
+                                                <p>{item.content}</p>
+                                                <time>{new Date(item.createdAt).toLocaleString('ru-RU')}</time>
                                             </div>
-                                            <div className={styles.committeeStats}>
-                                                {c.upcomingSessions?.length > 0 && <span>📅 {c.upcomingSessions.length} заседаний</span>}
-                                                {c.initiatives?.length > 0 && <span>📝 {c.initiatives.length} инициатив</span>}
-                                                <span className={styles.arrow}>→</span>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                        }
-                    </section>
-                )}
-            </main>
-        </div>
-            </>
+                                            <button className={styles.deleteBtn} onClick={() => handleDeleteNews(item.id)}>🗑️</button>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </section>
+                    )}
+                </main>
+            </div>
+        </>
     );
 };
 

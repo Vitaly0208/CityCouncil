@@ -2,8 +2,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { sessionService, votingService } from "../../api/apiService.js";
 import { queryKeys } from '../query/keys';
-import {tokenService} from "../../api/tokenService.js";
-import {API_URL} from "../../api/endpoints.js";
 
 /**
  * @typedef {Object} Vote

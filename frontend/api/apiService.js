@@ -18,7 +18,6 @@ export const toFormData = (data) => {
     return formData;
 };
 
-// ============ AUTH ============
 export const authService = {
     login: (credentials) => axiosInstance.post(ENDPOINTS.AUTH.LOGIN, credentials),
     register: (userData) => axiosInstance.post(ENDPOINTS.AUTH.REGISTER, userData),
@@ -38,6 +37,7 @@ export const committeeService = {
     getAll: () => axiosInstance.get(ENDPOINTS.COMMITTEES.BASE),
     getById: (id) => axiosInstance.get(ENDPOINTS.COMMITTEES.DETAILS(id)),
     create: (data) => axiosInstance.post(ENDPOINTS.COMMITTEES.BASE, data),
+    delete: (id) => axiosInstance.delete(ENDPOINTS.COMMITTEES.DETAILS(id)),
     update: (id, data) => axiosInstance.put(ENDPOINTS.COMMITTEES.DETAILS(id), data),
     addMember: (committeeId, userId) =>
         axiosInstance.post(ENDPOINTS.COMMITTEES.MEMBERS(committeeId), { userId }),

@@ -1,18 +1,19 @@
-
 import { Link, useNavigate } from 'react-router-dom';
 import { useCommittees } from "../../hooks/useCommittees.js";
-import { tokenService} from "../../../api/tokenService.js";
+import { tokenService } from "../../../api/tokenService.js";
 import Navbar from '../Layout/NaVbar/NavBar.jsx';
 import styles from './CommitteesPage.module.css';
 
 const CommitteesPage = () => {
     const navigate = useNavigate();
-    const { committees, isLoading, isError } = useCommittees();
+    const { committees, isLoading, isError, error } = useCommittees();
 
     const handleLogout = () => {
         tokenService.clearTokens();
         navigate('/login');
     };
+
+    const safeCommittees = Array.isArray(committees) ? committees : [];
 
     if (isLoading) {
         return (
@@ -30,7 +31,24 @@ const CommitteesPage = () => {
             <>
                 <Navbar onLogout={handleLogout} />
                 <div className={styles.container}>
-                    <div className={styles.error}>Не удалось загрузить список комиссий</div>
+                    <div className={styles.error}>
+                        Не удалось загрузить комиссии: {error?.message || 'Проверьте консоль'}
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    if (safeCommittees.length === 0) {
+        return (
+            <>
+                <Navbar onLogout={handleLogout} />
+                <div className={styles.container}>
+                    <header className={styles.pageHeader}>
+                        <h1 className={styles.pageTitle}>Комиссии</h1>
+                        <p className={styles.pageSubtitle}>Список пуст</p>
+                    </header>
+                    <div className={styles.empty}>Комиссии пока не созданы</div>
                 </div>
             </>
         );
@@ -48,7 +66,7 @@ const CommitteesPage = () => {
                 </header>
 
                 <div className={styles.grid}>
-                    {committees.map((committee) => (
+                    {safeCommittees.map((committee) => (
                         <Link
                             key={committee.id}
                             to={`/committees/${committee.id}`}
@@ -56,7 +74,7 @@ const CommitteesPage = () => {
                         >
                             <header className={styles.cardHeader}>
                                 <span className={styles.committeeCode}>
-                                    #{committee.code || committee.id.slice(0, 6).toUpperCase()}
+                                    #{committee.code || committee.id?.slice(0, 6).toUpperCase() || '---'}
                                 </span>
                                 <span className={`${styles.badge} ${styles.badgeActive}`}>
                                     Активна
@@ -64,12 +82,10 @@ const CommitteesPage = () => {
                             </header>
 
                             <div className={styles.cardBody}>
-                                <h2 className={styles.cardTitle}>{committee.name}</h2>
-
+                                <h2 className={styles.cardTitle}>{committee.name || 'Без названия'}</h2>
                                 <p className={styles.specialization}>
-                                    {committee.specialization}
+                                    {committee.specialization || 'Специализация не указана'}
                                 </p>
-
                                 <p className={styles.description}>
                                     {committee.description || 'Описание комиссии не предоставлено'}
                                 </p>

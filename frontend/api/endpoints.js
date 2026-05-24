@@ -1,4 +1,3 @@
-// src/api/endpoints.js
 export const API_URL = 'http://localhost:8080';
 
 export const ENDPOINTS = {
@@ -10,8 +9,11 @@ export const ENDPOINTS = {
     },
 
     USERS: {
+        BASE: '/api/users',
         PROFILE: (id) => `/api/users/${id}`,
         ME: '/api/users/me',
+        BY_ROLE: (role) => `/api/users?role=${role}`,
+        SEARCH: (query) => `/api/users?search=${encodeURIComponent(query)}`,
     },
 
     COMMITTEES: {

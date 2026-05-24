@@ -24,6 +24,7 @@
     padding: 1.5rem 2rem;
     display: flex;
     align-items: flex-start;
+    justify-content: space-between;
     gap: 1.5rem;
 }
 
@@ -97,7 +98,7 @@
 
 /* === Основной контент === */
 .main {
-    max-width: 1100px;
+    max-width: 1300px;
     margin: 0 auto;
     padding: 2rem;
     display: flex;
@@ -383,4 +384,89 @@
     .sessionDate {
         align-self: flex-end;
     }
+}
+
+.actionBar {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.joinBtn {
+    background: var(--success);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.joinBtn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.joinBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.alreadyMember {
+    font-size: 0.95rem;
+    color: var(--success);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    background: rgba(35, 134, 54, 0.1);
+    border-radius: 6px;
+}
+.actionBar {
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.joinBtn,
+.leaveBtn {
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.joinBtn {
+    background: var(--success);
+    color: white;
+}
+
+.leaveBtn {
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.joinBtn:hover:not(:disabled),
+.leaveBtn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.joinBtn:disabled,
+.leaveBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.alreadyMember {
+    font-size: 0.95rem;
+    color: var(--success);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    background: rgba(35, 134, 54, 0.1);
+    border-radius: 6px;
 }
