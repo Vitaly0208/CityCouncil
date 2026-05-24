@@ -46,7 +46,9 @@ public class CommitteeRepository : ICommitteeRepository
     }
 
     public async Task<List<Committee>> GetAllAsync(CancellationToken ct = default) => 
-        await _dbContext.Committees.ToListAsync(ct);
+        await _dbContext.Committees
+            .Where(c => !c.IsArchived)
+            .ToListAsync(ct);
 
     public async Task<List<Committee>> GetBySpecializationAsync(string specialization, CancellationToken ct = default) =>
         await _dbContext.Committees

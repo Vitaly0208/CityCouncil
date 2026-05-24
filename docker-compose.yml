@@ -3,7 +3,7 @@
     build:
       context: ./backend/MyCityCouncil
       dockerfile: Dockerfile
-    container_name: mycitycouncil-api
+    container_name: mycitycouncilproject-api
     ports:
       - "8080:8080"
     environment:
@@ -32,7 +32,7 @@
 
   db:
     image: postgres:15-alpine
-    container_name: mycitycouncil-db
+    container_name: mycitycouncilproject-db
     environment:
       - POSTGRES_DB=mycitycouncil_db
       - POSTGRES_USER=postgres

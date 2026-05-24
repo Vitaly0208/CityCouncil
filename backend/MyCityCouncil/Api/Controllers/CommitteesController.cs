@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using MyCityCouncil.Application.Features.Committees.Create;
+using MyCityCouncil.Application.Features.Committees.Delete;
 using MyCityCouncil.Application.Features.Committees.GetDetails;
 using MyCityCouncil.Application.Features.Committees.GetList;
 using MyCityCouncil.Application.Features.Committees.Members;
@@ -14,7 +15,7 @@ namespace MyCityCouncil.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // По умолчанию требуем авторизацию. Публичные методы помечены [AllowAnonymous]
+[Authorize]
 public class CommitteesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -29,10 +30,7 @@ public class CommitteesController : ControllerBase
         var result = await _mediator.Send(query, ct);
         return Ok(result);
     }
-    
-    /// <summary>
-    /// Получить детальную информацию о комиссии: профиль, текущий состав, история за 10 лет
-    /// </summary>
+
     [HttpGet("{id}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(CommitteeDetailsDto), StatusCodes.Status200OK)]
@@ -44,9 +42,6 @@ public class CommitteesController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Создать новую комиссию
-    /// </summary>
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(CreateCommitteeDto), StatusCodes.Status201Created)]
@@ -56,14 +51,7 @@ public class CommitteesController : ControllerBase
         var result = await _mediator.Send(command, ct);
         return CreatedAtAction(nameof(GetDetails), new { id = result.Id }, result);
     }
-
-    /// <summary>
-    /// Обновить профиль комиссии (название, специализация, описание)
-    /// </summary>
-
-    /// <summary>
-    /// Добавить рядового члена в комиссию
-    /// </summary>
+    
     [HttpPost("{id}/members")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(MembershipDto), StatusCodes.Status201Created)]
@@ -73,10 +61,7 @@ public class CommitteesController : ControllerBase
         var result = await _mediator.Send(command with { CommitteeId = id }, ct);
         return CreatedAtAction(nameof(GetMember), new { committeeId = id, userId = result.UserId }, result);
     }
-
-    /// <summary>
-    /// Назначить председателя комиссии (пользователь уже должен быть активным членом)
-    /// </summary>
+    
     [HttpPost("{id}/chairman")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(MembershipDto), StatusCodes.Status200OK)]
@@ -86,9 +71,29 @@ public class CommitteesController : ControllerBase
         var result = await _mediator.Send(command with { CommitteeId = id }, ct);
         return Ok(result);
     }
-    /// <summary>
-    /// Уволить пользователя из комиссии (снимает флаг председателя, если он был)
-    /// </summary>
+    
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    {
+        try
+        {
+            await _mediator.Send(new DeleteCommitteeCommand(id), ct);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new { error = "Комиссия не найдена" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     [HttpDelete("{id}/members/{userId}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -100,9 +105,6 @@ public class CommitteesController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>
-    /// Вспомогательный эндпоинт для получения конкретного членства (для CreatedAtAction)
-    /// </summary>
     [HttpGet("{committeeId}/members/{userId}")]
     [ApiExplorerSettings(IgnoreApi = true)] // Скрыт из Swagger, используется только для генерации ссылок
     public ActionResult<MembershipDto> GetMember(Guid committeeId, Guid userId) => 
