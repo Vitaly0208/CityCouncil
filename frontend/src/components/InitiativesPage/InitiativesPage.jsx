@@ -108,7 +108,7 @@ const InitiativesPage = () => {
                                     </div>
                                     <div className={styles.cardMeta}>
                                         <time className={styles.date}>{new Date(init.createdAt).toLocaleDateString('ru-RU')}</time>
-                                        <span className={styles.author}>👤 {init.authorName}</span>
+                                        <span className={styles.author}>{init.authorName}</span>
                                     </div>
                                 </article>
                             ))}

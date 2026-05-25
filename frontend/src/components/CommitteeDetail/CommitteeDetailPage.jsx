@@ -42,31 +42,17 @@ const CommitteeDetailsPage = () => {
     };
 
     const handleLeave = async () => {
-        console.log('🔍 handleLeave started');
-        console.log('🔍 currentUserId:', currentUserId);
-        console.log('🔍 committeeId:', id);
-        console.log('🔍 leaveCommittee state:', leaveCommittee);
-
         if (!currentUserId) {
-            console.warn('⚠️ Exit blocked: currentUserId is undefined');
             alert('Не удалось определить пользователя. Войдите заново.');
             return;
         }
 
-        const confirmed = confirm(`Покинуть комиссию "${committee.name}"?`);
-        console.log('🔍 confirm result:', confirmed);
-        if (!confirmed) return;
+        if (!confirm(`Покинуть комиссию "${committee.name}"?`)) return;
 
         try {
-            console.log('🚀 Calling mutateAsync...');
-            await leaveCommittee.mutateAsync({
-                committeeId: id,
-                userId: currentUserId
-            });
-            console.log('✅ mutateAsync resolved');
+            await leaveCommittee.mutateAsync({ committeeId: id, userId: currentUserId });
             alert(`✅ Вы покинули комиссию "${committee.name}"`);
         } catch (err) {
-            console.error('❌ mutateAsync rejected:', err);
             alert('❌ Ошибка: ' + (err.message || 'Не удалось покинуть'));
         }
     };
@@ -101,30 +87,31 @@ const CommitteeDetailsPage = () => {
         <>
             <Navbar onLogout={handleLogout} />
             <div className={styles.container}>
-                <header className={styles.pageHeader}>
-                    <div className={styles.headerContent}>
-                        <div className={styles.headerTop}>
-                            <span className={styles.committeeCode}>#{committee.code || id.slice(0, 8).toUpperCase()}</span>
-                            <span className={`${styles.badge} ${styles.badgeActive}`}>Активна</span>
-                        </div>
-                        <h1 className={styles.pageTitle}>{committee.name}</h1>
-                        <p className={styles.specialization}>{committee.specialization}</p>
-                    </div>
-
-                    <div className={styles.actionBar}>
-                        {isMember ? (
-                            <button className={styles.leaveBtn} onClick={handleLeave} disabled={isPending}>
-                                {leaveCommittee.isPending ? 'Выход...' : 'Покинуть комиссию'}
-                            </button>
-                        ) : (
-                            <button className={styles.joinBtn} onClick={handleJoin} disabled={isPending}>
-                                {joinCommittee.isPending ? 'Вступление...' : 'Вступить в комиссию'}
-                            </button>
-                        )}
-                    </div>
-                </header>
-
+                {/* 👇 Всё содержимое теперь внутри main для идеального выравнивания */}
                 <main className={styles.main}>
+                    <header className={styles.pageHeader}>
+                        <div className={styles.headerContent}>
+                            <div className={styles.headerTop}>
+                                <span className={`${styles.badge} ${styles.badgeActive}`}>Активна</span>
+                            </div>
+                            <h1 className={styles.pageTitle}>{committee.name}</h1>
+                            <p className={styles.specialization}>{committee.specialization}</p>
+                        </div>
+
+                        <div className={styles.actionBar}>
+                            {isMember ? (
+                                <button className={styles.leaveBtn} onClick={handleLeave} disabled={isPending}>
+                                    {leaveCommittee.isPending ? 'Выход...' : 'Покинуть комиссию'}
+                                </button>
+                            ) : (
+                                <button className={styles.joinBtn} onClick={handleJoin} disabled={isPending}>
+                                    {joinCommittee.isPending ? 'Вступление...' : 'Вступить в комиссию'}
+                                </button>
+                            )}
+                        </div>
+                    </header>
+
+                    {/* О комиссии */}
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>О комиссии</h2>
                         <div className={styles.infoGrid}>
@@ -138,12 +125,6 @@ const CommitteeDetailsPage = () => {
                                         <dt>Членов комиссии</dt>
                                         <dd>{committee.currentMembers?.length ?? 0}</dd>
                                     </div>
-                                    {committee.meetingSchedule && (
-                                        <div className={styles.infoRow}>
-                                            <dt>График заседаний</dt>
-                                            <dd>{committee.meetingSchedule}</dd>
-                                        </div>
-                                    )}
                                     <div className={styles.infoRow}>
                                         <dt>Создана</dt>
                                         <dd>{formatDate(committee.createdAt)}</dd>
@@ -159,6 +140,7 @@ const CommitteeDetailsPage = () => {
                         </div>
                     </section>
 
+                    {/* Состав комиссии */}
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>Состав комиссии</h2>
                         {committee.currentMembers?.length > 0 ? (
@@ -173,9 +155,7 @@ const CommitteeDetailsPage = () => {
                                         </div>
                                         <p className={styles.memberRole}>{member.isChairman ? 'Председатель' : 'Член комиссии'}</p>
                                         {member.appointedAt && (
-                                            <span className={styles.memberSince}>
-                                                С {formatDate(member.appointedAt)}
-                                            </span>
+                                            <span className={styles.memberSince}>С {formatDate(member.appointedAt)}</span>
                                         )}
                                     </div>
                                 ))}
@@ -185,7 +165,52 @@ const CommitteeDetailsPage = () => {
                         )}
                     </section>
 
-                    {/* Остальные секции (Инициативы, Заседания) остаются без изменений */}
+                    {/* Расписание заседаний */}
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Расписание заседаний</h2>
+                        {committee.upcomingSessions?.length > 0 ? (
+                            <div className={styles.sessionsList}>
+                                {committee.upcomingSessions.map(session => (
+                                    <Link key={session.id} to={`/sessions/${session.id}`} className={styles.sessionCard}>
+                                        <div className={styles.sessionDate}>
+                                            <span className={styles.dateDay}>
+                                                {new Date(session.heldAt).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short' })}
+                                            </span>
+                                            <span className={styles.dateYear}>
+                                                {new Date(session.heldAt).getFullYear()}
+                                            </span>
+                                        </div>
+                                        <div className={styles.sessionInfo}>
+                                            <h3 className={styles.sessionTitle}>{session.title}</h3>
+                                            {session.location && <span className={styles.sessionLocation}>📍 {session.location}</span>}
+                                        </div>
+                                        <span className={styles.arrow}>→</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className={styles.empty}>Заседания не запланированы</div>
+                        )}
+                    </section>
+
+                    {/* Принятые инициативы участников */}
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Принятые инициативы участников</h2>
+                        {committee.acceptedInitiatives?.length > 0 ? (
+                            <div className={styles.initiativesList}>
+                                {committee.acceptedInitiatives.map(init => (
+                                    <Link key={init.id} to={`/initiatives/${init.id}`} className={styles.initiativeCard}>
+                                        <div className={styles.initiativeContent}>
+                                            <h3 className={styles.initiativeTitle}>{init.title}</h3>
+                                        </div>
+                                        <time className={styles.initiativeDate}>{formatDate(init.createdAt)}</time>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className={styles.empty}>У участников пока нет принятых инициатив</div>
+                        )}
+                    </section>
                 </main>
             </div>
         </>

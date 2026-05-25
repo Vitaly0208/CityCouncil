@@ -298,10 +298,7 @@ const SessionDetailPage = () => {
                     <div className={styles.modal}>
                         <h2 className={styles.modalTitle}>Присоединиться к заседанию?</h2>
                         <p className={styles.modalText}>
-                            Вы собираетесь присоединиться к заседанию <strong>"{session.title}"</strong>
-                        </p>
-                        <p className={styles.modalHint}>
-                            После присоединения вы сможете участвовать в голосовании
+                            Вы собираетесь присоединиться к заседанию <strong>{session.title}</strong>
                         </p>
                         <div className={styles.modalActions}>
                             <button

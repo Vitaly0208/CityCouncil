@@ -4,11 +4,26 @@ import { queryKeys } from '../query/keys';
 
 /**
  * @typedef {Object} CommitteeMember
- * @property {string} id
+ * @property {string} userId
  * @property {string} fullName
- * @property {string} role
- * @property {string} appointedAt
  * @property {boolean} isChairman
+ * @property {string} appointedAt
+ */
+
+/**
+ * @typedef {Object} InitiativeSummary
+ * @property {string} id
+ * @property {string} title
+ * @property {string} authorName
+ * @property {string} createdAt
+ */
+
+/**
+ * @typedef {Object} SessionSummary
+ * @property {string} id
+ * @property {string} title
+ * @property {string} heldAt
+ * @property {string} location
  */
 
 /**
@@ -17,9 +32,11 @@ import { queryKeys } from '../query/keys';
  * @property {string} name
  * @property {string} specialization
  * @property {string} description
- * @property {CommitteeMember[]} members
- * @property {CommitteeMember} chairman
- * @property {boolean} isUserMember
+ * @property {boolean} isArchived
+ * @property {CommitteeMember[]} currentMembers
+ * @property {CommitteeMember[]} history
+ * @property {InitiativeSummary[]} acceptedInitiatives
+ * @property {SessionSummary[]} upcomingSessions
  */
 
 

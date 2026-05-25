@@ -20,12 +20,14 @@
 /* === Шапка страницы === */
 .pageHeader {
     background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 1.5rem 2rem;
+    border: 1px solid var(--border); /* Заменено на полную обводку */
+    border-radius: 8px;              /* Добавлено скругление как у секций */
+    padding: 1.5rem;                 /* Выровнено с .section */
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 1.5rem;
+    max-width: 1300px;               /* Ограничение ширины как у .main */     /* Центрирование и отступ снизу */
 }
 
 .backButton {
@@ -346,50 +348,9 @@
     color: var(--accent-hover);
 }
 
-/* === Адаптивность === */
-@media (max-width: 900px) {
-    .infoGrid {
-        grid-template-columns: 1fr;
-    }
-
-    .pageHeader {
-        flex-direction: column;
-        padding: 1.25rem 1.5rem;
-    }
-
-    .main {
-        padding: 1.5rem;
-    }
-
-    .sectionHeader {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-}
-
-@media (max-width: 600px) {
-    .membersGrid {
-        grid-template-columns: 1fr;
-    }
-
-    .initiativeItem,
-    .sessionItem {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .initiativeDate,
-    .sessionDate {
-        align-self: flex-end;
-    }
-}
 
 .actionBar {
-    margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
     display: flex;
     justify-content: flex-end;
 }
@@ -469,4 +430,71 @@
     padding: 0.75rem 1.5rem;
     background: rgba(35, 134, 54, 0.1);
     border-radius: 6px;
+}
+/* ===== Расписание заседаний ===== */
+.sessionsList, .initiativesList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sessionCard, .initiativeCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: rgba(139, 148, 158, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.sessionCard:hover, .initiativeCard:hover {
+    border-color: var(--accent);
+    background: rgba(207, 34, 46, 0.05);
+}
+
+.sessionDate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+    padding-right: 1rem;
+    border-right: 1px solid var(--border);
+    margin-right: 1rem;
+}
+
+.dateDay {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+.dateYear {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.sessionInfo { flex: 1; }
+.sessionTitle { margin: 0 0 0.25rem; font-size: 1rem; font-weight: 600; }
+.sessionLocation { font-size: 0.85rem; color: var(--text-secondary); }
+
+/* ===== Инициативы ===== */
+.initiativeContent { flex: 1; }
+.initiativeTitle { margin: 0 0 0.25rem; font-size: 1rem; font-weight: 600; }
+.initiativeAuthor { font-size: 0.85rem; color: var(--text-secondary); }
+.initiativeDate { font-size: 0.85rem; color: var(--text-tertiary); white-space: nowrap; margin-left: 1rem; }
+
+.arrow {
+    color: var(--accent);
+    font-size: 1.2rem;
+    margin-left: 1rem;
+    transition: transform 0.2s;
+}
+
+.sessionCard:hover .arrow, .initiativeCard:hover .arrow {
+    transform: translateX(3px);
 }

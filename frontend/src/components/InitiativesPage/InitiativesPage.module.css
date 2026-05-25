@@ -9,8 +9,15 @@
 .main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
 .topBar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .topBar h2 { margin: 0; font-size: 1.4rem; }
-.primaryBtn { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
-.primaryBtn:hover { background: var(--accent-hover); }
+.primaryBtn {
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500; }
+.primaryBtn:hover { background: rgba(207, 34, 46, 0.25); }
 .primaryBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .formCard { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
