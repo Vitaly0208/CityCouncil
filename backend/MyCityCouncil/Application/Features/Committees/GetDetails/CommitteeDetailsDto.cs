@@ -7,7 +7,9 @@ public record CommitteeDetailsDto(
     string? Description,
     bool IsArchived,
     List<CommitteeMemberDto> CurrentMembers,
-    List<CommitteeHistoryEntryDto> History
+    List<CommitteeHistoryEntryDto> History,
+    List<InitiativeSummaryDto> AcceptedInitiatives, 
+    List<SessionSummaryDto> UpcomingSessions
 ); 
 
 public record CommitteeMemberDto(
@@ -23,4 +25,18 @@ public record CommitteeHistoryEntryDto(
     bool WasChairman,
     DateTime AppointedAt,
     DateTime? DismissedAt
+);
+
+public record InitiativeSummaryDto(
+    Guid Id,
+    string Title,
+    string AuthorName,
+    DateTime CreatedAt
+);
+
+public record SessionSummaryDto(
+    Guid Id,
+    string Title,
+    DateTime HeldAt,
+    string? Location
 );

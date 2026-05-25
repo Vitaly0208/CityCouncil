@@ -235,4 +235,39 @@ public class CommitteeRepository : ICommitteeRepository
         _dbContext.Committees.Update(committee);
         return true;
     }
+    
+    public async Task<List<Initiative>> GetAcceptedInitiativesByMembersAsync(Guid committeeId, CancellationToken ct = default)
+    {
+        var memberUserIds = await _dbContext.CommitteeInfos
+            .Where(m => m.CommitteeId == committeeId)
+            .Select(m => m.UserId)
+            .Distinct()
+            .ToListAsync(ct);
+
+        if (!memberUserIds.Any()) return new List<Initiative>();
+
+        return await _dbContext.Initiatives
+            .Where(i => memberUserIds.Contains(i.UserId) && i.Status == InitiativeStatus.Accepted)
+            .Include(i => i.User)
+            .OrderByDescending(i => i.CreatedAt)
+            .ToListAsync(ct);
+    }
+
+    public async Task<List<Session>> GetUpcomingSessionsAsync(Guid committeeId, CancellationToken ct = default)
+    {
+        var now = DateTime.UtcNow;
+        return await _dbContext.Sessions
+            .Where(s => s.CommitteeId == committeeId && s.HeldAt > now && !s.IsCompleted)
+            .OrderBy(s => s.HeldAt)
+            .ToListAsync(ct);
+    }
+
+    public async Task<List<CommitteeInfo>> GetMembershipHistoryAsync(Guid committeeId, CancellationToken ct = default)
+    {
+        return await _dbContext.CommitteeInfos
+            .Where(m => m.CommitteeId == committeeId)
+            .Include(m => m.User)
+            .OrderByDescending(m => m.AppointedAt)
+            .ToListAsync(ct);
+    }
 }

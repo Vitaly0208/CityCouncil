@@ -18,6 +18,10 @@ public class GetCommitteeDetailsHandler : IRequestHandler<GetCommitteeDetailsQue
         
         var history = await _repo.GetHistoryAsync(request.CommitteeId, yearsBack: 10, ct);
         
+        var initiatives = await _repo.GetAcceptedInitiativesByMembersAsync(request.CommitteeId, ct);
+        
+        var sessions = await _repo.GetUpcomingSessionsAsync(request.CommitteeId, ct);
+        
         var currentMembersDto = currentMembers
             .Select(m => new CommitteeMemberDto(
                 m.UserId,
@@ -27,7 +31,7 @@ public class GetCommitteeDetailsHandler : IRequestHandler<GetCommitteeDetailsQue
             .OrderByDescending(m => m.IsChairman)
             .ThenBy(m => m.FullName)
             .ToList();
-
+        
         var historyDto = history
             .Select(h => new CommitteeHistoryEntryDto(
                 h.UserId,
@@ -37,6 +41,24 @@ public class GetCommitteeDetailsHandler : IRequestHandler<GetCommitteeDetailsQue
                 h.DismissedAt))
             .OrderByDescending(h => h.AppointedAt)
             .ToList();
+        
+        var initiativesDto = initiatives
+            .Select(i => new InitiativeSummaryDto(
+                i.Id,
+                i.Title,
+                $"{i.User?.FirstName} {i.User?.LastName}",
+                i.CreatedAt
+            ))
+            .ToList();
+        
+        var sessionsDto = sessions
+            .Select(s => new SessionSummaryDto(
+                s.Id,
+                s.Title,
+                s.HeldAt,
+                s.Location
+            ))
+            .ToList();
 
         return new CommitteeDetailsDto(
             committee.Id,
@@ -45,7 +67,9 @@ public class GetCommitteeDetailsHandler : IRequestHandler<GetCommitteeDetailsQue
             committee.Description,
             committee.IsArchived,
             currentMembersDto,
-            historyDto
+            historyDto,
+            initiativesDto,
+            sessionsDto
         );
     }
 }

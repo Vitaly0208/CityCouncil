@@ -54,4 +54,8 @@ public interface ICommitteeRepository
     
     Task<bool> ArchiveAsync(Guid committeeId, CancellationToken ct = default);
     
+    Task<List<Initiative>> GetAcceptedInitiativesByMembersAsync(Guid committeeId, CancellationToken ct = default);
+    Task<List<Session>> GetUpcomingSessionsAsync(Guid committeeId, CancellationToken ct = default);
+    Task<List<CommitteeInfo>> GetMembershipHistoryAsync(Guid committeeId, CancellationToken ct = default);
+    
 }
