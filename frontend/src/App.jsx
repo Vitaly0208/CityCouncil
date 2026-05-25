@@ -10,6 +10,7 @@ import InitiativesPage from "./components/InitiativesPage/InitiativesPage.jsx";
 import CommitteeDetailsPage from "./components/CommitteeDetail/CommitteeDetailPage.jsx";
 import SessionDetailPage from "./components/Sessions/SessionDetailPage/SessionDetailPage.jsx";
 import SessionsPage from "./components/Sessions/SessionsPage/SessionsPage.jsx";
+import DeputiesPage from "./components/Deputies/DeputiesPage.jsx";
 
 const ProtectedRoute = ({ children }) =>
     tokenService.isAuthenticated() ? children : <Navigate to="/login" replace />;
@@ -34,7 +35,7 @@ function App() {
                     <ProtectedRoute><CommitteesPage /></ProtectedRoute>
                 } />
                 <Route path="/parties" element={<ProtectedRoute><div>Страница партий</div></ProtectedRoute>} />
-                <Route path="/deputies" element={<ProtectedRoute><div>Страница депутатов</div></ProtectedRoute>} />
+                <Route path="/deputies" element={<ProtectedRoute><DeputiesPage /></ProtectedRoute>} />
                 <Route path="/elections" element={<ProtectedRoute><div>Страница выборов</div></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to="/login" replace />} />
                 <Route path="/initiatives" element={<ProtectedRoute><InitiativesPage /></ProtectedRoute>} />
@@ -49,12 +50,7 @@ function App() {
                 } />
                 <Route path="/sessions" element={<ProtectedRoute><SessionsPage /></ProtectedRoute>} />
                 <Route path="/sessions/:id" element={<ProtectedRoute><SessionDetailPage /></ProtectedRoute>} />
-                {/*<Route path="/committees/:id/initiatives" element={*/}
-                {/*    <ProtectedRoute><CommitteeInitiativesPage /></ProtectedRoute>*/}
-                {/*} />*/}
-                {/*<Route path="/committees/:id/sessions" element={*/}
-                {/*    <ProtectedRoute><CommitteeSessionsPage /></ProtectedRoute>*/}
-                {/*} />*/}
+
             </Routes>
         </BrowserRouter>
     );

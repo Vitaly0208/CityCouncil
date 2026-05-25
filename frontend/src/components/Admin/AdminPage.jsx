@@ -12,19 +12,16 @@ const AdminPage = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('moderation');
 
-    // Состояния для пользователей
     const [selectedUser, setSelectedUser] = useState(null);
     const [showCommissionModal, setShowCommissionModal] = useState(false);
     const [showChairmanModal, setShowChairmanModal] = useState(false);
 
-    // Состояния для новостей
     const [news, setNews] = useState(() => {
         try { return JSON.parse(localStorage.getItem('admin_news')) || []; }
         catch { return []; }
     });
     const [newsForm, setNewsForm] = useState({ title: '', content: '' });
 
-    // Фильтры и формы
     const [initSearch, setInitSearch] = useState('');
     const [sessionForm, setSessionForm] = useState({ title: '', heldAt: '', location: '', committeeId: '' });
     const [committeeForm, setCommitteeForm] = useState({ name: '', specialization: '', description: '' });
@@ -32,7 +29,6 @@ const AdminPage = () => {
     const [userFilter, setUserFilter] = useState({ committeeId: '', search: '' });
     const [visibleUsers, setVisibleUsers] = useState(10);
 
-    // Хуки данных
     const { initiatives: pendingInitiatives, isLoading: loadPending } = useInitiatives({ status: 'PendingReview' });
     const { initiatives: approvedInitiatives, isLoading: loadApproved } = useInitiatives({ status: 'Accepted' });
     const { committees, isLoading: loadCommittees } = useCommittees();
@@ -43,7 +39,6 @@ const AdminPage = () => {
 
     const { data: committeeUsers = [] } = useUsersByCommittee(userFilter.committeeId || null);
 
-    // Мутации
     const reviewMutation = useReviewInitiative();
     const createSessionMutation = useCreateSessionWithQueue();
     const createCommitteeMutation = useCreateCommittee();
@@ -56,7 +51,6 @@ const AdminPage = () => {
         localStorage.setItem('admin_news', JSON.stringify(news));
     }, [news]);
 
-    // Логика фильтрации пользователей
     const filteredUsers = useMemo(() => {
         let users = userFilter.committeeId ? committeeUsers : allUsers;
         if (userFilter.search) {
@@ -133,14 +127,12 @@ const AdminPage = () => {
     const handleAddUserToCommittee = async (userId, committeeId) => {
         try {
             await addUserToCommittee.mutateAsync({ userId, committeeId });
-            // Не закрываем модалку, чтобы видеть результат
         } catch (err) {
             alert('❌ Ошибка: ' + (err.message || 'Не удалось добавить'));
         }
     };
 
     const handleRemoveUserFromCommittee = async (userId, committeeId) => {
-        // if (!confirm('Удалить пользователя из комиссии?')) return; // Можно включить подтверждение
         try {
             await removeUserFromCommittee.mutateAsync({ userId, committeeId });
         } catch (err) {
@@ -180,7 +172,7 @@ const AdminPage = () => {
         { id: 'sessions', label: 'Заседания' },
         { id: 'committees', label: 'Комиссии' },
         { id: 'deputies', label: 'Пользователи' },
-        { id: 'approved', label: 'Утверждённые' },
+        { id: 'Initiatives', label: 'Инициативы' },
         { id: 'news', label: 'Новости' },
     ];
 
@@ -231,8 +223,8 @@ const AdminPage = () => {
                                                 <span className={styles.meta}>Автор: {init.authorName} • {new Date(init.createdAt).toLocaleDateString('ru-RU')}</span>
                                             </div>
                                             <div className={styles.reviewActions}>
-                                                <button className={styles.approveBtn} onClick={() => handleReview(init.id, true)}>✅ Одобрить</button>
-                                                <button className={styles.rejectBtn} onClick={() => handleReview(init.id, false)}>❌ Отклонить</button>
+                                                <button className={styles.approveBtn} onClick={() => handleReview(init.id, true)}>Одобрить</button>
+                                                <button className={styles.rejectBtn} onClick={() => handleReview(init.id, false)}>Отклонить</button>
                                             </div>
                                         </div>
                                     ))}
@@ -246,7 +238,7 @@ const AdminPage = () => {
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Управление комиссиями</h2>
                             <form onSubmit={handleCreateCommittee} className={styles.committeeForm}>
-                                <h3>➕ Новая комиссия</h3>
+                                <h3>Новая комиссия</h3>
                                 <div className={styles.formGrid}>
                                     <input type="text" placeholder="Название комиссии" value={committeeForm.name} onChange={e => setCommitteeForm({...committeeForm, name: e.target.value})} required />
                                     <input type="text" placeholder="Специализация" value={committeeForm.specialization} onChange={e => setCommitteeForm({...committeeForm, specialization: e.target.value})} required />
@@ -267,7 +259,7 @@ const AdminPage = () => {
                                             </div>
                                             <div className={styles.committeeActions}>
                                                 <Link to={`/committees/${c.id}`} className={styles.linkBtn}>Просмотр</Link>
-                                                <button className={styles.deleteBtn} onClick={() => handleDeleteCommittee(c.id, c.name)} disabled={deleteCommitteeMutation.isPending}>🗑️ Удалить</button>
+                                                <button className={styles.deleteBtn} onClick={() => handleDeleteCommittee(c.id, c.name)} disabled={deleteCommitteeMutation.isPending}>Удалить</button>
                                             </div>
                                         </div>
                                     ))}
@@ -294,7 +286,7 @@ const AdminPage = () => {
                                 </select>
                                 <input
                                     type="text"
-                                    placeholder="🔍 Поиск..."
+                                    placeholder="Поиск..."
                                     value={userFilter.search}
                                     onChange={e => setUserFilter({...userFilter, search: e.target.value})}
                                     className={styles.searchInput}
@@ -329,9 +321,6 @@ const AdminPage = () => {
                                                                 </span>
                                                                 <span className={styles.userEmail}>{u.email}</span>
                                                             </div>
-                                                            {isInCommittee && (
-                                                                <span className={styles.inCommitteeBadge}>✓</span>
-                                                            )}
                                                         </button>
                                                     );
                                                 })}
@@ -358,10 +347,7 @@ const AdminPage = () => {
                                         <div className={styles.userDetail}>
                                             <div className={styles.userDetailHeader}>
                                                 <div>
-                                                    <h3>{selectedUser.firstName} {selectedUser.lastName}</h3>
-                                                    {selectedUser.middleName && (
-                                                        <span className={styles.userMiddleName}>{selectedUser.middleName}</span>
-                                                    )}
+                                                    <h3>{selectedUser.middleName} {selectedUser.firstName} {selectedUser.lastName}</h3>
                                                 </div>
                                                 <span className={styles.roleBadge}>{selectedUser.role?.name || 'Пользователь'}</span>
                                             </div>
@@ -375,10 +361,10 @@ const AdminPage = () => {
                                                         <dt>Телефоны</dt>
                                                         <dd className={styles.phoneList}>
                                                             {selectedUser.homePhone && (
-                                                                <span className={styles.phoneItem}>🏠 {selectedUser.homePhone}</span>
+                                                                <span className={styles.phoneItem}>Home: {selectedUser.homePhone}</span>
                                                             )}
                                                             {selectedUser.workPhone && (
-                                                                <span className={styles.phoneItem}>💼 {selectedUser.workPhone}</span>
+                                                                <span className={styles.phoneItem}>Work: {selectedUser.workPhone}</span>
                                                             )}
                                                         </dd>
                                                     </>
@@ -429,7 +415,7 @@ const AdminPage = () => {
                                                     className={styles.manageCommitteesBtn}
                                                     onClick={() => setShowCommissionModal(true)}
                                                 >
-                                                    📋 Управление комиссиями
+                                                    Управление комиссиями
                                                 </button>
 
                                                 {selectedUser.committeesMemberships?.some(m => !m.dismissedAt) && (
@@ -438,7 +424,7 @@ const AdminPage = () => {
                                                         onClick={() => setShowChairmanModal(true)}
                                                         disabled={!selectedUser.committeesMemberships?.some(m => !m.dismissedAt && !m.isChairman)}
                                                     >
-                                                        👑 Сделать председателем
+                                                        Сделать председателем
                                                     </button>
                                                 )}
                                             </div>
@@ -467,7 +453,7 @@ const AdminPage = () => {
                                                             {membership ? (
                                                                 <>
                                                                     <span className={styles.memberBadge}>
-                                                                        {isChairman ? 'Председатель' : 'Член'}
+                                                                        {isChairman ? 'Председатель' : 'Участник'}
                                                                     </span>
                                                                     <button
                                                                         className={styles.removeSmallBtn}
@@ -554,17 +540,17 @@ const AdminPage = () => {
                                     <input type="text" placeholder="ID Комиссии" value={sessionForm.committeeId} onChange={e => setSessionForm({...sessionForm, committeeId: e.target.value})} required />
                                 </div>
                                 <button type="submit" className={styles.primaryBtn} disabled={createSessionMutation.isPending}>
-                                    {createSessionMutation.isPending ? 'Создание...' : '🚀 Создать заседание'}
+                                    {createSessionMutation.isPending ? 'Создание...' : 'Создать заседание'}
                                 </button>
                             </form>
                         </section>
                     )}
 
                     {/* Утверждённые */}
-                    {activeTab === 'approved' && (
+                    {activeTab === 'Initiatives' && (
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Утверждённые инициативы</h2>
-                            <input type="text" placeholder="🔍 Поиск..." value={initSearch} onChange={e => setInitSearch(e.target.value)} className={styles.searchInput} />
+                            <input type="text" placeholder="Поиск..." value={initSearch} onChange={e => setInitSearch(e.target.value)} className={styles.searchInput} />
                             {filteredApproved.length === 0 ? <div className={styles.empty}>Инициативы не найдены</div> :
                                 <div className={styles.initiativesList}>
                                     {filteredApproved.map(init => (
@@ -588,7 +574,7 @@ const AdminPage = () => {
                             <form onSubmit={handleAddNews} className={styles.newsForm}>
                                 <input type="text" placeholder="Заголовок" value={newsForm.title} onChange={e => setNewsForm({...newsForm, title: e.target.value})} required />
                                 <textarea placeholder="Содержание" value={newsForm.content} onChange={e => setNewsForm({...newsForm, content: e.target.value})} rows={3} required />
-                                <button type="submit" className={styles.primaryBtn}>📢 Опубликовать</button>
+                                <button type="submit" className={styles.primaryBtn}>Опубликовать</button>
                             </form>
                             <div className={styles.newsList}>
                                 {news.length === 0 ? <div className={styles.empty}>Новостей нет</div> :
@@ -599,7 +585,7 @@ const AdminPage = () => {
                                                 <p>{item.content}</p>
                                                 <time>{new Date(item.createdAt).toLocaleString('ru-RU')}</time>
                                             </div>
-                                            <button className={styles.deleteBtn} onClick={() => handleDeleteNews(item.id)}>🗑️</button>
+                                            <button className={styles.deleteBtn} onClick={() => handleDeleteNews(item.id)}>Удалить</button>
                                         </div>
                                     ))
                                 }

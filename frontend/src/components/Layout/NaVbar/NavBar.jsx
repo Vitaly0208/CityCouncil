@@ -22,6 +22,7 @@ const Navbar = ({ onLogout }) => {
         { to: '/initiatives', label: 'Инициативы' },
         { to: '/committees', label: 'Комиссии' },
         { to: '/sessions', label: 'Заседания' },
+        { to: '/deputies', label: 'Депутаты' },
     ];
 
     const adminLinks = [

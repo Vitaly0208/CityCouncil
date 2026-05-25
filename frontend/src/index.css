@@ -9,3 +9,11 @@ html, body, #root {
     background: #0b1623;
     font-family: Inter, system-ui, sans-serif;
 }
+html, body {
+    margin: 0;
+    font-family: 'Roboto Slab', serif;
+}
+
+.cardTitle, .sectionTitle, .headerTitle {
+    font-family: system-ui, -apple-system, sans-serif;
+}
