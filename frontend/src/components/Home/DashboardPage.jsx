@@ -1,7 +1,8 @@
-// src/pages/Dashboard/DashboardPage.jsx
+import { useState, useMemo } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { tokenService } from "../../../api/tokenService.js";
 import { useInitiatives } from "../../hooks/useInitiatives.js";
+import { useSessions } from "../../hooks/useSessions.js";
 import styles from './DashboardPage.module.css';
 
 const NEWS = [
@@ -10,40 +11,67 @@ const NEWS = [
     { id: 3, date: '22 апреля 2026', title: 'Завершены выборы председателя Комиссии по транспорту', text: 'Новый руководитель вступит в должность с 1 мая...' },
 ];
 
-const SESSIONS = [
-    { id: 1, day: '30', month: 'апр', time: '10:00', title: 'Заседание Комиссии по образованию', isNext: true },
-    { id: 2, day: '02', month: 'мая', time: '11:00', title: 'Заседание Комиссии по ЖКХ', isNext: false },
-    { id: 3, day: '05', month: 'мая', time: '14:00', title: 'Пленарное заседание Городской Думы', isNext: false },
-    { id: 4, day: '07', month: 'мая', time: '09:30', title: 'Выборы главы партии «Прогресс»', isNext: false },
-];
-
-const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => i + 1);
-const EVENT_DAYS = [8, 15, 20, 28, 30];
-
 const DashboardPage = () => {
     const navigate = useNavigate();
+    const { initiatives, isLoading, isError } = useInitiatives({ status: 'Accepted' });
+    const { data: sessions, isLoading: loadSessions, isError: sessionsError } = useSessions();
 
-    // ✅ 1. Правильно деструктурируем хук + фильтруем только принятые на бэке
-    const { initiatives, isLoading , isError, error} = useInitiatives({ status: 'Accepted' });
+    const now = new Date();
+    const [viewDate, setViewDate] = useState({ month: now.getMonth(), year: now.getFullYear() });
 
     const handleLogout = () => {
         tokenService.clearTokens();
         navigate('/login');
     };
 
-    // ✅ 2. Форматирование даты из ISO-строки
     const formatDate = (isoString) => {
         if (!isoString) return '';
         return new Date(isoString).toLocaleDateString('ru-RU', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
+            day: '2-digit', month: '2-digit', year: 'numeric'
         });
     };
 
+    const handlePrevMonth = () => {
+        setViewDate(prev => {
+            const d = new Date(prev.year, prev.month - 1, 1);
+            return { month: d.getMonth(), year: d.getFullYear() };
+        });
+    };
+
+    const handleNextMonth = () => {
+        setViewDate(prev => {
+            const d = new Date(prev.year, prev.month + 1, 1);
+            return { month: d.getMonth(), year: d.getFullYear() };
+        });
+    };
+
+    const calendarData = useMemo(() => {
+        const { month, year } = viewDate;
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDay = new Date(year, month, 1).getDay();
+        const offset = firstDay === 0 ? 6 : firstDay - 1;
+        const monthLabel = new Date(year, month).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+
+        const eventDays = new Set();
+        sessions?.forEach(s => {
+            const d = new Date(s.heldAt);
+            if (d.getMonth() === month && d.getFullYear() === year && !s.isCompleted) {
+                eventDays.add(d.getDate());
+            }
+        });
+
+        return { daysInMonth, offset, monthLabel, eventDays };
+    }, [viewDate, sessions]);
+
+    const upcomingSessions = useMemo(() => {
+        return sessions
+            ?.filter(s => !s.isCompleted && new Date(s.heldAt) > now)
+            .sort((a, b) => new Date(a.heldAt) - new Date(b.heldAt))
+            .slice(0, 4);
+    }, [sessions, now]);
+
     return (
         <div className={styles.container}>
-            {/* Шапка */}
             <header className={styles.header}>
                 <div className={styles.headerLeft}>
                     <div>
@@ -53,7 +81,6 @@ const DashboardPage = () => {
                 </div>
 
                 <div className={styles.searchBar}>
-                    <span>🔍</span>
                     <input type="text" placeholder="Поиск инициатив, депутатов..." />
                 </div>
 
@@ -65,9 +92,7 @@ const DashboardPage = () => {
                 </div>
             </header>
 
-            {/* Основная сетка */}
             <main className={styles.gridLayout}>
-                {/* НАВИГАЦИОННАЯ ПАНЕЛЬ */}
                 <nav className={`${styles.card} ${styles.subNavCard}`}>
                     <NavLink to="/news" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Новости</NavLink>
                     <NavLink to="/committees" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Комиссии</NavLink>
@@ -75,10 +100,8 @@ const DashboardPage = () => {
                     <NavLink to="/initiatives" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Инициативы</NavLink>
                     <NavLink to="/parties" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Партии</NavLink>
                     <NavLink to="/deputies" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Депутаты</NavLink>
-                    <NavLink to="/elections" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Выборы</NavLink>
                 </nav>
 
-                {/* Приветствие */}
                 <section className={`${styles.card} ${styles.welcomeCard}`}>
                     <div className={styles.cardHeader}>
                         <h2 className={styles.cardTitle}>Добро пожаловать</h2>
@@ -92,7 +115,6 @@ const DashboardPage = () => {
                     </div>
                 </section>
 
-                {/* Новости */}
                 <section className={styles.card}>
                     <div className={styles.cardHeader}>
                         <h2 className={styles.cardTitle}>Новости</h2>
@@ -110,60 +132,70 @@ const DashboardPage = () => {
                     </div>
                 </section>
 
-                {/* Заседания */}
                 <section className={styles.card}>
                     <div className={styles.cardHeader}>
                         <h2 className={styles.cardTitle}>Ближайшие заседания</h2>
-                        <a href="#" className={styles.cardLink}>Расписание →</a>
+                        <Link to="/sessions" className={styles.cardLink}>Расписание →</Link>
                     </div>
                     <div className={styles.list}>
-                        {SESSIONS.map((item) => (
-                            <article key={item.id} className={`${styles.sessionItem} ${item.isNext ? styles.sessionItemFeatured : ''}`}>
-                                <div className={`${styles.dateBadge} ${item.isNext ? styles.dateBadgeFeatured : ''}`}>
-                                    <span className={styles.dateDay}>{item.day}</span>
-                                    <span className={styles.dateMonth}>{item.month}</span>
-                                </div>
-                                <div className={styles.sessionInfo}>
-                                    <span className={`${styles.sessionTime} ${item.isNext ? styles.sessionTimeFeatured : ''}`}>{item.time}</span>
-                                    <h3 className={`${styles.sessionTitle} ${item.isNext ? styles.sessionTitleFeatured : ''}`}>{item.title}</h3>
-                                    <a href="#" className={styles.sessionLink}>Повестка →</a>
-                                </div>
-                            </article>
-                        ))}
+                        {loadSessions ? (
+                            <div className={styles.loadingSmall}>Загрузка...</div>
+                        ) : sessionsError || upcomingSessions?.length === 0 ? (
+                            <div className={styles.emptySmall}>Предстоящих заседаний нет</div>
+                        ) : (
+                            upcomingSessions.map((s, idx) => {
+                                const date = new Date(s.heldAt);
+                                const isNext = idx === 0;
+                                return (
+                                    <article key={s.id} className={`${styles.sessionItem} ${isNext ? styles.sessionItemFeatured : ''}`}>
+                                        <div className={`${styles.dateBadge} ${isNext ? styles.dateBadgeFeatured : ''}`}>
+                                            <span className={styles.dateDay}>{date.getDate().toString().padStart(2, '0')}</span>
+                                            <span className={styles.dateMonth}>{date.toLocaleDateString('ru-RU', { month: 'short' })}</span>
+                                        </div>
+                                        <div className={styles.sessionInfo}>
+                                            <span className={`${styles.sessionTime} ${isNext ? styles.sessionTimeFeatured : ''}`}>
+                                                {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                            <h3 className={`${styles.sessionTitle} ${isNext ? styles.sessionTitleFeatured : ''}`}>{s.title}</h3>
+                                            <Link to={`/sessions/${s.id}`} className={styles.sessionLink}>Повестка →</Link>
+                                        </div>
+                                    </article>
+                                );
+                            })
+                        )}
                     </div>
                 </section>
 
-                {/* Календарь */}
                 <section className={`${styles.card} ${styles.calendarCard}`}>
                     <div className={styles.calendarHeader}>
-                        <button className={styles.calendarNav}>‹</button>
-                        <span className={styles.calendarMonth}>Апрель 2026</span>
-                        <button className={styles.calendarNav}>›</button>
+                        <button className={styles.calendarNav} onClick={handlePrevMonth}>‹</button>
+                        <span className={styles.calendarMonth}>{calendarData.monthLabel}</span>
+                        <button className={styles.calendarNav} onClick={handleNextMonth}>›</button>
                     </div>
                     <div className={styles.calendarGrid}>
-                        {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d => <div key={d} className={styles.calendarWeekday}>{d}</div>)}
-                        <div className={styles.calendarEmpty}></div>
-                        {CALENDAR_DAYS.map(day => (
+                        {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d =>
+                            <div key={d} className={styles.calendarWeekday}>{d}</div>
+                        )}
+                        {Array.from({ length: calendarData.offset }).map((_, i) =>
+                            <div key={`empty-${i}`} className={styles.calendarEmpty}></div>
+                        )}
+                        {Array.from({ length: calendarData.daysInMonth }, (_, i) => i + 1).map(day => (
                             <div key={day} className={styles.calendarDay}>
                                 {day}
-                                {EVENT_DAYS.includes(day) && <span className={styles.calendarDot}></span>}
+                                {calendarData.eventDays.has(day) && <span className={styles.calendarDot}></span>}
                             </div>
                         ))}
                     </div>
                     <div className={styles.calendarLegend}>
-                        <span className={styles.legendItem}><span className={`${styles.dot} ${styles.dotRed}`}></span> Заседание комиссии</span>
-                        <span className={styles.legendItem}><span className={`${styles.dot} ${styles.dotOrange}`}></span> Пленарное заседание</span>
-                        <span className={styles.legendItem}><span className={`${styles.dot} ${styles.dotGreen}`}></span> Внутрипартийные выборы</span>
+                        <span className={styles.legendItem}>
+                            <span className={`${styles.dot} ${styles.dotRed}`}></span> Заседание комиссии
+                        </span>
                     </div>
                 </section>
             </main>
 
             <section className={styles.initiativesSection}>
                 <header className={styles.initiativesHeader}>
-                    {/*<img*/}
-                    {/*    src="/initiative.png"*/}
-                    {/*    alt="Логотип инициативы"*/}
-                    {/*/>*/}
                     <div>
                         <h2 className={styles.sectionTitle}>Последние принятые инициативы</h2>
                         <p className={styles.sectionSubtitle}>Инициативы, утверждённые городской думой</p>
@@ -172,28 +204,11 @@ const DashboardPage = () => {
                 </header>
 
                 <div className={styles.initiativesList}>
-                    {/* Загрузка */}
-                    {isLoading && (
-                        <div className={styles.initiativeRow}>
-                            <span className={styles.initiativeTitle}>Загрузка инициатив...</span>
-                        </div>
-                    )}
-
-                    {/* Ошибка */}
-                    {isError && (
-                        <div className={styles.initiativeRow}>
-                            <span className={styles.initiativeTitle}>Не удалось загрузить инициативы</span>
-                        </div>
-                    )}
-
-                    {/* Пустой список */}
+                    {isLoading && <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Загрузка инициатив...</span></div>}
+                    {isError && <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Не удалось загрузить инициативы</span></div>}
                     {!isLoading && !isError && initiatives.length === 0 && (
-                        <div className={styles.initiativeRow}>
-                            <span className={styles.initiativeTitle}>Принятых инициатив пока нет</span>
-                        </div>
+                        <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Принятых инициатив пока нет</span></div>
                     )}
-
-                    {/* ✅ Список инициатив с правильными полями */}
                     {!isLoading && !isError && initiatives.map((item, index) => (
                         <Link
                             key={item.id}
@@ -203,15 +218,9 @@ const DashboardPage = () => {
                             <div className={styles.initiativeContent}>
                                 <h3 className={styles.initiativeTitle}>{item.title}</h3>
                                 <div className={styles.initiativeMeta}>
-                                    <span className={styles.metaItem}>
-                                        <span className={styles.metaIcon}>👤</span>
-                                        {item.authorName || 'Неизвестный автор'}  {/* ✅ Правильное поле */}
-                                    </span>
+                                    <span className={styles.metaItem}>{item.authorName || 'Неизвестный автор'}</span>
                                     <span className={styles.metaDivider}>•</span>
-                                    <span className={styles.metaItem}>
-                                        <span className={styles.metaIcon}>📅</span>
-                                        {formatDate(item.createdAt)}  {/* ✅ Форматируем ISO-дату */}
-                                    </span>
+                                    <span className={styles.metaItem}>{formatDate(item.createdAt)}</span>
                                 </div>
                             </div>
                             <span className={styles.arrow}>→</span>
