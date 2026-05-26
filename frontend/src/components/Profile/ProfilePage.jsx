@@ -17,9 +17,9 @@ const ProfilePage = () => {
     };
 
     const getRoleLabel = (isChairman, status) => {
-        if (status === 'Архив') return 'Член (архив)';
+        if (status === 'Архив') return 'Участник (архив)';
         if (isChairman) return 'Председатель';
-        return 'Член';
+        return 'Участник';
     };
 
     const getRoleClass = (isChairman, status) => {

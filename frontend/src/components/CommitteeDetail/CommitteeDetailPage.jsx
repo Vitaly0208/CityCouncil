@@ -35,9 +35,9 @@ const CommitteeDetailsPage = () => {
 
         try {
             await joinCommittee.mutateAsync({ committeeId: id, userId: currentUserId });
-            alert(`✅ Вы вступили в комиссию "${committee.name}"`);
+            alert(`Вы вступили в комиссию "${committee.name}"`);
         } catch (err) {
-            alert('❌ Ошибка: ' + (err.message || 'Не удалось вступить'));
+            alert('Ошибка: ' + (err.message || 'Не удалось вступить'));
         }
     };
 
@@ -51,9 +51,9 @@ const CommitteeDetailsPage = () => {
 
         try {
             await leaveCommittee.mutateAsync({ committeeId: id, userId: currentUserId });
-            alert(`✅ Вы покинули комиссию "${committee.name}"`);
+            alert(`Вы покинули комиссию "${committee.name}"`);
         } catch (err) {
-            alert('❌ Ошибка: ' + (err.message || 'Не удалось покинуть'));
+            alert('Ошибка: ' + (err.message || 'Не удалось покинуть'));
         }
     };
 
@@ -87,7 +87,6 @@ const CommitteeDetailsPage = () => {
         <>
             <Navbar onLogout={handleLogout} />
             <div className={styles.container}>
-                {/* 👇 Всё содержимое теперь внутри main для идеального выравнивания */}
                 <main className={styles.main}>
                     <header className={styles.pageHeader}>
                         <div className={styles.headerContent}>
@@ -111,7 +110,6 @@ const CommitteeDetailsPage = () => {
                         </div>
                     </header>
 
-                    {/* О комиссии */}
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>О комиссии</h2>
                         <div className={styles.infoGrid}>
@@ -122,7 +120,7 @@ const CommitteeDetailsPage = () => {
                                         <dd>{committee.currentMembers?.find(m => m.isChairman)?.fullName || 'Не назначен'}</dd>
                                     </div>
                                     <div className={styles.infoRow}>
-                                        <dt>Членов комиссии</dt>
+                                        <dt>Участников комиссии</dt>
                                         <dd>{committee.currentMembers?.length ?? 0}</dd>
                                     </div>
                                     <div className={styles.infoRow}>
@@ -153,10 +151,13 @@ const CommitteeDetailsPage = () => {
                                                 <span className={`${styles.badge} ${styles.badgeChairman}`}>Председатель</span>
                                             )}
                                         </div>
-                                        <p className={styles.memberRole}>{member.isChairman ? 'Председатель' : 'Член комиссии'}</p>
-                                        {member.appointedAt && (
-                                            <span className={styles.memberSince}>С {formatDate(member.appointedAt)}</span>
-                                        )}
+                                        <div className = {styles.memberDesc}>
+                                            <p className={styles.memberRole}>{member.isChairman ? 'Председатель' : 'Участник'}</p>
+                                            {member.appointedAt && (
+                                                <span className={styles.memberSince}>с {formatDate(member.appointedAt)}</span>
+                                            )}
+                                        </div>
+
                                     </div>
                                 ))}
                             </div>
@@ -165,7 +166,6 @@ const CommitteeDetailsPage = () => {
                         )}
                     </section>
 
-                    {/* Расписание заседаний */}
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>Расписание заседаний</h2>
                         {committee.upcomingSessions?.length > 0 ? (
@@ -193,7 +193,6 @@ const CommitteeDetailsPage = () => {
                         )}
                     </section>
 
-                    {/* Принятые инициативы участников */}
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>Принятые инициативы участников</h2>
                         {committee.acceptedInitiatives?.length > 0 ? (

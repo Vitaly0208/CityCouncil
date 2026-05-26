@@ -31,6 +31,14 @@ public class CreateCommitteeHandler : IRequestHandler<CreateCommitteeCommand, Cr
         };
 
         await _committeeRepo.AddAsync(committee, ct);
+        
+        await _committeeRepo.AddMemberAsync(
+            committeeId: committee.Id,
+            userId: request.ChairmanId,
+            isChairman: true,
+            ct
+        );
+        
         await _unitOfWork.SaveAsync(ct);
         
         return new CreateCommitteeDto(
