@@ -45,8 +45,7 @@ public class InitiativeRepository : IInitiativeRepository
             .Where(i => i.Status == status)
             .OrderByDescending(i => i.ApprovedAt ?? i.CreatedAt)
             .ToListAsync(ct);
-
-    // Очередь: только InQueue, сортировка по дате одобрения (самые старые — первыми)
+    
     public async Task<List<Initiative>> GetQueueAsync(int limit = 25, CancellationToken ct = default) =>
         await _dbContext.Initiatives
             .AsNoTracking()
@@ -55,7 +54,6 @@ public class InitiativeRepository : IInitiativeRepository
             .Take(limit)
             .ToListAsync(ct);
 
-    // Топ-3 для продвижения на заседание
     public async Task<List<Initiative>> GetTopQueueInitiativesAsync(int count = 3, CancellationToken ct = default) =>
         await _dbContext.Initiatives
             .AsNoTracking()

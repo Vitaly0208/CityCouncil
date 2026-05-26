@@ -10,6 +10,8 @@ public class VotingInfo
     public string SessionTitle { get; set; } = string.Empty;
     public string InitiativeTitle { get; set; } = string.Empty;
     public InitiativeStatus Status { get; set; }
+    public DateTime InitiativeCreatedAt { get; set; }
+    public Guid AuthorId { get; set; }
     public DateTime VotedAt { get; set; } = DateTime.UtcNow;
     public bool IsFinalized { get; set; } = false;
     

@@ -13,10 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:3000") // Порт фронтенда в Docker
+        policy.WithOrigins("http://localhost:3000")
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials()); // Важно для токенов/куки
+            .AllowCredentials());
 });
 
 builder.Services.AddControllers();

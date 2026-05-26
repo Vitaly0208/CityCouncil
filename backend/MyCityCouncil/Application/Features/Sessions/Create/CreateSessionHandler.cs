@@ -58,6 +58,8 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
                     InitiativeId = initiative.Id,
                     SessionTitle = session.Title,
                     InitiativeTitle = initiative.Title,
+                    InitiativeCreatedAt = initiative.CreatedAt,
+                    AuthorId = initiative.User.Id,
                     Status = initiative.Status,
                 };
                 

@@ -53,7 +53,6 @@ public class CommitteesController : ControllerBase
     }
     
     [HttpPost("{id}/members")]
-    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(MembershipDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<MembershipDto>> AddMember(Guid id, [FromBody] AddMemberCommand command, CancellationToken ct)
@@ -106,7 +105,7 @@ public class CommitteesController : ControllerBase
     }
 
     [HttpGet("{committeeId}/members/{userId}")]
-    [ApiExplorerSettings(IgnoreApi = true)] // Скрыт из Swagger, используется только для генерации ссылок
+    [ApiExplorerSettings(IgnoreApi = true)]
     public ActionResult<MembershipDto> GetMember(Guid committeeId, Guid userId) => 
         NotFound();
 }

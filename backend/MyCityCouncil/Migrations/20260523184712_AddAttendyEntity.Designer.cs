@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCityCouncil.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260524132522_AddSessionAttendeesTable")]
-    partial class AddSessionAttendeesTable
+    [Migration("20260523184712_AddAttendyEntity")]
+    partial class AddAttendyEntity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

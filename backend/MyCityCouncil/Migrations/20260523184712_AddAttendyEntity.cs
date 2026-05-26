@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MyCityCouncil.Migrations
 {
     /// <inheritdoc />
-    public partial class AddSessionAttendeesTable : Migration
+    public partial class AddAttendyEntity : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -192,9 +192,17 @@ input:focus, textarea:focus, select:focus {
     background: var(--accent-light);
     color: var(--accent);
     border: 1px solid var(--accent);
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
 }
 .approveBtn:hover { background: rgba(207, 34, 46, 0.25); }
-.rejectBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.5rem; border-radius: 6px; cursor: pointer; }
+.rejectBtn { background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer; }
 .rejectBtn:hover { border-color: var(--accent); color: var(--accent); }
 
 .newsList { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }

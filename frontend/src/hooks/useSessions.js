@@ -18,6 +18,8 @@ import { queryKeys } from '../query/keys';
  * @property {string} status - Статус инициативы (например, "InFirstHearing")
  * @property {boolean} isFinalized - Завершено ли голосование по этой инициативе
  * @property {Vote[]} votes - Список голосов по этой инициативе
+ * @property {string} initiativeCreatedAt
+ * @property {string} authorId
  */
 
 /**

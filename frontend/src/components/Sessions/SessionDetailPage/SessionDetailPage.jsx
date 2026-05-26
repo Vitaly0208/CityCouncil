@@ -54,7 +54,6 @@ const SessionDetailPage = () => {
         }
     };
 
-    // Завершение заседания
     const handleFinalize = async () => {
         if (!confirm('Завершить заседание? Это действие необратимо.')) return;
 
@@ -66,13 +65,12 @@ const SessionDetailPage = () => {
         }
     };
 
-    // Исправленный подсчет голосов
     const getVoteCounts = (initiative) => {
         const votes = Array.isArray(initiative?.votes) ? initiative.votes : [];
 
         return {
-            for: votes.filter(v => v?.type === 'For' || v?.type === 0).length,
-            against: votes.filter(v => v?.type === 'Against' || v?.type === 1).length,
+            for: votes.filter(v => v?.voteType === 'For' || v?.voteType === 0).length,
+            against: votes.filter(v => v?.voteType === 'Against' || v?.voteType === 1).length,
             total: votes.length
         };
     };
@@ -195,10 +193,10 @@ const SessionDetailPage = () => {
 
                                 <div className={styles.detailMeta}>
                                     <div className={styles.metaItem}>
-                                        <strong>Автор:</strong> {selectedInitiative.authorName || 'Неизвестный'}
+                                        <strong>Автор:</strong> {selectedInitiative.authorId || 'Неизвестный'}
                                     </div>
                                     <div className={styles.metaItem}>
-                                        <strong>Дата создания:</strong> {formatDate(selectedInitiative.createdAt)}
+                                        <strong>Дата создания:</strong> {formatDate(selectedInitiative.initiativeCreatedAt)}
                                     </div>
                                     <div className={styles.metaItem}>
                                         <strong>Статус:</strong> {selectedInitiative.status}
@@ -226,14 +224,14 @@ const SessionDetailPage = () => {
                                                     onClick={() => handleVote(0)}
                                                     disabled={castVote.isPending}
                                                 >
-                                                    ✅ За
+                                                    За
                                                 </button>
                                                 <button
                                                     className={styles.voteAgainst}
                                                     onClick={() => handleVote(1)}
                                                     disabled={castVote.isPending}
                                                 >
-                                                    ❌ Против
+                                                    Против
                                                 </button>
                                             </div>
                                         )}
