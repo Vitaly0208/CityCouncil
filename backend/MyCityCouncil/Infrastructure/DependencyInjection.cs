@@ -41,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IVoteRepository, VoteRepository>();
         services.AddScoped<IVotingRepository, VotingRepository>();
         services.AddScoped<ISessionAttendeeRepository, SessionAttendeeRepository>();
+        services.AddScoped<IPartyRepository, PartyRepository>();
     }
     
     private static void AddServices(this IServiceCollection services)

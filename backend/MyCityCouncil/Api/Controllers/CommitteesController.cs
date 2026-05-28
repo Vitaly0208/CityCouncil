@@ -95,7 +95,6 @@ public class CommitteesController : ControllerBase
     }
 
     [HttpDelete("{id}/members/{userId}")]
-    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DismissMember(Guid id, Guid userId, CancellationToken ct)
@@ -106,7 +105,7 @@ public class CommitteesController : ControllerBase
     }
 
     [HttpGet("{committeeId}/members/{userId}")]
-    [ApiExplorerSettings(IgnoreApi = true)] // Скрыт из Swagger, используется только для генерации ссылок
+    [ApiExplorerSettings(IgnoreApi = true)]
     public ActionResult<MembershipDto> GetMember(Guid committeeId, Guid userId) => 
         NotFound();
 }
