@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useCommittees } from "../../hooks/useCommittees.js";
-import { tokenService } from "../../../api/tokenService.js";
-import Navbar from '../Layout/NaVbar/NavBar.jsx';
+import { useCommittees } from "../../../hooks/useCommittees.js";
+import { tokenService } from "../../../../api/tokenService.js";
+import Navbar from '../../Layout/NaVbar/NavBar.jsx';
 import styles from './CommitteesPage.module.css';
 
 const COMMITTEE_ICON = '/committee.png';

@@ -1,8 +1,8 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useCommitteeDetails, useJoinCommittee, useLeaveCommittee } from '../../hooks/useCommittee';
-import { tokenService } from "../../../api/tokenService.js";
-import { getUserId } from "../../utils/jwt.js";
-import Navbar from '../Layout/NaVbar/NavBar.jsx';
+import { useCommitteeDetails, useJoinCommittee, useLeaveCommittee } from '../../../hooks/useCommittee.js';
+import { tokenService } from "../../../../api/tokenService.js";
+import { getUserId } from "../../../utils/jwt.js";
+import Navbar from '../../Layout/NaVbar/NavBar.jsx';
 import styles from './CommitteeDetailPage.module.css';
 
 const formatDate = (dateString) => {
