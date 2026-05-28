@@ -11,7 +11,6 @@
     --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* === Базовая структура === */
 .navbar {
     position: sticky;
     top: 0;
@@ -25,13 +24,26 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 1400px;
     margin: 0 auto;
     padding: 0.75rem 2rem;
     height: 64px;
+    font-family: 'Roboto Slab', serif;
+}
+.container button,
+.container input,
+.container select,
+.container textarea,
+.container a,
+.container span,
+.container p,
+.container label {
+    font-family: inherit;
+}
+.container h1, .container h2, .container h3, .container h4, .container h5, .container h6
+{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-/* === Бренд / Логотип === */
 .brand {
     display: flex;
     align-items: center;
@@ -56,7 +68,6 @@
     letter-spacing: -0.3px;
 }
 
-/* === Десктопное меню === */
 .desktopMenu {
     display: flex;
     align-items: center;

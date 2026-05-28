@@ -8,7 +8,6 @@
     --accent: #cf222e;
     --accent-hover: #a41926;
     --accent-light: rgba(207, 34, 46, 0.15);
-    /* Используем красный вместо зеленого для единообразия */
     --success: #cf222e;
 }
 
@@ -16,7 +15,21 @@
     min-height: 100vh;
     background: var(--bg);
     color: var(--text-primary);
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Roboto Slab', serif;
+}
+.container button,
+.container input,
+.container select,
+.container textarea,
+.container a,
+.container span,
+.container p,
+.container label {
+    font-family: inherit;
+}
+.container h1, .container h2, .container h3, .container h4, .container h5, .container h6
+{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 .header {
@@ -64,8 +77,6 @@
     margin: 0 auto;
     padding: 1.5rem 2rem 3rem;
 }
-
-/* === Вкладки === */
 .tabsContainer {
     margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
@@ -101,7 +112,6 @@
     font-weight: 600;
 }
 
-/* === Секции === */
 .section {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -118,7 +128,7 @@
     border-bottom: 1px solid var(--border);
 }
 
-/* === Формы и инпуты === */
+
 .sessionForm, .newsForm, .committeeForm {
     display: flex;
     flex-direction: column;
@@ -169,7 +179,6 @@ input:focus, textarea:focus, select:focus {
 .primaryBtn:hover { background: rgba(207, 34, 46, 0.25); }
 .primaryBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* === Карточки модерации === */
 .list { display: flex; flex-direction: column; gap: 0.75rem; }
 
 .reviewCard {
@@ -188,14 +197,25 @@ input:focus, textarea:focus, select:focus {
 .meta { font-size: 0.8rem; color: var(--text-tertiary); }
 
 .reviewActions { display: flex; flex-direction: column; gap: 0.5rem; min-width: 110px; }
-.approveBtn {
+.approveBtn{
     background: var(--accent-light);
     color: var(--accent);
     border: 1px solid var(--accent);
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
 }
 .approveBtn:hover { background: rgba(207, 34, 46, 0.25); }
-.rejectBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.5rem; border-radius: 6px; cursor: pointer; }
-.rejectBtn:hover { border-color: var(--accent); color: var(--accent); }
+.rejectBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer; }
+.rejectBtn:hover { border-color: #dddddd; color: #dddddd; }
 
 .newsList { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
 .newsCard {
@@ -213,7 +233,7 @@ input:focus, textarea:focus, select:focus {
 .deleteBtn { background: transparent; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 1.1rem; }
 .deleteBtn:hover { color: var(--accent); }
 
-/* === Списки (Инициативы и Комиссии) === */
+
 .initiativesList, .committeesList { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
 
 .initiativeRow, .committeeRow {
@@ -250,7 +270,6 @@ input:focus, textarea:focus, select:focus {
 }
 .linkBtn:hover { border-color: var(--accent); color: var(--accent); }
 
-/* === Фильтры === */
 .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
 
 .selectInput, .searchInput {
@@ -264,7 +283,6 @@ input:focus, textarea:focus, select:focus {
 .selectInput { min-width: 200px; }
 .searchInput { flex: 1; min-width: 200px; }
 
-/* === Депутаты (Старая сетка - оставлено для совместимости, если нужно) === */
 .deputiesGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
 .deputyCard {
     padding: 1rem;
@@ -274,12 +292,18 @@ input:focus, textarea:focus, select:focus {
 }
 .deputyHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
 .deputyHeader h4 { margin: 0; font-size: 1rem; }
-.roleBadge { font-size: 0.75rem; padding: 0.2rem 0.5rem; background: var(--accent-light); color: var(--accent); border-radius: 4px; }
+.roleBadge {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.5rem;
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+}
 .deputyDetails { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 0.5rem; font-size: 0.85rem; margin: 0; }
 .deputyDetails dt { color: var(--text-tertiary); }
 .deputyDetails dd { margin: 0; color: var(--text-primary); }
 
-/* === Пользователи (Двухколоночный макет) === */
 .usersLayout {
     display: grid;
     grid-template-columns: 320px 1fr;
@@ -287,7 +311,6 @@ input:focus, textarea:focus, select:focus {
     min-height: 400px;
 }
 
-/* Список (слева) */
 .usersListPanel {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -365,7 +388,7 @@ input:focus, textarea:focus, select:focus {
     font-weight: 700;
 }
 
-/* Детали (справа) */
+
 .userDetailPanel {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -465,7 +488,7 @@ input:focus, textarea:focus, select:focus {
 }
 .initiativeLink:hover { background: rgba(255, 255, 255, 0.1); }
 
-/* Кнопки действий пользователя */
+
 .userDetailActions {
     display: flex;
     flex-direction: column;
@@ -524,10 +547,10 @@ input:focus, textarea:focus, select:focus {
     font-weight: 600;
     cursor: pointer;
     width: calc(100% - 2rem);
+    transition: all 0.2s;
 }
 .loadMoreBtn:hover { border-color: var(--accent); color: var(--accent); }
 
-/* === Модалки === */
 .modalOverlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -597,12 +620,10 @@ input:focus, textarea:focus, select:focus {
 }
 .modalCloseBtn:hover { border-color: var(--accent); }
 
-/* === Утилиты === */
 .hint { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; }
 .loading, .empty { text-align: center; padding: 2rem; color: var(--text-secondary); }
 .searchBar input { width: 100%; margin-bottom: 1rem; }
 
-/* ===== Выбор председателя при создании комиссии ===== */
 .chairmanSelectWrapper {
     margin: 1rem 0;
     display: flex;
@@ -645,7 +666,6 @@ input:focus, textarea:focus, select:focus {
     font-size: 0.9rem;
 }
 
-/* ===== Модалка выбора пользователя ===== */
 .modalSearch {
     width: 100%;
     margin-bottom: 1rem;

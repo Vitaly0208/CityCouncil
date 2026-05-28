@@ -54,7 +54,6 @@ const SessionDetailPage = () => {
         }
     };
 
-    // Завершение заседания
     const handleFinalize = async () => {
         if (!confirm('Завершить заседание? Это действие необратимо.')) return;
 
@@ -66,13 +65,12 @@ const SessionDetailPage = () => {
         }
     };
 
-    // Исправленный подсчет голосов
     const getVoteCounts = (initiative) => {
         const votes = Array.isArray(initiative?.votes) ? initiative.votes : [];
 
         return {
-            for: votes.filter(v => v?.type === 'For' || v?.type === 0).length,
-            against: votes.filter(v => v?.type === 'Against' || v?.type === 1).length,
+            for: votes.filter(v => v?.voteType === 'For' || v?.voteType === 0).length,
+            against: votes.filter(v => v?.voteType === 'Against' || v?.voteType === 1).length,
             total: votes.length
         };
     };
@@ -93,7 +91,6 @@ const SessionDetailPage = () => {
         });
     };
 
-    // Загрузка
     if (isLoading) {
         return (
             <>
@@ -103,7 +100,6 @@ const SessionDetailPage = () => {
         );
     }
 
-    // Ошибка
     if (isError || !session) {
         return (
             <>
@@ -111,7 +107,7 @@ const SessionDetailPage = () => {
                 <div className={styles.error}>
                     <h2>Ошибка загрузки</h2>
                     <p>{error?.message || 'Не удалось загрузить заседание'}</p>
-                    <Link to="/sessions">← Назад к списку</Link>
+                    <Link to="/sessions">Назад к списку</Link>
                 </div>
             </>
         );
@@ -122,7 +118,6 @@ const SessionDetailPage = () => {
             <Navbar onLogout={handleLogout} />
 
             <div className={styles.container}>
-                {/* Шапка */}
                 <header className={styles.header}>
                     <div className={styles.headerTop}>
                         <h1 className={styles.title}>{session.title}</h1>
@@ -160,7 +155,6 @@ const SessionDetailPage = () => {
                     </div>
                 </header>
 
-                {/* Основной контент - 3 колонки */}
                 <main className={styles.main}>
                     {/* Левая колонка - Инициативы */}
                     <aside className={styles.leftColumn}>
@@ -181,7 +175,6 @@ const SessionDetailPage = () => {
                         </div>
                     </aside>
 
-                    {/* Центральная колонка - Детали и голосование */}
                     <section className={styles.centerColumn}>
                         {!selectedInitiative ? (
                             <div className={styles.placeholder}>
@@ -210,7 +203,6 @@ const SessionDetailPage = () => {
                                     <p>{selectedInitiative.description || 'Описание отсутствует'}</p>
                                 </div>
 
-                                {/* Голосование */}
                                 {!session.isCompleted && isJoined && (
                                     <div className={styles.votingSection}>
                                         <h3>Голосование</h3>
@@ -226,14 +218,14 @@ const SessionDetailPage = () => {
                                                     onClick={() => handleVote(0)}
                                                     disabled={castVote.isPending}
                                                 >
-                                                    ✅ За
+                                                    За
                                                 </button>
                                                 <button
                                                     className={styles.voteAgainst}
                                                     onClick={() => handleVote(1)}
                                                     disabled={castVote.isPending}
                                                 >
-                                                    ❌ Против
+                                                    Против
                                                 </button>
                                             </div>
                                         )}
@@ -244,7 +236,7 @@ const SessionDetailPage = () => {
                                     </div>
                                 )}
 
-                                {/* Результаты */}
+
                                 <div className={styles.resultsSection}>
                                     <h3>Результаты голосования</h3>
                                     {(() => {
@@ -272,7 +264,6 @@ const SessionDetailPage = () => {
                         )}
                     </section>
 
-                    {/* Правая колонка - Присутствующие */}
                     <aside className={styles.rightColumn}>
                         <h2 className={styles.columnTitle}>
                             Присутствующие ({session.attendees?.length || 0})
@@ -292,7 +283,6 @@ const SessionDetailPage = () => {
                 </main>
             </div>
 
-            {/* Модалка присоединения */}
             {showJoinModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modal}>

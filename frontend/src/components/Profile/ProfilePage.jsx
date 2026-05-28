@@ -78,21 +78,22 @@ const ProfilePage = () => {
 
     return (
         <div className={styles.container}>
-            {/* Шапка */}
             <Navbar onLogout={handleLogout} />
 
-            {/* Заголовок профиля */}
+
             <div className={styles.pageHeader}>
                 <h1 className={styles.pageTitle}>Профиль депутата</h1>
                 <p className={styles.pageSubtitle}>Личная информация, участие в комиссиях и активность</p>
             </div>
 
-            {/* Основной контент */}
             <main className={styles.profileLayout}>
-                {/* Левая колонка: карточка депутата */}
                 <aside className={styles.profileCard}>
                     <div className={styles.avatar}>
-                        <span className={styles.avatarInitials}>{getInitials(profile.fullName)}</span>
+                        <img
+                            src={profile.avatarUrl || '/profile.png'}
+                            alt={`Аватар ${profile.fullName || 'пользователя'}`}
+                            className={styles.avatarImage}
+                        />
                     </div>
                     <h2 className={styles.profileName}>{profile.fullName}</h2>
                     <span className={styles.profileRole}>{profile.roleName}</span>
@@ -124,9 +125,7 @@ const ProfilePage = () => {
                     </div>
                 </aside>
 
-                {/* Правая колонка: комиссии и партийная деятельность */}
                 <div className={styles.profileContent}>
-                    {/* Участие в комиссиях */}
                     <section className={styles.card}>
                         <div className={styles.cardHeader}>
                             <h2 className={styles.cardTitle}>Участие в комиссиях</h2>

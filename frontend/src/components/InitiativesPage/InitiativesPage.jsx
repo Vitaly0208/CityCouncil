@@ -57,7 +57,12 @@ const InitiativesPage = () => {
             <div className={styles.container}>
                 <main className={styles.main}>
                     <div className={styles.topBar}>
-                        <h2>Активные и принятые инициативы</h2>
+                        <header className={styles.pageHeader}>
+                            <h1 className={styles.pageTitle}>Инициативы</h1>
+                            <p className={styles.pageSubtitle}>
+                                Утвержденные и активные инициативы
+                            </p>
+                        </header>
                         <button className={styles.primaryBtn} onClick={() => setShowForm(!showForm)}>
                             {showForm ? 'Скрыть форму' : '+ Предложить инициативу'}
                         </button>
@@ -99,9 +104,15 @@ const InitiativesPage = () => {
                         <div className={styles.list}>
                             {initiatives.map(init => (
                                 <article key={init.id} className={styles.card}>
+                                    <div className={styles.cardImageWrapper}>
+                                        <img
+                                            src={init.imageUrl || '/initiative.png'}
+                                            alt={init.title}
+                                            className={styles.cardImage}
+                                        />
+                                    </div>
                                     <div className={styles.cardContent}>
                                         <div className={styles.cardHeader}>
-                                            {getStatusBadge(init.status)}
                                             <h3 className={styles.cardTitle}>{init.title}</h3>
                                         </div>
                                         <p className={styles.cardDesc}>{init.description}</p>

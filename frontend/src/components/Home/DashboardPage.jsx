@@ -108,8 +108,7 @@ const DashboardPage = () => {
                     </div>
                     <div className={styles.welcomeContent}>
                         <p className={styles.welcomeText}>
-                            Вы вошли в систему Городской Думы. Здесь вы можете отслеживать работу комиссий,
-                            участвовать в голосованиях, просматривать протоколы заседаний и знакомиться с принятыми инициативами.
+                            Вы вошли в систему Городской Думы. Вы можете отслеживать работу комиссий, просматривать протоколы заседаний и знакомиться с принятыми инициативами.
                             Используйте навигацию или поиск для быстрого доступа к нужным разделам.
                         </p>
                     </div>
@@ -117,8 +116,7 @@ const DashboardPage = () => {
 
                 <section className={styles.card}>
                     <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}>Новости</h2>
-                        <a href="#" className={styles.cardLink}>Все новости →</a>
+                        <h2 className={styles.sectionTitle}>Новости</h2>
                     </div>
                     <div className={styles.list}>
                         {NEWS.map((item) => (
@@ -134,8 +132,8 @@ const DashboardPage = () => {
 
                 <section className={styles.card}>
                     <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}>Ближайшие заседания</h2>
-                        <Link to="/sessions" className={styles.cardLink}>Расписание →</Link>
+                        <h2 className={styles.sectionTitle}>Ближайшие заседания</h2>
+                        <Link to="/sessions" className={styles.cardLink}>Расписание</Link>
                     </div>
                     <div className={styles.list}>
                         {loadSessions ? (
@@ -157,7 +155,7 @@ const DashboardPage = () => {
                                                 {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                             <h3 className={`${styles.sessionTitle} ${isNext ? styles.sessionTitleFeatured : ''}`}>{s.title}</h3>
-                                            <Link to={`/sessions/${s.id}`} className={styles.sessionLink}>Повестка →</Link>
+                                            <Link to={`/sessions/${s.id}`} className={styles.sessionLink}>Повестка</Link>
                                         </div>
                                     </article>
                                 );
@@ -204,26 +202,61 @@ const DashboardPage = () => {
                 </header>
 
                 <div className={styles.initiativesList}>
-                    {isLoading && <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Загрузка инициатив...</span></div>}
-                    {isError && <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Не удалось загрузить инициативы</span></div>}
-                    {!isLoading && !isError && initiatives.length === 0 && (
-                        <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Принятых инициатив пока нет</span></div>
+                    {/* Состояние загрузки */}
+                    {isLoading && (
+                        <div className={styles.card}>
+                            <div className={styles.cardContent}>
+                                <p className={styles.cardDesc}>Загрузка инициатив...</p>
+                            </div>
+                        </div>
                     )}
-                    {!isLoading && !isError && initiatives.map((item, index) => (
+
+                    {/* Состояние ошибки */}
+                    {isError && (
+                        <div className={styles.card}>
+                            <div className={styles.cardContent}>
+                                <p className={styles.cardDesc}>Не удалось загрузить инициативы</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Пустой список */}
+                    {!isLoading && !isError && initiatives.length === 0 && (
+                        <div className={styles.card}>
+                            <div className={styles.cardContent}>
+                                <p className={styles.cardDesc}>Принятых инициатив пока нет</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Основной список карточек */}
+                    {!isLoading && !isError && initiatives.map((item) => (
                         <Link
                             key={item.id}
                             to={`/initiatives/${item.id}`}
-                            className={`${styles.initiativeRow} ${index % 2 === 0 ? styles.even : styles.odd}`}
+                            className={styles.cardInit}
                         >
-                            <div className={styles.initiativeContent}>
-                                <h3 className={styles.initiativeTitle}>{item.title}</h3>
-                                <div className={styles.initiativeMeta}>
-                                    <span className={styles.metaItem}>{item.authorName || 'Неизвестный автор'}</span>
-                                    <span className={styles.metaDivider}>•</span>
-                                    <span className={styles.metaItem}>{formatDate(item.createdAt)}</span>
-                                </div>
+                            <div className={styles.cardImageWrapper}>
+                                <img
+                                    src={item.imageUrl || '/initiative.png'}
+                                    alt={item.title}
+                                    className={styles.cardImage}
+                                    loading="lazy"
+                                />
                             </div>
-                            <span className={styles.arrow}>→</span>
+                            <div className={styles.cardContentInit}>
+                                <div className={styles.cardHeaderInit}>
+                                    <h3 className={styles.cardTitleInit}>{item.title}</h3>
+                                </div>
+                                {item.description && (
+                                    <p className={styles.cardDescInit}>{item.description}</p>
+                                )}
+                            </div>
+                            <div className={styles.cardMetaInit}>
+                                <span className={styles.author}>{item.authorName || 'Неизвестный автор'}</span>
+                                <span className={styles.metaDivider}>•</span>
+                                <time className={styles.date}>{formatDate(item.createdAt)}</time>
+                            </div>
                         </Link>
                     ))}
                 </div>

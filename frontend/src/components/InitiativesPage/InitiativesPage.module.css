@@ -4,10 +4,55 @@
     --accent: #cf222e; --accent-hover: #a41926; --success: #238636; --warning: #9e6a03;
 }
 
-.container { min-height: 100vh; background: var(--bg); color: var(--text-primary); font-family: system-ui, sans-serif; }
+.container {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Roboto Slab', serif;
+}
+.container button,
+.container input,
+.container select,
+.container textarea,
+.container a,
+.container span,
+.container p,
+.container label {
+    font-family: inherit;
+}
+.container h1, .container h2, .container h3, .container h4, .container h5, .container h6
+{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
 
-.main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
-.topBar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.main {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.pageHeader {
+    margin: 0;
+}
+
+.pageTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+}
+
+.pageSubtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2rem 1.5rem;
+}
 .topBar h2 { margin: 0; font-size: 1.4rem; }
 .primaryBtn {
     background: var(--accent-light);
@@ -27,7 +72,6 @@
 .formActions { display: flex; gap: 1rem; justify-content: flex-end; }
 .secondaryBtn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; }
 
-/* ===== Список инициатив (вертикальный) ===== */
 .list {
     display: flex;
     flex-direction: column;
@@ -56,7 +100,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    min-width: 0; /* Prevents flex overflow */
+    min-width: 0;
 }
 
 .cardHeader {
@@ -78,7 +122,6 @@
     color: var(--text-secondary);
     font-size: 0.9rem;
     line-height: 1.5;
-    /* Обрезаем длинные описания */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -114,8 +157,20 @@
 .loading, .empty { text-align: center; padding: 3rem; color: var(--text-secondary); }
 .error { color: var(--accent); text-align: center; padding: 2rem; }
 
-/* Адаптив для мобильных */
-@media (max-width: 640px) {
-    .card { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .cardMeta { align-items: flex-start; text-align: left; width: 100%; flex-direction: row; justify-content: space-between; }
+.cardImageWrapper {
+    width: 65px;
+    height: 65px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.cardImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    padding: 0.1rem
 }

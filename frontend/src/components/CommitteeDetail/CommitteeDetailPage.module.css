@@ -14,7 +14,21 @@
     min-height: 100vh;
     background: var(--bg);
     color: var(--text-primary);
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Roboto Slab', serif;
+}
+.container button,
+.container input,
+.container select,
+.container textarea,
+.container a,
+.container span,
+.container p,
+.container label {
+    font-family: inherit;
+}
+.container h1, .container h2, .container h3, .container h4, .container h5, .container h6
+{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 .pageHeader {

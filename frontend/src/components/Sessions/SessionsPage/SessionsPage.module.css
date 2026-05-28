@@ -12,13 +12,27 @@
     min-height: 100vh;
     background: var(--bg);
     color: var(--text-primary);
-    font-family: system-ui, -apple-system, sans-serif;
-    padding: 2rem;
+    font-family: 'Roboto Slab', serif;
+    padding-bottom: 3rem;
 }
-
+.container button,
+.container input,
+.container select,
+.container textarea,
+.container a,
+.container span,
+.container p,
+.container label {
+    font-family: inherit;
+}
+.container h1, .container h2, .container h3, .container h4, .container h5, .container h6
+{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
 .pageHeader {
-    margin-bottom: 2.5rem;
-    padding-bottom: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 2rem 1.5rem;
     border-bottom: 1px solid var(--border);
 }
 
@@ -35,14 +49,15 @@
     margin: 0;
 }
 
-/* === Сетка 3 колонки === */
 .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
+    max-width: 1400px;
+    margin: auto;
+    padding: 2rem;
 }
 
-/* === Карточка === */
 .card {
     background: var(--card-bg);
     border: 1px solid var(--border);
