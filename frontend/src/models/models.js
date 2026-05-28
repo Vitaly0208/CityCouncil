@@ -209,47 +209,6 @@
  */
 
 /**
- * ==================== ВЫБОРЫ ====================
- */
-
-/**
- * @typedef {'CommissionChairman'|'PartyLeader'} ElectionType
- */
-
-/**
- * @typedef {'Scheduled'|'InProgress'|'Finalized'|'Cancelled'} ElectionStatus
- */
-
-/**
- * @typedef {Object} Election
- * @property {string} id
- * @property {ElectionType} type
- * @property {string} targetId - ID комиссии или партии
- * @property {string} targetName
- * @property {Array<string>} candidateIds
- * @property {Array<ElectionVote>} votes
- * @property {ElectionStatus} status
- * @property {string} votingDeadline
- * @property {string | null} winnerId
- * @property {string} createdAt
- */
-
-/**
- * @typedef {Object} ElectionVote
- * @property {string} voterId
- * @property {string} candidateId
- * @property {string} votedAt
- */
-
-/**
- * @typedef {Object} CreateElectionPayload
- * @property {ElectionType} type
- * @property {string} targetId
- * @property {Array<string>} candidateIds
- * @property {string} votingDeadline
- */
-
-/**
  * ==================== ОТЧЁТЫ ====================
  */
 

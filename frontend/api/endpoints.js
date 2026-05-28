@@ -39,6 +39,13 @@ export const ENDPOINTS = {
         ATTENDEES: (id) => `/api/sessions/${id}/attendees`,
     },
 
+    PARTIES: {
+        BASE: '/api/parties',
+        DETAILS: (id) => `/api/parties/${id}`,
+        MEMBERS: (id) => `/api/parties/${id}/members`,
+        USER_PARTIES: (userId) => `/api/parties/user/${userId}`,
+    },
+
     VOTING: {
         CAST: '/api/voting/cast',
         FINALIZE: (sessionId) => `/api/voting/finalize/${sessionId}`,

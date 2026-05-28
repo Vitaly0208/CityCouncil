@@ -1,14 +1,11 @@
-
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { tokenService } from '../../../api/tokenService';
-import { useUserProfile} from "../../hooks/useUserProfile.js";
-import { getUserRole } from '../../utils/jwt';
+import { useUserProfile } from "../../hooks/useUserProfile.js";
 import styles from './ProfilePage.module.css';
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const isAdmin = getUserRole() === 'Admin';
     const { profile, isLoading, isError, refetch } = useUserProfile();
 
     const handleLogout = () => {
@@ -38,16 +35,8 @@ const ProfilePage = () => {
         });
     };
 
-    const getInitials = (fullName) => {
-        if (!fullName) return '??';
-        const parts = fullName.split(' ');
-        if (parts.length >= 2) {
-            return `${parts[1][0]}${parts[0][0]}`.toUpperCase();
-        }
-        return fullName.slice(0, 2).toUpperCase();
-    };
-
     const commissions = profile?.commissions || profile?.Commissions || [];
+    const parties = profile?.parties || profile?.Parties || [];
 
     if (isLoading) {
         return (
@@ -79,7 +68,6 @@ const ProfilePage = () => {
     return (
         <div className={styles.container}>
             <Navbar onLogout={handleLogout} />
-
 
             <div className={styles.pageHeader}>
                 <h1 className={styles.pageTitle}>Профиль депутата</h1>
@@ -129,7 +117,7 @@ const ProfilePage = () => {
                     <section className={styles.card}>
                         <div className={styles.cardHeader}>
                             <h2 className={styles.cardTitle}>Участие в комиссиях</h2>
-                            <Link to="/committees" className={styles.profileLink}>Все комиссии</Link>
+                            <Link to="/committees" className={styles.cardLink}>Все комиссии</Link>
                         </div>
                         <div className={styles.list}>
                             {commissions.length > 0 ? (
@@ -138,18 +126,47 @@ const ProfilePage = () => {
                                         <div className={styles.listItemInfo}>
                                             <h3 className={styles.listItemTitle}>{item.committeeName}</h3>
                                             <span className={styles.listItemDate}>
-                        {formatDate(item.appointedAt)}
+                                                {formatDate(item.appointedAt)}
                                                 {item.dismissedAt ? ` — ${formatDate(item.dismissedAt)}` : ''}
-                      </span>
+                                            </span>
                                         </div>
                                         <span className={`${styles.roleBadge} ${getRoleClass(item.isChairman, item.status)}`}>
-                      {getRoleLabel(item.isChairman, item.status)}
-                    </span>
+                                            {getRoleLabel(item.isChairman, item.status)}
+                                        </span>
                                     </div>
                                 ))
                             ) : (
                                 <div className={styles.emptyState}>
                                     <p>Нет данных об участии в комиссиях</p>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+
+                    <section className={styles.card}>
+                        <div className={styles.cardHeader}>
+                            <h2 className={styles.cardTitle}>Участие в партиях</h2>
+                            <Link to="/parties" className={styles.cardLink}>Все партии</Link>
+                        </div>
+                        <div className={styles.list}>
+                            {parties.length > 0 ? (
+                                parties.map((party) => (
+                                    <Link key={party.id} to={`/parties/${party.id}`} className={styles.listItem}>
+                                        <div className={styles.listItemInfo}>
+                                            <h3 className={styles.listItemTitle}>{party.name}</h3>
+                                            <span className={styles.listItemDate}>
+                                                {party.abbreviation && `${party.abbreviation} • `}
+                                                {party.ideology || 'Идеология не указана'}
+                                            </span>
+                                        </div>
+                                        <span className={`${styles.roleBadge} ${styles.roleMember}`}>
+                                            Участник
+                                        </span>
+                                    </Link>
+                                ))
+                            ) : (
+                                <div className={styles.emptyState}>
+                                    <p>Нет данных об участии в партиях</p>
                                 </div>
                             )}
                         </div>

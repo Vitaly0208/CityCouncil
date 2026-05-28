@@ -59,6 +59,20 @@ export const committeeService = {
         axiosInstance.delete(`${ENDPOINTS.COMMITTEES.MEMBERS(committeeId)}/${userId}`),
 };
 
+export const partyService = {
+    getAll: () => axiosInstance.get(ENDPOINTS.PARTIES.BASE),
+    getById: (id) => axiosInstance.get(ENDPOINTS.PARTIES.DETAILS(id)),
+    create: (data) => axiosInstance.post(ENDPOINTS.PARTIES.BASE, data),
+    delete: (id) => axiosInstance.delete(ENDPOINTS.PARTIES.DETAILS(id)),
+    update: (id, data) => axiosInstance.put(ENDPOINTS.PARTIES.DETAILS(id), data),
+    addMember: (partyId, userId) =>
+        axiosInstance.post(ENDPOINTS.PARTIES.MEMBERS(partyId), { userId }),
+    removeMember: (partyId, userId) =>
+        axiosInstance.delete(`${ENDPOINTS.PARTIES.MEMBERS(partyId)}/${userId}`),
+    getUserParties: (userId) =>
+        axiosInstance.get(ENDPOINTS.PARTIES.USER_PARTIES(userId)),
+};
+
 export const initiativeService = {
     getAll: (params) => axiosInstance.get(ENDPOINTS.INITIATIVES.BASE, { params }),
     create: (data) => axiosInstance.post(ENDPOINTS.INITIATIVES.CREATE, data),
