@@ -5,6 +5,7 @@ using MyCityCouncil.Application.Features.UsersS.GetProfile;
 using System.Security.Claims;
 using MyCityCouncil.Application.Features.UsersS.GetByCommittee;
 using MyCityCouncil.Application.Features.UsersS.GetUsers;
+using MyCityCouncil.Application.Features.UsersS.UpdateProfile;
 using MyCityCouncil.Domain.Models;
 
 namespace MyCityCouncil.Api.Controllers;
@@ -19,7 +20,7 @@ public class UsersController : ControllerBase
     public UsersController(IMediator mediator) => _mediator = mediator;
     
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserProfileDto>> GetProfile(Guid id, CancellationToken ct)
@@ -60,5 +61,18 @@ public class UsersController : ControllerBase
     {
         var users = await _mediator.Send(new GetUsersByCommitteeQuery(committeeId), ct);
         return Ok(users);
+    }
+    
+    
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(UpdateProfileDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] UpdateProfileCommand command, CancellationToken ct)
+    {
+        var secureCommand = command with { UserId = id };
+        var result = await _mediator.Send(secureCommand, ct);
+        return Ok(result);
     }
 }

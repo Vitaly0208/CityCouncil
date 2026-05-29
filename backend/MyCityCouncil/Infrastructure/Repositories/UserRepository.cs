@@ -56,4 +56,21 @@ public class UserRepository : IUserRepository
                 u.Email.Contains(searchTerm))
             .AsNoTracking()
             .ToListAsync(ct);
+    
+    public async Task<bool> HasActivePartyAsync(Guid userId, CancellationToken ct = default) =>
+        await _dbContext.PartiesInfos.AnyAsync(p => p.UserId == userId && p.DismissedAt == null, ct);
+    
+    public async Task<User?> GetByIdWithRelationsAsync(Guid id, CancellationToken ct = default) =>
+        await _dbContext.Users
+            .Include(u => u.Role)
+            .Include(u => u.CommitteesMemberships).ThenInclude(cm => cm.Committee)
+            .Include(u => u.PartyMemberships).ThenInclude(pm => pm.Party)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id, ct);
+    
+    public async Task UpdateAsync(User user, CancellationToken ct = default)
+    {
+        _dbContext.Users.Update(user);
+        await Task.CompletedTask;
+    }
 }

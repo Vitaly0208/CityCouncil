@@ -8,7 +8,8 @@ public record UserProfileDto(
     DateTime MemberSince,
     string HomePhone,
     string WorkPhone,
-    List<CommissionMembershipDto> Commissions
+    List<CommissionMembershipDto> Commissions,
+    PartyMembershipDto? CurrentParty
 );
 
 public record CommissionMembershipDto(
@@ -17,4 +18,12 @@ public record CommissionMembershipDto(
     DateTime? DismissedAt,
     bool IsChairman,
     string Status
+);
+
+public record PartyMembershipDto(
+    Guid PartyId,
+    string PartyName,
+    string? Abbreviation,
+    string? Ideology,
+    DateTime AppointedAt
 );
