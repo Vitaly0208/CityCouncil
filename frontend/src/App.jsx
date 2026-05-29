@@ -28,11 +28,16 @@ function App() {
                         <DashboardPage />
                     </ProtectedRoute>
                 } />
+                <Route path="/profile/:userId" element={
+                    <ProtectedRoute>
+                        <ProfilePage />
+                    </ProtectedRoute>} />
                 <Route path="/profile" element={
                     <ProtectedRoute>
                         <ProfilePage />
                     </ProtectedRoute>
                 } />
+
                 <Route path="/committees" element={
                     <ProtectedRoute><CommitteesPage /></ProtectedRoute>
                 } />

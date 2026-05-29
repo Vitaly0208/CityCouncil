@@ -1,12 +1,35 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { tokenService } from '../../../api/tokenService';
-import { useUserProfile } from "../../hooks/useUserProfile.js";
+import { useUserProfile, useUpdateProfile } from "../../hooks/useUserProfile.js";
+import { getUserRole } from '../../utils/jwt';
 import styles from './ProfilePage.module.css';
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
 
 const ProfilePage = () => {
+    const { userId: routeUserId } = useParams();
     const navigate = useNavigate();
-    const { profile, isLoading, isError, refetch } = useUserProfile();
+
+    const targetId = routeUserId || null;
+    const isMyProfile = !routeUserId;
+
+    const { profile, isLoading, isError, refetch } = useUserProfile(targetId);
+    const { updateProfileAsync, isPending } = useUpdateProfile();
+
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [formData, setFormData] = useState({
+        homePhone: '',
+        workPhone: '',
+        avatarUrl: ''
+    });
+
+    useEffect(() => {
+        console.log('🔍 ProfilePage debug:');
+        console.log('📦 routeUserId:', routeUserId);
+        console.log('🎯 targetId:', targetId);
+        console.log('👤 isMyProfile:', isMyProfile);
+        console.log('📄 profile loaded:', profile?.id);
+    }, [routeUserId, targetId, isMyProfile, profile]);
 
     const handleLogout = () => {
         tokenService.clearTokens();
@@ -35,8 +58,54 @@ const ProfilePage = () => {
         });
     };
 
+    const handleEditClick = () => {
+        setFormData({
+            homePhone: profile?.homePhone || '',
+            workPhone: profile?.workPhone || '',
+            avatarUrl: profile?.avatarUrl || ''
+        });
+        setShowEditModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowEditModal(false);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            await updateProfileAsync({
+                id: profile.id,
+                data: {
+                    userId: profile.id,
+                    homePhone: formData.homePhone || null,
+                    workPhone: formData.workPhone || null,
+                    avatarUrl: formData.avatarUrl || null
+                }
+            });
+
+            await refetch();
+            setShowEditModal(false);
+            alert('Профиль успешно обновлён');
+        } catch (err) {
+            alert('Ошибка: ' + (err.message || 'Не удалось обновить профиль'));
+        }
+    };
+
     const commissions = profile?.commissions || profile?.Commissions || [];
-    const parties = profile?.parties || profile?.Parties || [];
+    const currentParty = profile?.currentParty || null;
+
+    // 👇 Редактирование доступно только для своего профиля и только админам
+    const canEdit = isMyProfile && getUserRole() === 'Admin';
 
     if (isLoading) {
         return (
@@ -54,11 +123,8 @@ const ProfilePage = () => {
             <div className={styles.container}>
                 <div className={styles.errorContainer}>
                     <p className={styles.errorMessage}>Не удалось загрузить профиль</p>
-                    <button onClick={() => refetch()} className={styles.backButton}>
-                        Повторить
-                    </button>
-                    <button onClick={() => navigate('/dashboard')} className={styles.backButton}>
-                        На главную
+                    <button onClick={() => navigate(-1)} className={styles.backButton}>
+                        Назад
                     </button>
                 </div>
             </div>
@@ -70,8 +136,26 @@ const ProfilePage = () => {
             <Navbar onLogout={handleLogout} />
 
             <div className={styles.pageHeader}>
-                <h1 className={styles.pageTitle}>Профиль депутата</h1>
-                <p className={styles.pageSubtitle}>Личная информация, участие в комиссиях и активность</p>
+                <div className={styles.pageHeaderContent}>
+                    <div>
+                        <h1 className={styles.pageTitle}>
+                            {isMyProfile ? 'Мой профиль' : 'Профиль депутата'}
+                        </h1>
+                        <p className={styles.pageSubtitle}>
+                            {profile.fullName} • {profile.roleName}
+                        </p>
+                    </div>
+                </div>
+
+                {canEdit && (
+                    <button
+                        className={styles.editProfileBtn}
+                        onClick={handleEditClick}
+                        disabled={isPending}
+                    >
+                        {isPending ? 'Сохранение...' : 'Редактировать профиль'}
+                    </button>
+                )}
             </div>
 
             <main className={styles.profileLayout}>
@@ -79,13 +163,15 @@ const ProfilePage = () => {
                     <div className={styles.avatar}>
                         <img
                             src={profile.avatarUrl || '/profile.png'}
-                            alt={`Аватар ${profile.fullName || 'пользователя'}`}
+                            alt={profile.fullName}
                             className={styles.avatarImage}
                         />
                     </div>
                     <h2 className={styles.profileName}>{profile.fullName}</h2>
                     <span className={styles.profileRole}>{profile.roleName}</span>
-                    <span className={styles.profileParty}>{profile.partyName}</span>
+                    {profile.partyName && (
+                        <span className={styles.profileParty}>{profile.partyName}</span>
+                    )}
 
                     <div className={styles.profileDivider}></div>
 
@@ -149,21 +235,22 @@ const ProfilePage = () => {
                             <Link to="/parties" className={styles.cardLink}>Все партии</Link>
                         </div>
                         <div className={styles.list}>
-                            {parties.length > 0 ? (
-                                parties.map((party) => (
-                                    <Link key={party.id} to={`/parties/${party.id}`} className={styles.listItem}>
-                                        <div className={styles.listItemInfo}>
-                                            <h3 className={styles.listItemTitle}>{party.name}</h3>
-                                            <span className={styles.listItemDate}>
-                                                {party.abbreviation && `${party.abbreviation} • `}
-                                                {party.ideology || 'Идеология не указана'}
-                                            </span>
-                                        </div>
-                                        <span className={`${styles.roleBadge} ${styles.roleMember}`}>
-                                            Участник
+                            {currentParty ? (
+                                <Link
+                                    key={currentParty.partyId}
+                                    to={`/parties/${currentParty.partyId}`}
+                                    className={styles.listItem}
+                                >
+                                    <div className={styles.listItemInfo}>
+                                        <h3 className={styles.listItemTitle}>{currentParty.partyName}</h3>
+                                        <span className={styles.listItemDate}>
+                                            {currentParty.ideology || 'Идеология не указана'}
                                         </span>
-                                    </Link>
-                                ))
+                                    </div>
+                                    <span className={`${styles.roleBadge} ${styles.roleMember}`}>
+                                        Участник
+                                    </span>
+                                </Link>
                             ) : (
                                 <div className={styles.emptyState}>
                                     <p>Нет данных об участии в партиях</p>
@@ -173,6 +260,73 @@ const ProfilePage = () => {
                     </section>
                 </div>
             </main>
+
+            {showEditModal && canEdit && (
+                <div className={styles.modalOverlay} onClick={handleCloseModal}>
+                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.modalTitle}>Редактирование профиля</h2>
+                            <button className={styles.modalClose} onClick={handleCloseModal}>×</button>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className={styles.modalForm}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Домашний телефон</label>
+                                <input
+                                    type="tel"
+                                    name="homePhone"
+                                    value={formData.homePhone}
+                                    onChange={handleInputChange}
+                                    className={styles.formInput}
+                                    placeholder="+7 (___) ___-__-__"
+                                />
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Служебный телефон</label>
+                                <input
+                                    type="tel"
+                                    name="workPhone"
+                                    value={formData.workPhone}
+                                    onChange={handleInputChange}
+                                    className={styles.formInput}
+                                    placeholder="+7 (___) ___-__-__"
+                                />
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>URL аватара</label>
+                                <input
+                                    type="url"
+                                    name="avatarUrl"
+                                    value={formData.avatarUrl}
+                                    onChange={handleInputChange}
+                                    className={styles.formInput}
+                                    placeholder="https://example.com/avatar.jpg"
+                                />
+                            </div>
+
+                            <div className={styles.modalActions}>
+                                <button
+                                    type="button"
+                                    className={styles.cancelBtn}
+                                    onClick={handleCloseModal}
+                                    disabled={isPending}
+                                >
+                                    Отмена
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={styles.saveBtn}
+                                    disabled={isPending}
+                                >
+                                    {isPending ? 'Сохранение...' : 'Сохранить изменения'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

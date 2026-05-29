@@ -12,6 +12,7 @@ export const ENDPOINTS = {
         BASE: '/api/users',
         PROFILE: (id) => `/api/users/${id}`,
         ME: '/api/users/me',
+        UPDATE: (userId) => `/api/users/${userId}`,
         BY_ROLE: (role) => `/api/users?role=${role}`,
         SEARCH: (query) => `/api/users?search=${encodeURIComponent(query)}`,
     },

@@ -30,6 +30,8 @@ export const authService = {
 export const userService = {
     getProfile: (id) => axiosInstance.get(ENDPOINTS.USERS.PROFILE(id)),
     getMyProfile: () => axiosInstance.get(ENDPOINTS.USERS.ME),
+    updateProfile: (id, data) =>
+        axiosInstance.put(ENDPOINTS.USERS.UPDATE(id), data),
     getAll: (params = {}) => {
         const cleanParams = Object.fromEntries(
             Object.entries(params).filter(([_, v]) => v != null && v !== '')
@@ -44,7 +46,6 @@ export const userService = {
         axiosInstance.delete(`${ENDPOINTS.COMMITTEES.MEMBERS(committeeId)}/${userId}`),
 };
 
-// ============ COMMITTEES ============
 export const committeeService = {
     getAll: () => axiosInstance.get(ENDPOINTS.COMMITTEES.BASE),
     getById: (id) => axiosInstance.get(ENDPOINTS.COMMITTEES.DETAILS(id)),
