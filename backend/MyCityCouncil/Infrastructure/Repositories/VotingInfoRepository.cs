@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyCityCouncil.Domain.Enums;
 using MyCityCouncil.Domain.Interfaces;
 using MyCityCouncil.Domain.Models;
 using MyCityCouncil.Infrastructure.Persistence;
@@ -41,4 +42,8 @@ public class VotingRepository : IVotingRepository
             .Where(vi => vi.SessionId == sessionId)
             .ToListAsync(ct);
     }
+    
+    public async Task<int> CountVotesAsync(Guid initiativeId, VoteType type, CancellationToken ct = default) =>
+        await _dbContext.Votes
+            .CountAsync(v => v.VotingInfo.InitiativeId == initiativeId && v.Type == type, ct);
 }

@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.Extensions.Logging;
 using MyCityCouncil.Application.Interfaces;
 using MyCityCouncil.Domain.Enums;
 using MyCityCouncil.Domain.Interfaces;
@@ -31,39 +30,40 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
 
     public async Task<SessionDto> Handle(CreateSessionWithQueueCommand request, CancellationToken ct)
     {
-        var topInitiatives = await _initiativeRepository.GetTopQueueInitiativesAsync(3, ct);
+        var topInitiatives = await _initiativeRepository.GetTopQueueByCommitteeAsync(request.CommitteeId, 3, ct);
+        
         var session = new Session
         {
             CommitteeId = request.CommitteeId,
             Title = request.Title,
             HeldAt = request.HeldAt,
             Location = request.Location,
+            HearingRound = 1,
             CreatedAt = DateTime.UtcNow
         };
 
         await _sessionRepository.AddAsync(session, ct);
         var committee = await _committeeRepository.GetByIdAsync(request.CommitteeId, ct);
-        var assignedIds = new List<Guid>();
         
-        if (topInitiatives.Any())
+        foreach (var initiative in topInitiatives)
         {
-            foreach (var initiative in topInitiatives)
+            initiative.Status = InitiativeStatus.InFirstHearing;
+            _initiativeRepository.Update(initiative);
+            
+            var votingInfo = new VotingInfo
             {
-                initiative.Status = InitiativeStatus.InFirstHearing;
-                _initiativeRepository.Update(initiative);
-                
-                var votingInfo = new VotingInfo
-                {
-                    SessionId = session.Id,
-                    InitiativeId = initiative.Id,
-                    SessionTitle = session.Title,
-                    InitiativeTitle = initiative.Title,
-                    Status = initiative.Status,
-                };
-                
-                await _votingRepository.AddAsync(votingInfo, ct);
-                assignedIds.Add(initiative.Id);
-            }
+                SessionId = session.Id,
+                InitiativeId = initiative.Id,
+                SessionTitle = session.Title,
+                InitiativeTitle = initiative.Title,
+                InitiativeDescription = initiative.Description,
+                InitiativeAuthor = $"{initiative.User?.LastName} {initiative.User?.FirstName} {initiative.User?.MiddleName}".Trim(),
+                InitiativeCreatedAt = initiative.CreatedAt,
+                Status = initiative.Status,
+                HearingRound = 1
+            };
+            
+            await _votingRepository.AddAsync(votingInfo, ct);
         }
 
         await _uow.SaveAsync(ct);
@@ -74,9 +74,10 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionWithQueueComman
             HeldAt: session.HeldAt,
             Location: session.Location,
             CommitteeId: session.CommitteeId,
-            CommitteeName: committee.Name,
+            CommitteeName: committee?.Name ?? string.Empty,
             IsCompleted: session.IsCompleted,
-            InitiativeIds: assignedIds
+            HearingRound: session.HearingRound,
+            Initiatives: new List<VotingInfoDto>()
         );
     }
 }

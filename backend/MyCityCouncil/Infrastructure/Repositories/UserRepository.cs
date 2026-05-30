@@ -32,7 +32,7 @@ public class UserRepository : IUserRepository
         await _dbContext.Users
             .Include(u => u.Role)
             .Include(u => u.CommitteesMemberships)
-            .ThenInclude(cm => cm.Committee)
+                .ThenInclude(cm => cm.Committee)
             .AsNoTracking()
             .ToListAsync(ct);
 

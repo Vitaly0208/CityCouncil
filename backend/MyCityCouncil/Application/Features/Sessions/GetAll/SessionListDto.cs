@@ -5,6 +5,7 @@ public record SessionListDto(
     string Title,
     DateTime HeldAt,
     string? Location,
+    Guid CommitteeId,
     string CommitteeName,
     bool IsCompleted,
     int InitiativesCount

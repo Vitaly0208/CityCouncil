@@ -1,4 +1,6 @@
-﻿namespace MyCityCouncil.Application.Features.Sessions;
+﻿
+namespace MyCityCouncil.Application.Features.Sessions;
+
 public record SessionDto(
     Guid Id,
     string Title,
@@ -7,5 +9,6 @@ public record SessionDto(
     string CommitteeName,
     Guid CommitteeId,
     bool IsCompleted,
-    List<Guid> InitiativeIds
+    int HearingRound,
+    List<VotingInfoDto> Initiatives
 );

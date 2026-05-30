@@ -13,6 +13,7 @@ public record UserProfileDto(
 );
 
 public record CommissionMembershipDto(
+    Guid CommitteeId, 
     string CommitteeName,
     DateTime AppointedAt,
     DateTime? DismissedAt,

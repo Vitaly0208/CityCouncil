@@ -2,4 +2,4 @@
 
 namespace MyCityCouncil.Application.Features.Sessions.Finalize;
 
-public record FinalizeSessionCommand(Guid SessionId) : IRequest<Unit>;
+public record FinalizeSessionCommand(Guid SessionId) : IRequest<FinalizeSessionResult>;

@@ -31,6 +31,7 @@ public class GetUserProfileHandler : IRequestHandler<GetUserProfileQuery, UserPr
 
         var commissions = user.CommitteesMemberships?
             .Select(cm => new CommissionMembershipDto(
+                CommitteeId: cm.CommitteeId, 
                 CommitteeName: cm.Committee?.Name ?? "Неизвестная комиссия",
                 AppointedAt: cm.AppointedAt,
                 DismissedAt: cm.DismissedAt,

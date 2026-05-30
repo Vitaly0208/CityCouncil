@@ -1,4 +1,5 @@
-﻿using MyCityCouncil.Domain.Enums;
+﻿using System.Text.Json.Serialization;
+using MyCityCouncil.Domain.Enums;
 
 namespace MyCityCouncil.Domain.Models;
 
@@ -10,6 +11,8 @@ public class Vote
     public VotingInfo VotingInfo { get; set; } = null!;
     
     public Guid VoterId { get; set; }
+    [JsonIgnore]
+    public User Voter { get; set; } = null!; 
     public VoteType Type { get; set; }
     public DateTime VotedAt { get; set; } = DateTime.UtcNow;
 }
