@@ -85,6 +85,7 @@ export const sessionService = {
     getById: (id) => axiosInstance.get(ENDPOINTS.SESSIONS.DETAILS(id)),
     create: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE, data),
     createWithQueue: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE_WITH_QUEUE, data),
+    getProtocol: (id) => axiosInstance.get(ENDPOINTS.SESSIONS.PROTOCOL(id)),
     join: (sessionId) =>
         axiosInstance.post(ENDPOINTS.SESSIONS.JOIN(sessionId)),
     getAttendees: (sessionId) =>

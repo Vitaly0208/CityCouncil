@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { authService} from "../../../../api/apiService.js";
+import { authService } from "../../../../api/apiService.js";
 import styles from './RegisterPage.module.css';
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
+        middleName: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -33,10 +34,10 @@ const RegisterPage = () => {
             await authService.register({
                 firstName: formData.firstName,
                 lastName: formData.lastName,
+                middleName: formData.middleName,
                 email: formData.email,
                 password: formData.password
             });
-            // Успех → редирект на логин
             navigate('/login');
         } catch (err) {
             const message = err.response?.data?.title || 'Ошибка регистрации. Попробуйте позже.';
@@ -60,28 +61,86 @@ const RegisterPage = () => {
                     <div className={styles.row}>
                         <div className={styles.field}>
                             <label htmlFor="firstName">Имя</label>
-                            <input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleChange} placeholder="Иван" required className={styles.input} />
+                            <input
+                                id="firstName"
+                                name="firstName"
+                                type="text"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                placeholder="Иван"
+                                required
+                                className={styles.input}
+                            />
                         </div>
 
                         <div className={styles.field}>
                             <label htmlFor="lastName">Фамилия</label>
-                            <input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleChange} placeholder="Иванов" required className={styles.input} />
+                            <input
+                                id="lastName"
+                                name="lastName"
+                                type="text"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                placeholder="Иванов"
+                                required
+                                className={styles.input}
+                            />
                         </div>
                     </div>
 
                     <div className={styles.field}>
+                        <label htmlFor="middleName">Отчество</label>
+                        <input
+                            id="middleName"
+                            name="middleName"
+                            type="text"
+                            value={formData.middleName}
+                            onChange={handleChange}
+                            placeholder="Иванович"
+                            className={styles.input}
+                        />
+                    </div>
+
+                    <div className={styles.field}>
                         <label htmlFor="email">Email</label>
-                        <input id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="deputy@duma.gov" required className={styles.input} />
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="deputy@duma.gov"
+                            required
+                            className={styles.input}
+                        />
                     </div>
 
                     <div className={styles.field}>
                         <label htmlFor="password">Пароль</label>
-                        <input id="password" name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Минимум 6 символов" required className={styles.input} />
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Минимум 6 символов"
+                            required
+                            className={styles.input}
+                        />
                     </div>
 
                     <div className={styles.field}>
                         <label htmlFor="confirmPassword">Подтвердите пароль</label>
-                        <input id="confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} placeholder="Повторите пароль" required className={styles.input} />
+                        <input
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            placeholder="Повторите пароль"
+                            required
+                            className={styles.input}
+                        />
                     </div>
 
                     <button type="submit" disabled={loading} className={styles.button}>

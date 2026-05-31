@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { tokenService } from "../../../api/tokenService.js";
 import { useInitiatives } from "../../hooks/useInitiatives.js";
 import { useSessions } from "../../hooks/useSessions.js";
+import { useUserProfile } from "../../hooks/useUserProfile.js";
 import styles from './DashboardPage.module.css';
 
 const NEWS = [
@@ -15,7 +16,8 @@ const DashboardPage = () => {
     const navigate = useNavigate();
     const { initiatives, isLoading, isError } = useInitiatives({ status: 'Accepted' });
     const { data: sessions, isLoading: loadSessions, isError: sessionsError } = useSessions();
-
+    const isAuth = tokenService.isAuthenticated();
+    const { profile } = isAuth ? useUserProfile() : { profile: null };
     const now = new Date();
     const [viewDate, setViewDate] = useState({ month: now.getMonth(), year: now.getFullYear() });
 
@@ -85,10 +87,21 @@ const DashboardPage = () => {
                 </div>
 
                 <div className={styles.headerRight}>
-                    <span className={styles.userName}>Иванов И. И.</span>
-                    <span className={styles.userRole}>Комиссия по образованию</span>
+                    {isAuth && profile ? (
+                        <>
+                            <span className={styles.userName}>{profile.fullName}</span>
+                        </>
+                    ) : (
+                        <span className={styles.userName}>Гость</span>
+                    )}
+
                     <Link to="/profile" className={styles.logoutBtn}>Профиль</Link>
-                    <button className={styles.logoutBtn} onClick={handleLogout}>Выйти</button>
+                    <button
+                        className={styles.logoutBtn}
+                        onClick={isAuth ? handleLogout : () => navigate('/login')}
+                    >
+                        {isAuth ? 'Выйти' : 'Войти'}
+                    </button>
                 </div>
             </header>
 
@@ -145,7 +158,12 @@ const DashboardPage = () => {
                                 const date = new Date(s.heldAt);
                                 const isNext = idx === 0;
                                 return (
-                                    <article key={s.id} className={`${styles.sessionItem} ${isNext ? styles.sessionItemFeatured : ''}`}>
+                                    <article
+                                        key={s.id}
+                                        className={`${styles.sessionItem} ${isNext ? styles.sessionItemFeatured : ''}`}
+                                        onClick={() => navigate(`/sessions/${s.id}`)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
                                         <div className={`${styles.dateBadge} ${isNext ? styles.dateBadgeFeatured : ''}`}>
                                             <span className={styles.dateDay}>{date.getDate().toString().padStart(2, '0')}</span>
                                             <span className={styles.dateMonth}>{date.toLocaleDateString('ru-RU', { month: 'short' })}</span>
@@ -155,7 +173,7 @@ const DashboardPage = () => {
                                                 {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                             <h3 className={`${styles.sessionTitle} ${isNext ? styles.sessionTitleFeatured : ''}`}>{s.title}</h3>
-                                            <Link to={`/sessions/${s.id}`} className={styles.sessionLink}>Повестка</Link>
+                                            <span className={styles.sessionLink}>Перейти к повестке →</span>
                                         </div>
                                     </article>
                                 );
@@ -202,7 +220,6 @@ const DashboardPage = () => {
                 </header>
 
                 <div className={styles.initiativesList}>
-                    {/* Состояние загрузки */}
                     {isLoading && (
                         <div className={styles.card}>
                             <div className={styles.cardContent}>
@@ -211,7 +228,6 @@ const DashboardPage = () => {
                         </div>
                     )}
 
-                    {/* Состояние ошибки */}
                     {isError && (
                         <div className={styles.card}>
                             <div className={styles.cardContent}>
@@ -220,7 +236,6 @@ const DashboardPage = () => {
                         </div>
                     )}
 
-                    {/* Пустой список */}
                     {!isLoading && !isError && initiatives.length === 0 && (
                         <div className={styles.card}>
                             <div className={styles.cardContent}>
@@ -229,7 +244,6 @@ const DashboardPage = () => {
                         </div>
                     )}
 
-                    {/* Основной список карточек */}
                     {!isLoading && !isError && initiatives.map((item) => (
                         <Link
                             key={item.id}
