@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using MyCityCouncil.Application.Features.UsersS.GetProfile;
 using System.Security.Claims;
+using MyCityCouncil.Application.Features.UsersS.GetAll;
 using MyCityCouncil.Application.Features.UsersS.GetByCommittee;
-using MyCityCouncil.Application.Features.UsersS.GetUsers;
 using MyCityCouncil.Application.Features.UsersS.UpdateProfile;
 using MyCityCouncil.Domain.Models;
 
@@ -44,15 +44,6 @@ public class UsersController : ControllerBase
         var result = await _mediator.Send(query, ct);
         return Ok(result);
     }
-    
-    [HttpGet]
-    [AllowAnonymous] 
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
-    public async Task<IActionResult> GetAll([FromQuery] string? role, [FromQuery] string? search, CancellationToken ct)
-    {
-        var users = await _mediator.Send(new GetUsersQuery(role, search), ct);
-        return Ok(users);
-    }
 
     [HttpGet("by-committee/{committeeId}")]
     [Authorize]
@@ -74,6 +65,29 @@ public class UsersController : ControllerBase
     {
         var secureCommand = command with { UserId = id };
         var result = await _mediator.Send(secureCommand, ct);
+        return Ok(result);
+    }
+    
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<UserSearchDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? searchTerm,
+        [FromQuery] string? role,
+        [FromQuery] Guid? committeeId,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
+    {
+        var query = new GetAllUsersQuery(
+            SearchTerm: searchTerm,
+            Role: role,
+            CommitteeId: committeeId,
+            Page: page,
+            PageSize: pageSize
+        );
+    
+        var result = await _mediator.Send(query, ct);
         return Ok(result);
     }
 }

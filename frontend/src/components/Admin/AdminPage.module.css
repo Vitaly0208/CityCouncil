@@ -139,7 +139,14 @@
     border-radius: 8px;
     margin-bottom: 2rem;
 }
-
+.partyForm{
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
 .formGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

@@ -43,7 +43,7 @@
     max-width: 1400px;
     margin: auto;
     border-bottom: 1px solid var(--border);
-    padding: 2rem;
+    padding: 2rem 2rem 1.5rem;
 }
 .pageHeaderContent {
     flex: 1;
@@ -549,7 +549,7 @@
 }
 
 .showAllBtn:hover {
-    border-color: var(--accent);
+    border-color: var(--text-primary);
     color: var(--text-primary);
     background: rgba(var(--accent-rgb, 207, 34, 46), 0.05);
 }

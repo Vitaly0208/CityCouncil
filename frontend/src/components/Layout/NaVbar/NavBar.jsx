@@ -35,10 +35,18 @@ const Navbar = ({ onLogout }) => {
     return (
         <nav className={styles.navbar}>
             <div className={styles.container}>
-                <Link to="/dashboard" className={styles.brand} onClick={handleLinkClick}>
-                    <span className={styles.brandText}>Городская Дума</span>
-                </Link>
-
+                <div className={styles.headerLeft}>
+                    <div className={styles.logoContainer}>
+                        <img
+                            src="/gerb.png"
+                            alt="Логотип"
+                            className={styles.logoImage}
+                        />
+                    </div>
+                    <Link to="/dashboard" className={styles.brand} onClick={handleLinkClick}>
+                        <span className={styles.brandText}>Городской совет</span>
+                    </Link>
+                </div>
                 <div className={styles.desktopMenu}>
                     <ul className={styles.navList}>
                         {commonLinks.map((link) => (

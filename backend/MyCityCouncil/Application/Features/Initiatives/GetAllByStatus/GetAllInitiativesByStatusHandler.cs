@@ -15,15 +15,34 @@ public class GetInitiativesHandler : IRequestHandler<GetAllInitiativesByStatusQu
     public async Task<List<InitiativeDto>> Handle(GetAllInitiativesByStatusQuery request, CancellationToken ct)
     {
         List<Initiative> initiatives;
-
+        
         if (!string.IsNullOrEmpty(request.Status) && 
-            Enum.TryParse<InitiativeStatus>(request.Status, out var status))
+            Enum.TryParse<InitiativeStatus>(request.Status, true, out var status))
         {
             initiatives = await _initiativeRepository.GetByStatusAsync(status, ct);
         }
         else
         {
             initiatives = await _initiativeRepository.GetAllAsync(ct);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            var searchTerm = request.SearchTerm.ToLower();
+            initiatives = initiatives.Where(i => 
+                i.Title.ToLower().Contains(searchTerm) ||
+                i.Description.ToLower().Contains(searchTerm) ||
+                (i.User != null && (
+                    i.User.FirstName.ToLower().Contains(searchTerm) ||
+                    i.User.LastName.ToLower().Contains(searchTerm) ||
+                    (i.User.MiddleName?.ToLower().Contains(searchTerm) == true)
+                ))
+            ).ToList();
+        }
+        
+        if (request.PageSize > 0 && initiatives.Count > request.PageSize)
+        {
+            initiatives = initiatives.Take(request.PageSize).ToList();
         }
 
         return initiatives.Select(i => new InitiativeDto(
@@ -41,6 +60,6 @@ public class GetInitiativesHandler : IRequestHandler<GetAllInitiativesByStatusQu
 
     private static string FormatAuthorName(User? user) =>
         user != null 
-            ? $"{user.LastName} {user.MiddleName} {user.FirstName}".Trim() 
+            ? $"{user.LastName} {user.FirstName} {user.MiddleName}".Trim() 
             : "Неизвестный автор";
 }

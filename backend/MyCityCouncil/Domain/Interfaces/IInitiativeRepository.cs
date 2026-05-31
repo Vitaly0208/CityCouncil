@@ -22,4 +22,11 @@ public interface IInitiativeRepository
     
     Task<bool> ExistsAsync(Guid id, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
+    Task<List<Initiative>> GetAllFilteredAsync(
+        string? searchTerm,
+        InitiativeStatus? status,
+        Guid? authorId,
+        int page,
+        int pageSize,
+        CancellationToken ct = default);
 }

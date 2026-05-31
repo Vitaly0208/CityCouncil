@@ -5,7 +5,6 @@ import { useUserProfile, useUpdateProfile } from "../../hooks/useUserProfile.js"
 import { getUserRole } from '../../utils/jwt';
 import styles from './ProfilePage.module.css';
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
-import Footer from "../Footer/Footer.jsx";
 
 const ProfilePage = () => {
     const { userId: routeUserId } = useParams();
@@ -98,7 +97,7 @@ const ProfilePage = () => {
 
     const commissions = profile?.commissions || profile?.Commissions || [];
     const currentParty = profile?.currentParty || null;
-    const sessionAttendance = profile?.sessionAttendance || profile?.SessionAttendance || [];
+    const sessionAttendance = profile?.attendances  || profile?.Attendances || [];
     const acceptedInitiatives = profile?.acceptedInitiatives || profile?.AcceptedInitiatives || [];
 
     const displayCommissions = showAllCommissions ? commissions : commissions.slice(0, 3);
@@ -150,7 +149,7 @@ const ProfilePage = () => {
                             {isMyProfile ? 'Мой профиль' : 'Профиль депутата'}
                         </h1>
                         <p className={styles.pageSubtitle}>
-                            {profile.fullName} • {profile.roleName}
+                            {profile.fullName}
                         </p>
                     </div>
                 </div>
@@ -285,9 +284,6 @@ const ProfilePage = () => {
                                             {session.committeeName} • {formatDate(session.heldAt)}
                                         </span>
                                     </div>
-                                    <span className={`${styles.roleBadge} ${session.wasAttended || session.WasAttended ? styles.badgeAttended : styles.badgeMissed}`}>
-                                        {session.wasAttended || session.WasAttended ? 'Посещено' : 'Пропущено'}
-                                    </span>
                                 </div>
                             ))
                         ) : (

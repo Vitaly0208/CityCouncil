@@ -5,6 +5,7 @@ import { useInitiatives } from "../../hooks/useInitiatives.js";
 import { useSessions } from "../../hooks/useSessions.js";
 import { useUserProfile } from "../../hooks/useUserProfile.js";
 import styles from './DashboardPage.module.css';
+import SearchBar from "../SearchBar/SearchBar.jsx";
 
 const NEWS = [
     { id: 1, date: '28 апреля 2026', title: 'Утверждён новый бюджет на 2027 год', text: 'Депутаты большинством голосов поддержали проект бюджета...' },
@@ -76,15 +77,17 @@ const DashboardPage = () => {
         <div className={styles.container}>
             <header className={styles.header}>
                 <div className={styles.headerLeft}>
-                    <div>
-                        <h1 className={styles.headerTitle}>Городская Дума</h1>
-                        <span className={styles.headerSubtitle}>Система обеспечения законодательной деятельности</span>
+                    <div className={styles.logoContainer}>
+                        <img
+                            src="/gerb.png"
+                            alt="Логотип"
+                            className={styles.logoImage}
+                        />
                     </div>
+                    <div className={styles.headerTitle}>Городской совет</div>
                 </div>
 
-                <div className={styles.searchBar}>
-                    <input type="text" placeholder="Поиск инициатив, депутатов..." />
-                </div>
+                <SearchBar className={styles.dashboardSearch} />
 
                 <div className={styles.headerRight}>
                     {isAuth && profile ? (
@@ -95,7 +98,11 @@ const DashboardPage = () => {
                         <span className={styles.userName}>Гость</span>
                     )}
 
-                    <Link to="/profile" className={styles.logoutBtn}>Профиль</Link>
+                    {isAuth && (
+                        <Link to="/profile" className={styles.logoutBtn}>
+                            Профиль
+                        </Link>
+                    )}
                     <button
                         className={styles.logoutBtn}
                         onClick={isAuth ? handleLogout : () => navigate('/login')}
@@ -107,10 +114,9 @@ const DashboardPage = () => {
 
             <main className={styles.gridLayout}>
                 <nav className={`${styles.card} ${styles.subNavCard}`}>
-                    <NavLink to="/news" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Новости</NavLink>
-                    <NavLink to="/committees" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Комиссии</NavLink>
-                    <NavLink to="/sessions" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Заседания</NavLink>
                     <NavLink to="/initiatives" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Инициативы</NavLink>
+                    <NavLink to="/sessions" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Заседания</NavLink>
+                    <NavLink to="/committees" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Комиссии</NavLink>
                     <NavLink to="/parties" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Партии</NavLink>
                     <NavLink to="/deputies" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Депутаты</NavLink>
                 </nav>
@@ -121,7 +127,7 @@ const DashboardPage = () => {
                     </div>
                     <div className={styles.welcomeContent}>
                         <p className={styles.welcomeText}>
-                            Вы вошли в систему Городской Думы. Вы можете отслеживать работу комиссий, просматривать протоколы заседаний и знакомиться с принятыми инициативами.
+                            Вы вошли в систему Городского Совета. Вы можете отслеживать работу комиссий, просматривать протоколы заседаний и знакомиться с принятыми инициативами.
                             Используйте навигацию или поиск для быстрого доступа к нужным разделам.
                         </p>
                     </div>

@@ -73,4 +73,44 @@ public class UserRepository : IUserRepository
         _dbContext.Users.Update(user);
         await Task.CompletedTask;
     }
+    public async Task<List<User>> GetAllFilteredAsync(
+        string? searchTerm,
+        string? role,
+        Guid? committeeId,
+        int page,
+        int pageSize,
+        CancellationToken ct = default)
+    {
+        var query = _dbContext.Users
+            .AsNoTracking()
+            .Include(u => u.Role)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var q = searchTerm.ToLower();
+            query = query.Where(u => 
+                u.FirstName.ToLower().Contains(q) ||
+                u.LastName.ToLower().Contains(q) ||
+                (u.MiddleName != null && u.MiddleName.ToLower().Contains(q)) ||
+                u.Email.ToLower().Contains(q)
+            );
+        }
+
+        if (!string.IsNullOrWhiteSpace(role))
+            query = query.Where(u => u.Role != null && u.Role.Name == role);
+
+        if (committeeId.HasValue)
+        {
+            query = query.Where(u => u.CommitteesMemberships.Any(m => 
+                m.CommitteeId == committeeId.Value && m.DismissedAt == null));
+        }
+
+        return await query
+            .OrderBy(u => u.LastName)
+            .ThenBy(u => u.FirstName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+    }
 }

@@ -50,6 +50,13 @@ const RegisterPage = () => {
     return (
         <div className={styles.container}>
             <div className={styles.card}>
+                <div className={styles.logoContainer}>
+                    <img
+                        src="/gerb.png"
+                        alt="Логотип"
+                        className={styles.logoImage}
+                    />
+                </div>
                 <div className={styles.header}>
                     <h1>Регистрация</h1>
                     <p>Создайте учётную запись для доступа к системе</p>

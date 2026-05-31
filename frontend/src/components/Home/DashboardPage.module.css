@@ -63,20 +63,21 @@ h1, h2, h3, h4, h5, h6, .cardTitle, .sectionTitle, .headerTitle {
     display: flex;
     align-items: center;
     gap: 0.85rem;
+    margin-left: 1.5rem;
 }
 
-.logo {
-    font-size: 1.6rem;
-    font-weight: bold;
-    background: rgba(255, 255, 255, 0.2);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+.logoContainer {
     display: flex;
-    align-items: center;
     justify-content: center;
 }
-
+.dashboardSearch {
+    max-width: 500px;
+}
+.logoImage {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
 .headerTitle {
     margin: 0;
     font-size: 1.15rem;
@@ -122,6 +123,7 @@ h1, h2, h3, h4, h5, h6, .cardTitle, .sectionTitle, .headerTitle {
     align-items: center;
     gap: 1.1rem;
     font-size: 0.9rem;
+    margin-right: 1.5rem;
 }
 
 .userName {
@@ -534,9 +536,9 @@ h1, h2, h3, h4, h5, h6, .cardTitle, .sectionTitle, .headerTitle {
 .initiativesList {
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
+    gap: 1rem;
 }
 
 .initiativeRow {
@@ -676,7 +678,7 @@ h1, h2, h3, h4, h5, h6, .cardTitle, .sectionTitle, .headerTitle {
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 1.5rem;
+    padding: 0.5rem;
     display: flex;
     flex-direction: row;
     text-decoration: none;

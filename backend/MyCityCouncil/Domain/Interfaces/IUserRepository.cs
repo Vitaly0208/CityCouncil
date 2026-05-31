@@ -15,4 +15,11 @@ public interface IUserRepository
     Task<List<User>> SearchAsync(string searchTerm, CancellationToken ct = default);
     Task<bool> HasActivePartyAsync(Guid userId, CancellationToken ct = default);
     Task<User?> GetByIdWithRelationsAsync(Guid id, CancellationToken ct = default);
+    Task<List<User>> GetAllFilteredAsync(
+        string? searchTerm,
+        string? role,
+        Guid? committeeId,
+        int page,
+        int pageSize,
+        CancellationToken ct = default);
 }

@@ -3,12 +3,13 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
+
 using MyCityCouncil.Application.Features.Initiatives;
 using MyCityCouncil.Application.Features.Initiatives.Create;
 using MyCityCouncil.Application.Features.Initiatives.GetAllByStatus;
 using MyCityCouncil.Application.Features.Initiatives.Review;
+using MyCityCouncil.Domain.Enums;
+
 
 namespace MyCityCouncil.Api.Controllers;
 
@@ -26,12 +27,18 @@ public class InitiativesController : ControllerBase
     
     [HttpGet]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(List<InitiativeDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<InitiativeDto>>> GetAll(
+    public async Task<IActionResult> GetAll(
         [FromQuery] string? status,
-        CancellationToken ct)
+        [FromQuery] string? searchTerm,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
     {
-        var query = new GetAllInitiativesByStatusQuery(status);
+        var query = new GetAllInitiativesByStatusQuery(
+            Status: status,
+            SearchTerm: searchTerm,
+            PageSize: pageSize
+        );
+    
         var result = await _mediator.Send(query, ct);
         return Ok(result);
     }
@@ -100,6 +107,7 @@ public class InitiativesController : ControllerBase
             return StatusCode(500, new { message = "Внутренняя ошибка сервера." });
         }
     }
+
 
     [HttpGet("{id}")]
     [AllowAnonymous]

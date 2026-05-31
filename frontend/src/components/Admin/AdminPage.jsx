@@ -260,7 +260,7 @@ const AdminPage = () => {
         { id: 'committees', label: 'Комиссии' },
         { id: 'parties', label: 'Партии' },
         { id: 'deputies', label: 'Пользователи' },
-        { id: 'approved', label: 'Утверждённые' },
+        { id: 'approved', label: 'Инициативы' },
         { id: 'news', label: 'Новости' },
     ];
 
