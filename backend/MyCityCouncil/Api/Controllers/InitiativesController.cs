@@ -15,7 +15,6 @@ namespace MyCityCouncil.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class InitiativesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -38,6 +37,7 @@ public class InitiativesController : ControllerBase
     }
     
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(CreateInitiativeResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

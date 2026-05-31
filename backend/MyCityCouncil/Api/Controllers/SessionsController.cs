@@ -7,6 +7,7 @@ using MyCityCouncil.Application.Features.Sessions.Create;
 using MyCityCouncil.Application.Features.Sessions.GetAll;
 using MyCityCouncil.Application.Features.Sessions.GetById;
 using MyCityCouncil.Application.Features.Sessions.JoinSession;
+using MyCityCouncil.Application.Features.Sessions.Protocol;
 
 namespace MyCityCouncil.Api.Controllers;
 
@@ -19,7 +20,7 @@ public class SessionsController : ControllerBase
     
     
     [HttpPost("create")]
-    [Authorize(Roles = "Admin,Chairman")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(SessionDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<SessionDto>> Create([FromBody] CreateSessionWithQueueCommand command, CancellationToken ct)
     {
@@ -37,8 +38,9 @@ public class SessionsController : ControllerBase
         var result = await _mediator.Send(command, ct);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
-    
+        
     [HttpGet]
+    [AllowAnonymous] 
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<SessionListDto>))]
     public async Task<IActionResult> GetAll(
         [FromQuery] Guid? committeeId,
@@ -55,6 +57,7 @@ public class SessionsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SessionDetailDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [AllowAnonymous] 
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
         var query = new GetSessionDetailsQuery(id);
@@ -64,6 +67,7 @@ public class SessionsController : ControllerBase
     }
     
     [HttpPost("{id}/join")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -88,6 +92,7 @@ public class SessionsController : ControllerBase
     }
     
     [HttpGet("{id}/attendees")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AttendeeDto>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAttendees(Guid id, CancellationToken ct)
@@ -98,6 +103,18 @@ public class SessionsController : ControllerBase
             return NotFound();
         
         return Ok(session.Attendees);
+    }
+    
+    [HttpGet("{id:guid}/protocol")]
+    [AllowAnonymous] 
+    [ProducesResponseType(typeof(SessionProtocolDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProtocol(Guid id, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetSessionProtocolQuery(id), ct);
+        if (result == null) return NotFound("Заседание не найдено или ещё не завершено");
+        
+        return Ok(result);
     }
     
 }

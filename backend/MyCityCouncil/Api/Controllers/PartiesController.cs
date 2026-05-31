@@ -15,7 +15,6 @@ namespace MyCityCouncil.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class PartiesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -23,6 +22,7 @@ public class PartiesController : ControllerBase
     public PartiesController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CreatePartyCommand command, CancellationToken ct)
     {
@@ -31,6 +31,7 @@ public class PartiesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
@@ -39,6 +40,7 @@ public class PartiesController : ControllerBase
         return NoContent();
     }
     [HttpPost("{partyId}/members")]
+    [Authorize]
     [ProducesResponseType(typeof(MembershipJoinDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -58,6 +60,7 @@ public class PartiesController : ControllerBase
     }
 
     [HttpDelete("{id}/members/{userId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Leave(Guid id, Guid userId, CancellationToken ct)
@@ -68,6 +71,7 @@ public class PartiesController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(List<PartyDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous] 
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
         var result = await _mediator.Send(new GetAllPartiesQuery(), ct);
@@ -77,6 +81,7 @@ public class PartiesController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(PartyDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [AllowAnonymous] 
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
         try

@@ -70,6 +70,12 @@ public class InitiativeRepository : IInitiativeRepository
             .Take(count)
             .ToListAsync(ct);
     }
+    public async Task<List<Initiative>> GetAcceptedByUserIdAsync(Guid userId, CancellationToken ct = default) =>
+        await _dbContext.Initiatives
+            .AsNoTracking()
+            .Where(i => i.UserId == userId && i.Status == InitiativeStatus.Accepted)
+            .OrderByDescending(i => i.ApprovedAt)
+            .ToListAsync(ct);
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken ct = default) =>
         await _dbContext.Initiatives.AnyAsync(i => i.Id == id, ct);

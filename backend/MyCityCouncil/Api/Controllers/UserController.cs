@@ -12,7 +12,6 @@ namespace MyCityCouncil.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -21,6 +20,7 @@ public class UsersController : ControllerBase
     
 
     [HttpGet("{id:guid}")]
+    [AllowAnonymous] 
     [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserProfileDto>> GetProfile(Guid id, CancellationToken ct)
@@ -31,6 +31,7 @@ public class UsersController : ControllerBase
     }
     
     [HttpGet("me")]
+    [Authorize]
     [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<UserProfileDto>> GetMyProfile(CancellationToken ct)
@@ -45,7 +46,7 @@ public class UsersController : ControllerBase
     }
     
     [HttpGet]
-    [Authorize]
+    [AllowAnonymous] 
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
     public async Task<IActionResult> GetAll([FromQuery] string? role, [FromQuery] string? search, CancellationToken ct)
     {

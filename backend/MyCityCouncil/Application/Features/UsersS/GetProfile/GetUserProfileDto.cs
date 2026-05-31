@@ -9,7 +9,9 @@ public record UserProfileDto(
     string HomePhone,
     string WorkPhone,
     List<CommissionMembershipDto> Commissions,
-    PartyMembershipDto? CurrentParty
+    PartyMembershipDto? CurrentParty,
+    List<AcceptedInitiativeDto> AcceptedInitiatives,
+    List<SessionAttendanceDto> Attendances
 );
 
 public record CommissionMembershipDto(
@@ -27,4 +29,20 @@ public record PartyMembershipDto(
     string? Abbreviation,
     string? Ideology,
     DateTime AppointedAt
+);
+
+public record AcceptedInitiativeDto(
+    Guid Id,
+    string Title,
+    string Description,
+    DateTime ApprovedAt
+);
+
+public record SessionAttendanceDto(
+    Guid SessionId,
+    string SessionTitle,
+    string CommitteeName,
+    DateTime HeldAt,
+    bool WasAttended,
+    int HearingRound
 );
