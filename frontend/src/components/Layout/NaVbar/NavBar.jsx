@@ -20,10 +20,10 @@ const Navbar = ({ onLogout }) => {
 
     const commonLinks = [
         { to: '/initiatives', label: 'Инициативы' },
-        { to: '/committees', label: 'Комиссии' },
         { to: '/sessions', label: 'Заседания' },
-        { to: '/deputies', label: 'Депутаты' },
+        { to: '/committees', label: 'Комиссии' },
         { to: '/parties', label: 'Партии' },
+        { to: '/deputies', label: 'Депутаты' },
     ];
 
     const adminLinks = [
