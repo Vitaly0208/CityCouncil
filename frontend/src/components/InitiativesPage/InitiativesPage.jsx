@@ -4,9 +4,11 @@ import { useInitiatives, useCreateInitiative } from "../../hooks/useInitiatives.
 import styles from './InitiativesPage.module.css';
 import { useState } from "react";
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
+import {useAuthRedirect} from "../../hooks/useAuthRedirect.js";
 
 const InitiativesPage = () => {
     const navigate = useNavigate();
+    const requireAuth = useAuthRedirect();
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ title: '', description: '' });
 
@@ -16,6 +18,10 @@ const InitiativesPage = () => {
     const handleLogout = () => {
         tokenService.clearTokens();
         navigate('/login');
+    };
+
+    const handleCreateClick = () => {
+        requireAuth(() => navigate("/initiatives/create"));
     };
 
     const handleSubmit = async (e) => {
@@ -63,7 +69,10 @@ const InitiativesPage = () => {
                                 Утвержденные и активные инициативы
                             </p>
                         </header>
-                        <button className={styles.primaryBtn} onClick={() => setShowForm(!showForm)}>
+                        <button
+                            className={styles.primaryBtn}
+                            onClick={() => requireAuth(() => setShowForm(prev => !prev))}
+                        >
                             {showForm ? 'Скрыть форму' : '+ Предложить инициативу'}
                         </button>
                     </div>

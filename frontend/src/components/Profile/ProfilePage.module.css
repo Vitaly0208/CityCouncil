@@ -220,7 +220,7 @@
 }
 .pageTitle {
     margin: 0 0 0.35rem;
-    font-size: 1.6rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -236,7 +236,7 @@
     gap: 1.5rem;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 1rem 1.75rem 2rem;
+    padding: 1rem 1.75rem 1rem;
 }
 .profileCard {
     background: var(--card-bg);
@@ -247,6 +247,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    max-height: 573px;
 }
 
 .avatar {
@@ -321,14 +322,13 @@
     line-height: 1.4;
 }
 
-/* --- Right Content --- */
+
 .profileContent {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-/* --- Cards --- */
 .card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -349,7 +349,7 @@
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-primary); /* Убрал красный, теперь нейтральный */
+    color: var(--text-primary);
 }
 
 .cardLink {
@@ -359,7 +359,6 @@
 }
 .cardLink:hover { color: var(--text-primary); }
 
-/* --- List Items --- */
 .list {
     display: flex;
     flex-direction: column;
@@ -399,7 +398,6 @@
     color: var(--text-secondary);
 }
 
-/* --- Role Badges --- */
 .roleBadge {
     font-size: 0.7rem;
     font-weight: 600;
@@ -429,7 +427,6 @@
     background: transparent;
     opacity: 0.6;
 }
-/* Loading & Error states */
 .loadingContainer,
 .errorContainer {
     display: flex;
@@ -514,4 +511,77 @@
 
 .adminButton:active {
     transform: translateY(0);
+}
+
+.initiativesSection {
+    max-width: 1400px;
+    margin: auto;
+    padding: 2rem;
+}
+
+.listItemDescription {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.roleAccepted {
+    color: var(--success);
+    border-color: var(--success);
+    background: transparent;
+}
+
+.showAllBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.showAllBtn:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    background: rgba(var(--accent-rgb, 207, 34, 46), 0.05);
+}
+
+.bottomGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: auto;
+    padding: 1rem 1.5rem;
+}
+
+.badgeAttended {
+    color: var(--success);
+    border-color: var(--success);
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.badgeMissed {
+    color: #8b949e;
+    border-color: #8b949e;
+    background: transparent;
+}
+
+.listItemDescription {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }

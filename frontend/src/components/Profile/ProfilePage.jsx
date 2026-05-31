@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { tokenService } from '../../../api/tokenService';
 import { useUserProfile, useUpdateProfile } from "../../hooks/useUserProfile.js";
 import { getUserRole } from '../../utils/jwt';
 import styles from './ProfilePage.module.css';
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
+import Footer from "../Footer/Footer.jsx";
 
 const ProfilePage = () => {
     const { userId: routeUserId } = useParams();
@@ -23,13 +24,9 @@ const ProfilePage = () => {
         avatarUrl: ''
     });
 
-    useEffect(() => {
-        console.log('🔍 ProfilePage debug:');
-        console.log('📦 routeUserId:', routeUserId);
-        console.log('🎯 targetId:', targetId);
-        console.log('👤 isMyProfile:', isMyProfile);
-        console.log('📄 profile loaded:', profile?.id);
-    }, [routeUserId, targetId, isMyProfile, profile]);
+    const [showAllCommissions, setShowAllCommissions] = useState(false);
+    const [showAllAttendance, setShowAllAttendance] = useState(false);
+    const [showAllInitiatives, setShowAllInitiatives] = useState(false);
 
     const handleLogout = () => {
         tokenService.clearTokens();
@@ -81,7 +78,6 @@ const ProfilePage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
             await updateProfileAsync({
                 id: profile.id,
@@ -92,7 +88,6 @@ const ProfilePage = () => {
                     avatarUrl: formData.avatarUrl || null
                 }
             });
-
             await refetch();
             setShowEditModal(false);
             alert('Профиль успешно обновлён');
@@ -103,8 +98,13 @@ const ProfilePage = () => {
 
     const commissions = profile?.commissions || profile?.Commissions || [];
     const currentParty = profile?.currentParty || null;
+    const sessionAttendance = profile?.sessionAttendance || profile?.SessionAttendance || [];
+    const acceptedInitiatives = profile?.acceptedInitiatives || profile?.AcceptedInitiatives || [];
 
-    // 👇 Редактирование доступно только для своего профиля и только админам
+    const displayCommissions = showAllCommissions ? commissions : commissions.slice(0, 3);
+    const displayAttendance = showAllAttendance ? sessionAttendance : sessionAttendance.slice(0, 3);
+    const displayInitiatives = showAllInitiatives ? acceptedInitiatives : acceptedInitiatives.slice(0, 3);
+
     const canEdit = isMyProfile && getUserRole() === 'Admin';
 
     if (isLoading) {
@@ -130,6 +130,14 @@ const ProfilePage = () => {
             </div>
         );
     }
+
+    const renderShowAllButton = (isVisible, setIsVisible, count) => (
+        count > 3 ? (
+            <button className={styles.showAllBtn} onClick={() => setIsVisible(!isVisible)}>
+                {isVisible ? 'Свернуть' : 'Показать все'}
+            </button>
+        ) : null
+    );
 
     return (
         <div className={styles.container}>
@@ -203,11 +211,11 @@ const ProfilePage = () => {
                     <section className={styles.card}>
                         <div className={styles.cardHeader}>
                             <h2 className={styles.cardTitle}>Участие в комиссиях</h2>
-                            <Link to="/committees" className={styles.cardLink}>Все комиссии</Link>
+                            {renderShowAllButton(showAllCommissions, setShowAllCommissions, commissions.length)}
                         </div>
                         <div className={styles.list}>
-                            {commissions.length > 0 ? (
-                                commissions.map((item, index) => (
+                            {displayCommissions.length > 0 ? (
+                                displayCommissions.map((item, index) => (
                                     <div key={index} className={styles.listItem}>
                                         <div className={styles.listItemInfo}>
                                             <h3 className={styles.listItemTitle}>{item.committeeName}</h3>
@@ -232,15 +240,10 @@ const ProfilePage = () => {
                     <section className={styles.card}>
                         <div className={styles.cardHeader}>
                             <h2 className={styles.cardTitle}>Участие в партиях</h2>
-                            <Link to="/parties" className={styles.cardLink}>Все партии</Link>
                         </div>
                         <div className={styles.list}>
                             {currentParty ? (
-                                <Link
-                                    key={currentParty.partyId}
-                                    to={`/parties/${currentParty.partyId}`}
-                                    className={styles.listItem}
-                                >
+                                <div className={styles.listItem}>
                                     <div className={styles.listItemInfo}>
                                         <h3 className={styles.listItemTitle}>{currentParty.partyName}</h3>
                                         <span className={styles.listItemDate}>
@@ -250,7 +253,7 @@ const ProfilePage = () => {
                                     <span className={`${styles.roleBadge} ${styles.roleMember}`}>
                                         Участник
                                     </span>
-                                </Link>
+                                </div>
                             ) : (
                                 <div className={styles.emptyState}>
                                     <p>Нет данных об участии в партиях</p>
@@ -261,6 +264,71 @@ const ProfilePage = () => {
                 </div>
             </main>
 
+            <div className={styles.bottomGrid}>
+                <section className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>Посещения заседаний</h2>
+                        {renderShowAllButton(showAllAttendance, setShowAllAttendance, sessionAttendance.length)}
+                    </div>
+                    <div className={styles.list}>
+                        {displayAttendance.length > 0 ? (
+                            displayAttendance.map(session => (
+                                <div
+                                    key={session.sessionId}
+                                    className={styles.listItem}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate(`/sessions/${session.sessionId}/protocol`)}
+                                >
+                                    <div className={styles.listItemInfo}>
+                                        <h3 className={styles.listItemTitle}>{session.sessionTitle}</h3>
+                                        <span className={styles.listItemDate}>
+                                            {session.committeeName} • {formatDate(session.heldAt)}
+                                        </span>
+                                    </div>
+                                    <span className={`${styles.roleBadge} ${session.wasAttended || session.WasAttended ? styles.badgeAttended : styles.badgeMissed}`}>
+                                        {session.wasAttended || session.WasAttended ? 'Посещено' : 'Пропущено'}
+                                    </span>
+                                </div>
+                            ))
+                        ) : (
+                            <div className={styles.emptyState}>
+                                <p>Нет данных о заседаниях</p>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                <section className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>Принятые инициативы</h2>
+                        {renderShowAllButton(showAllInitiatives, setShowAllInitiatives, acceptedInitiatives.length)}
+                    </div>
+                    <div className={styles.list}>
+                        {displayInitiatives.length > 0 ? (
+                            displayInitiatives.map(init => (
+                                <div
+                                    key={init.id}
+                                    className={styles.listItem}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate(`/initiatives/${init.id}`)}
+                                >
+                                    <div className={styles.listItemInfo}>
+                                        <h3 className={styles.listItemTitle}>{init.title}</h3>
+                                        <span className={styles.listItemDate}>
+                                            Принята: {formatDate(init.approvedAt)}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className={styles.emptyState}>
+                                <p>Пока нет принятых инициатив</p>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            </div>
+
             {showEditModal && canEdit && (
                 <div className={styles.modalOverlay} onClick={handleCloseModal}>
                     <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -268,7 +336,6 @@ const ProfilePage = () => {
                             <h2 className={styles.modalTitle}>Редактирование профиля</h2>
                             <button className={styles.modalClose} onClick={handleCloseModal}>×</button>
                         </div>
-
                         <form onSubmit={handleSubmit} className={styles.modalForm}>
                             <div className={styles.formGroup}>
                                 <label className={styles.formLabel}>Домашний телефон</label>
@@ -281,7 +348,6 @@ const ProfilePage = () => {
                                     placeholder="+7 (___) ___-__-__"
                                 />
                             </div>
-
                             <div className={styles.formGroup}>
                                 <label className={styles.formLabel}>Служебный телефон</label>
                                 <input
@@ -293,19 +359,6 @@ const ProfilePage = () => {
                                     placeholder="+7 (___) ___-__-__"
                                 />
                             </div>
-
-                            <div className={styles.formGroup}>
-                                <label className={styles.formLabel}>URL аватара</label>
-                                <input
-                                    type="url"
-                                    name="avatarUrl"
-                                    value={formData.avatarUrl}
-                                    onChange={handleInputChange}
-                                    className={styles.formInput}
-                                    placeholder="https://example.com/avatar.jpg"
-                                />
-                            </div>
-
                             <div className={styles.modalActions}>
                                 <button
                                     type="button"
