@@ -5,6 +5,7 @@ import { useInitiatives, useReviewInitiative } from "../../hooks/useInitiatives.
 import { useCreateSessionWithQueue } from "../../hooks/useSessions.js";
 import { useCommittees, useCreateCommittee, useDeleteCommittee, useAppointChairman } from "../../hooks/useCommittees.js";
 import { useUsers, useUsersByCommittee, useAddUserToCommittee, useRemoveUserFromCommittee } from "../../hooks/UseUsers.js";
+import { useParties, useCreateParty, useDeleteParty, useJoinParty, useLeaveParty } from "../../hooks/useParties.js";
 import styles from './AdminPage.module.css';
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
 
@@ -13,9 +14,15 @@ const AdminPage = () => {
     const [activeTab, setActiveTab] = useState('moderation');
 
     const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedPartyUser, setSelectedPartyUser] = useState(null);
+
     const [showCommissionModal, setShowCommissionModal] = useState(false);
     const [showChairmanModal, setShowChairmanModal] = useState(false);
-    const [showChairmanSelectModal, setShowChairmanSelectModal] = useState(false); // 👈 Новая модалка
+    const [showChairmanSelectModal, setShowChairmanSelectModal] = useState(false);
+
+    const [showPartyModal, setShowPartyModal] = useState(false);
+    const [showPartyMemberModal, setShowPartyMemberModal] = useState(false);
+    const [showPartyLeaderSelectModal, setShowPartyLeaderSelectModal] = useState(false);
 
     const [news, setNews] = useState(() => {
         try { return JSON.parse(localStorage.getItem('admin_news')) || []; }
@@ -25,7 +32,8 @@ const AdminPage = () => {
 
     const [initSearch, setInitSearch] = useState('');
     const [sessionForm, setSessionForm] = useState({ title: '', heldAt: '', location: '', committeeId: '' });
-    const [committeeForm, setCommitteeForm] = useState({ name: '', specialization: '', description: '', chairmanId: '' }); // 👈 Добавили chairmanId
+    const [committeeForm, setCommitteeForm] = useState({ name: '', specialization: '', description: '', chairmanId: '', chairmanName: '' });
+    const [partyForm, setPartyForm] = useState({ name: '', abbreviation: '', ideology: '', description: '', leaderId: '', leaderName: '' });
 
     const [userFilter, setUserFilter] = useState({ committeeId: '', search: '' });
     const [visibleUsers, setVisibleUsers] = useState(10);
@@ -33,6 +41,7 @@ const AdminPage = () => {
     const { initiatives: pendingInitiatives, isLoading: loadPending } = useInitiatives({ status: 'PendingReview' });
     const { initiatives: approvedInitiatives, isLoading: loadApproved } = useInitiatives({ status: 'Accepted' });
     const { committees, isLoading: loadCommittees } = useCommittees();
+    const { parties, isLoading: loadParties } = useParties();
 
     const { data: allUsers = [], isLoading: loadUsers } = useUsers({
         searchTerm: userFilter.search || undefined
@@ -47,6 +56,11 @@ const AdminPage = () => {
     const addUserToCommittee = useAddUserToCommittee();
     const removeUserFromCommittee = useRemoveUserFromCommittee();
     const appointChairman = useAppointChairman();
+
+    const createPartyMutation = useCreateParty();
+    const deletePartyMutation = useDeleteParty();
+    const joinParty = useJoinParty();
+    const leaveParty = useLeaveParty();
 
     useEffect(() => {
         localStorage.setItem('admin_news', JSON.stringify(news));
@@ -92,15 +106,19 @@ const AdminPage = () => {
 
     const handleCreateSession = async (e) => {
         e.preventDefault();
+        if (!sessionForm.committeeId) {
+            alert('Выберите комиссию');
+            return;
+        }
         try {
             await createSessionMutation.mutateAsync({
                 ...sessionForm,
                 heldAt: new Date(sessionForm.heldAt).toISOString()
             });
             setSessionForm({ title: '', heldAt: '', location: '', committeeId: '' });
-            alert('✅ Заседание создано!');
+            alert('Заседание создано!');
         } catch (err) {
-            alert('❌ Ошибка: ' + err.message);
+            alert('Ошибка: ' + err.message);
         }
     };
 
@@ -111,12 +129,29 @@ const AdminPage = () => {
                 name: committeeForm.name,
                 specialization: committeeForm.specialization,
                 description: committeeForm.description,
-                chairmanId: committeeForm.chairmanId || undefined // 👈 Передаём председателя, если выбран
+                chairmanId: committeeForm.chairmanId || undefined
             });
-            setCommitteeForm({ name: '', specialization: '', description: '', chairmanId: '' });
-            alert('✅ Комиссия создана');
+            setCommitteeForm({ name: '', specialization: '', description: '', chairmanId: '', chairmanName: '' });
+            alert('Комиссия создана');
         } catch (err) {
-            alert('❌ Ошибка: ' + err.message);
+            alert('Ошибка: ' + err.message);
+        }
+    };
+
+    const handleCreateParty = async (e) => {
+        e.preventDefault();
+        try {
+            await createPartyMutation.mutateAsync({
+                name: partyForm.name,
+                abbreviation: partyForm.abbreviation,
+                ideology: partyForm.ideology,
+                description: partyForm.description,
+                leaderId: partyForm.leaderId || undefined
+            });
+            setPartyForm({ name: '', abbreviation: '', ideology: '', description: '', leaderId: '', leaderName: '' });
+            alert('Партия создана');
+        } catch (err) {
+            alert('Ошибка: ' + err.message);
         }
     };
 
@@ -124,9 +159,19 @@ const AdminPage = () => {
         if (!confirm(`Удалить комиссию "${name}"?\nЭто действие необратимо.`)) return;
         try {
             await deleteCommitteeMutation.mutateAsync(id);
-            alert('✅ Комиссия удалена');
+            alert('Комиссия удалена');
         } catch (err) {
-            alert('❌ Ошибка: ' + err.message);
+            alert('Ошибка: ' + err.message);
+        }
+    };
+
+    const handleDeleteParty = async (id, name) => {
+        if (!confirm(`Удалить партию "${name}"?\nЭто действие необратимо.`)) return;
+        try {
+            await deletePartyMutation.mutateAsync(id);
+            alert('Партия удалена');
+        } catch (err) {
+            alert('Ошибка: ' + err.message);
         }
     };
 
@@ -134,7 +179,7 @@ const AdminPage = () => {
         try {
             await addUserToCommittee.mutateAsync({ userId, committeeId });
         } catch (err) {
-            alert('❌ Ошибка: ' + (err.message || 'Не удалось добавить'));
+            alert('Ошибка: ' + (err.message || 'Не удалось добавить'));
         }
     };
 
@@ -142,7 +187,23 @@ const AdminPage = () => {
         try {
             await removeUserFromCommittee.mutateAsync({ userId, committeeId });
         } catch (err) {
-            alert('❌ Ошибка: ' + (err.message || 'Не удалось удалить'));
+            alert('Ошибка: ' + (err.message || 'Не удалось удалить'));
+        }
+    };
+
+    const handleJoinParty = async (userId, partyId) => {
+        try {
+            await joinParty.mutateAsync({ userId, partyId });
+        } catch (err) {
+            alert('Ошибка: ' + (err.message || 'Не удалось добавить'));
+        }
+    };
+
+    const handleLeaveParty = async (userId, partyId) => {
+        try {
+            await leaveParty.mutateAsync({ userId, partyId });
+        } catch (err) {
+            alert('Ошибка: ' + (err.message || 'Не удалось удалить'));
         }
     };
 
@@ -150,15 +211,30 @@ const AdminPage = () => {
         try {
             await appointChairman.mutateAsync({ userId, committeeId });
             setShowChairmanModal(false);
-            alert('✅ Пользователь назначен председателем');
+            alert('Пользователь назначен председателем');
         } catch (err) {
-            alert('❌ Ошибка: ' + (err.message || 'Не удалось назначить'));
+            alert('Ошибка: ' + (err.message || 'Не удалось назначить'));
+        }
+    };
+
+    const handleAppointPartyLeader = async (userId, partyId) => {
+        try {
+            await joinParty.mutateAsync({ userId, partyId });
+            setShowPartyMemberModal(false);
+            alert('Пользователь назначен лидером партии');
+        } catch (err) {
+            alert('Ошибка: ' + (err.message || 'Не удалось назначить'));
         }
     };
 
     const handleSelectChairman = (userId, fullName) => {
         setCommitteeForm(prev => ({ ...prev, chairmanId: userId, chairmanName: fullName }));
         setShowChairmanSelectModal(false);
+    };
+
+    const handleSelectPartyLeader = (userId, fullName) => {
+        setPartyForm(prev => ({ ...prev, leaderId: userId, leaderName: fullName }));
+        setShowPartyLeaderSelectModal(false);
     };
 
     const handleAddNews = (e) => {
@@ -182,8 +258,9 @@ const AdminPage = () => {
         { id: 'moderation', label: `Модерация (${pendingInitiatives?.length || 0})` },
         { id: 'sessions', label: 'Заседания' },
         { id: 'committees', label: 'Комиссии' },
+        { id: 'parties', label: 'Партии' },
         { id: 'deputies', label: 'Пользователи' },
-        { id: 'approved', label: 'Утверждённые' },
+        { id: 'approved', label: 'Инициативы' },
         { id: 'news', label: 'Новости' },
     ];
 
@@ -197,7 +274,7 @@ const AdminPage = () => {
         return <span className={`${styles.badge} ${s.class}`}>{s.text}</span>;
     };
 
-    if (loadPending || loadCommittees) {
+    if (loadPending || loadCommittees || loadParties) {
         return <div className={styles.container}><div className={styles.loading}>Загрузка панели...</div></div>;
     }
 
@@ -253,8 +330,6 @@ const AdminPage = () => {
                                     <input type="text" placeholder="Специализация" value={committeeForm.specialization} onChange={e => setCommitteeForm({...committeeForm, specialization: e.target.value})} required />
                                 </div>
                                 <textarea placeholder="Описание" value={committeeForm.description} onChange={e => setCommitteeForm({...committeeForm, description: e.target.value})} rows={2} />
-
-                                {/* 👇 Выбор председателя */}
                                 <div className={styles.chairmanSelectWrapper}>
                                     <label className={styles.chairmanLabel}>Председатель:</label>
                                     {committeeForm.chairmanName ? (
@@ -268,13 +343,11 @@ const AdminPage = () => {
                                         </button>
                                     )}
                                 </div>
-
                                 <button type="submit" className={styles.primaryBtn} disabled={createCommitteeMutation.isPending}>
                                     {createCommitteeMutation.isPending ? 'Создание...' : 'Создать комиссию'}
                                 </button>
                             </form>
 
-                            {/* 👇 Модалка выбора председателя */}
                             {showChairmanSelectModal && (
                                 <div className={styles.modalOverlay}>
                                     <div className={styles.modal}>
@@ -325,6 +398,93 @@ const AdminPage = () => {
                                             <div className={styles.committeeActions}>
                                                 <Link to={`/committees/${c.id}`} className={styles.linkBtn}>Просмотр</Link>
                                                 <button className={styles.deleteBtn} onClick={() => handleDeleteCommittee(c.id, c.name)} disabled={deleteCommitteeMutation.isPending}>Удалить</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            }
+                        </section>
+                    )}
+
+                    {activeTab === 'parties' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>Управление партиями</h2>
+                            <form onSubmit={handleCreateParty} className={styles.partyForm}>
+                                <h3>Новая партия</h3>
+                                <div className={styles.formGrid}>
+                                    <input type="text" placeholder="Название партии" value={partyForm.name} onChange={e => setPartyForm({...partyForm, name: e.target.value})} required />
+                                    <input type="text" placeholder="Аббревиатура" value={partyForm.abbreviation} onChange={e => setPartyForm({...partyForm, abbreviation: e.target.value})} />
+                                </div>
+                                <input type="text" placeholder="Идеология" value={partyForm.ideology} onChange={e => setPartyForm({...partyForm, ideology: e.target.value})} />
+                                <textarea placeholder="Описание" value={partyForm.description} onChange={e => setPartyForm({...partyForm, description: e.target.value})} rows={2} />
+                                <div className={styles.chairmanSelectWrapper}>
+                                    <label className={styles.chairmanLabel}>Лидер партии:</label>
+                                    {partyForm.leaderName ? (
+                                        <div className={styles.chairmanSelected}>
+                                            <span>{partyForm.leaderName}</span>
+                                            <button type="button" className={styles.chairmanChangeBtn} onClick={() => setShowPartyLeaderSelectModal(true)}>Изменить</button>
+                                        </div>
+                                    ) : (
+                                        <button type="button" className={styles.chairmanSelectBtn} onClick={() => setShowPartyLeaderSelectModal(true)}>
+                                            Выбрать лидера
+                                        </button>
+                                    )}
+                                </div>
+                                <button type="submit" className={styles.primaryBtn} disabled={createPartyMutation.isPending}>
+                                    {createPartyMutation.isPending ? 'Создание...' : 'Создать партию'}
+                                </button>
+                            </form>
+
+                            {showPartyLeaderSelectModal && (
+                                <div className={styles.modalOverlay}>
+                                    <div className={styles.modal}>
+                                        <h3 className={styles.modalTitle}>Выберите лидера партии</h3>
+                                        <input
+                                            type="text"
+                                            placeholder="Поиск пользователя..."
+                                            className={styles.modalSearch}
+                                            value={userFilter.search}
+                                            onChange={e => setUserFilter({...userFilter, search: e.target.value})}
+                                        />
+                                        <div className={styles.userSelectList}>
+                                            {loadUsers ? (
+                                                <div className={styles.loadingSmall}>Загрузка...</div>
+                                            ) : (
+                                                filteredUsers.slice(0, 20).map(user => (
+                                                    <button
+                                                        key={user.id}
+                                                        className={styles.userSelectItem}
+                                                        onClick={() => handleSelectPartyLeader(user.id, `${user.lastName} ${user.firstName} ${user.middleName || ''}`.trim())}
+                                                    >
+                                                        <span className={styles.userSelectName}>
+                                                            {user.lastName} {user.firstName} {user.middleName}
+                                                        </span>
+                                                        <span className={styles.userSelectEmail}>{user.email}</span>
+                                                    </button>
+                                                ))
+                                            )}
+                                        </div>
+                                        <div className={styles.modalActions}>
+                                            <button className={styles.modalCloseBtn} onClick={() => setShowPartyLeaderSelectModal(false)}>
+                                                Отмена
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {parties?.length === 0 ? <div className={styles.empty}>Партии не найдены</div> :
+                                <div className={styles.committeesList}>
+                                    {parties?.map(p => (
+                                        <div key={p.id} className={styles.committeeRow}>
+                                            <div className={styles.committeeInfo}>
+                                                <h4>{p.name} {p.abbreviation && `(${p.abbreviation})`}</h4>
+                                                <span className={styles.meta}>{p.ideology || 'Идеология не указана'}</span>
+                                                {p.description && <p className={styles.desc}>{p.description}</p>}
+                                            </div>
+                                            <div className={styles.committeeActions}>
+                                                <Link to={`/parties/${p.id}`} className={styles.linkBtn}>Просмотр</Link>
+                                                <button className={styles.deleteBtn} onClick={() => handleDeleteParty(p.id, p.name)} disabled={deletePartyMutation.isPending}>Удалить</button>
                                             </div>
                                         </div>
                                     ))}
@@ -456,6 +616,21 @@ const AdminPage = () => {
                                                     </>
                                                 )}
 
+                                                {selectedUser.partyMemberships?.length > 0 && (
+                                                    <>
+                                                        <dt>Партии</dt>
+                                                        <dd className={styles.commissionList}>
+                                                            {selectedUser.partyMemberships
+                                                                .filter(m => !m.dismissedAt)
+                                                                .map(m => (
+                                                                    <span key={m.partyId} className={styles.commissionTag}>
+                                                                        {m.party?.name}
+                                                                    </span>
+                                                                ))}
+                                                        </dd>
+                                                    </>
+                                                )}
+
                                                 {selectedUser.initiatives?.filter(i => i.status === 'Accepted')?.length > 0 && (
                                                     <>
                                                         <dt>Принятые инициативы</dt>
@@ -483,6 +658,12 @@ const AdminPage = () => {
                                                     onClick={() => setShowCommissionModal(true)}
                                                 >
                                                     Управление комиссиями
+                                                </button>
+                                                <button
+                                                    className={styles.manageCommitteesBtn}
+                                                    onClick={() => setShowPartyModal(true)}
+                                                >
+                                                    Управление партиями
                                                 </button>
 
                                                 {selectedUser.committeesMemberships?.some(m => !m.dismissedAt) && (
@@ -556,6 +737,59 @@ const AdminPage = () => {
                                 </div>
                             )}
 
+                            {showPartyModal && selectedUser && (
+                                <div className={styles.modalOverlay}>
+                                    <div className={styles.modal}>
+                                        <h3 className={styles.modalTitle}>Партии: {selectedUser.firstName} {selectedUser.lastName}</h3>
+
+                                        <div className={styles.modalCommissionList}>
+                                            {parties?.map(p => {
+                                                const membership = selectedUser.partyMemberships?.find(
+                                                    m => m.partyId === p.id && !m.dismissedAt
+                                                );
+
+                                                return (
+                                                    <div key={p.id} className={styles.modalCommissionItem}>
+                                                        <span className={styles.modalCommissionName}>{p.name}</span>
+                                                        <div className={styles.modalCommissionActions}>
+                                                            {membership ? (
+                                                                <>
+                                                                    <span className={styles.memberBadge}>Участник</span>
+                                                                    <button
+                                                                        className={styles.removeSmallBtn}
+                                                                        onClick={() => handleLeaveParty(selectedUser.id, p.id)}
+                                                                        disabled={leaveParty.isPending}
+                                                                    >
+                                                                        ✕
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                <button
+                                                                    className={styles.addSmallBtn}
+                                                                    onClick={() => handleJoinParty(selectedUser.id, p.id)}
+                                                                    disabled={joinParty.isPending}
+                                                                >
+                                                                    + Вступить
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                className={styles.modalCloseBtn}
+                                                onClick={() => setShowPartyModal(false)}
+                                            >
+                                                Закрыть
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {showChairmanModal && selectedUser && (
                                 <div className={styles.modalOverlay}>
                                     <div className={styles.modal}>
@@ -601,7 +835,18 @@ const AdminPage = () => {
                                     <input type="text" placeholder="Название" value={sessionForm.title} onChange={e => setSessionForm({...sessionForm, title: e.target.value})} required />
                                     <input type="datetime-local" value={sessionForm.heldAt} onChange={e => setSessionForm({...sessionForm, heldAt: e.target.value})} required />
                                     <input type="text" placeholder="Место" value={sessionForm.location} onChange={e => setSessionForm({...sessionForm, location: e.target.value})} />
-                                    <input type="text" placeholder="ID Комиссии" value={sessionForm.committeeId} onChange={e => setSessionForm({...sessionForm, committeeId: e.target.value})} required />
+
+                                    <select
+                                        value={sessionForm.committeeId}
+                                        onChange={e => setSessionForm({...sessionForm, committeeId: e.target.value})}
+                                        className={styles.selectInput}
+                                        required
+                                    >
+                                        <option value="">Выберите комиссию</option>
+                                        {committees?.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <button type="submit" className={styles.primaryBtn} disabled={createSessionMutation.isPending}>
                                     {createSessionMutation.isPending ? 'Создание...' : 'Создать заседание'}

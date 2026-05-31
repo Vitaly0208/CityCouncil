@@ -12,6 +12,7 @@ export const ENDPOINTS = {
         BASE: '/api/users',
         PROFILE: (id) => `/api/users/${id}`,
         ME: '/api/users/me',
+        UPDATE: (userId) => `/api/users/${userId}`,
         BY_ROLE: (role) => `/api/users?role=${role}`,
         SEARCH: (query) => `/api/users?search=${encodeURIComponent(query)}`,
     },
@@ -37,6 +38,14 @@ export const ENDPOINTS = {
         CREATE_WITH_QUEUE: '/api/sessions/create-with-queue',
         JOIN: (id) => `/api/sessions/${id}/join`,
         ATTENDEES: (id) => `/api/sessions/${id}/attendees`,
+        PROTOCOL: (id) => `/api/sessions/${id}/protocol`,
+    },
+
+    PARTIES: {
+        BASE: '/api/parties',
+        DETAILS: (id) => `/api/parties/${id}`,
+        MEMBERS: (id) => `/api/parties/${id}/members`,
+        USER_PARTIES: (userId) => `/api/parties/user/${userId}`,
     },
 
     VOTING: {

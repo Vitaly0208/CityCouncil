@@ -32,7 +32,7 @@ public class UserRepository : IUserRepository
         await _dbContext.Users
             .Include(u => u.Role)
             .Include(u => u.CommitteesMemberships)
-            .ThenInclude(cm => cm.Committee)
+                .ThenInclude(cm => cm.Committee)
             .AsNoTracking()
             .ToListAsync(ct);
 
@@ -56,4 +56,61 @@ public class UserRepository : IUserRepository
                 u.Email.Contains(searchTerm))
             .AsNoTracking()
             .ToListAsync(ct);
+    
+    public async Task<bool> HasActivePartyAsync(Guid userId, CancellationToken ct = default) =>
+        await _dbContext.PartiesInfos.AnyAsync(p => p.UserId == userId && p.DismissedAt == null, ct);
+    
+    public async Task<User?> GetByIdWithRelationsAsync(Guid id, CancellationToken ct = default) =>
+        await _dbContext.Users
+            .Include(u => u.Role)
+            .Include(u => u.CommitteesMemberships).ThenInclude(cm => cm.Committee)
+            .Include(u => u.PartyMemberships).ThenInclude(pm => pm.Party)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id, ct);
+    
+    public async Task UpdateAsync(User user, CancellationToken ct = default)
+    {
+        _dbContext.Users.Update(user);
+        await Task.CompletedTask;
+    }
+    public async Task<List<User>> GetAllFilteredAsync(
+        string? searchTerm,
+        string? role,
+        Guid? committeeId,
+        int page,
+        int pageSize,
+        CancellationToken ct = default)
+    {
+        var query = _dbContext.Users
+            .AsNoTracking()
+            .Include(u => u.Role)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var q = searchTerm.ToLower();
+            query = query.Where(u => 
+                u.FirstName.ToLower().Contains(q) ||
+                u.LastName.ToLower().Contains(q) ||
+                (u.MiddleName != null && u.MiddleName.ToLower().Contains(q)) ||
+                u.Email.ToLower().Contains(q)
+            );
+        }
+
+        if (!string.IsNullOrWhiteSpace(role))
+            query = query.Where(u => u.Role != null && u.Role.Name == role);
+
+        if (committeeId.HasValue)
+        {
+            query = query.Where(u => u.CommitteesMemberships.Any(m => 
+                m.CommitteeId == committeeId.Value && m.DismissedAt == null));
+        }
+
+        return await query
+            .OrderBy(u => u.LastName)
+            .ThenBy(u => u.FirstName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+    }
 }

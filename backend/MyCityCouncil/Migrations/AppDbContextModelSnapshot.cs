@@ -83,6 +83,10 @@ namespace MyCityCouncil.Migrations
                     b.Property<bool>("IsChairman")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -263,6 +267,12 @@ namespace MyCityCouncil.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
 
+                    b.Property<DateTime>("FinalizedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("HearingRound")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("HeldAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -398,6 +408,8 @@ namespace MyCityCouncil.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("VoterId");
+
                     b.HasIndex("VotingInfoId", "VoterId")
                         .IsUnique();
 
@@ -410,11 +422,19 @@ namespace MyCityCouncil.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("HearingRound")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("InitiativeAuthor")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("InitiativeCreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("InitiativeDescription")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("InitiativeId")
                         .HasColumnType("uuid");
@@ -564,11 +584,19 @@ namespace MyCityCouncil.Migrations
 
             modelBuilder.Entity("MyCityCouncil.Domain.Models.Vote", b =>
                 {
+                    b.HasOne("MyCityCouncil.Domain.Models.User", "Voter")
+                        .WithMany()
+                        .HasForeignKey("VoterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MyCityCouncil.Domain.Models.VotingInfo", "VotingInfo")
                         .WithMany("Votes")
                         .HasForeignKey("VotingInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Voter");
 
                     b.Navigation("VotingInfo");
                 });

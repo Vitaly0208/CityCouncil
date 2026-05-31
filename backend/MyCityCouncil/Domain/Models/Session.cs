@@ -9,12 +9,14 @@ public class Session
     public DateTime HeldAt { get; set; }
     public string? Location { get; set; }
     public bool IsCompleted { get; set; } = false;
+    public int HearingRound { get; set; } = 1; 
     
     public Guid CommitteeId { get; set; }
     [JsonIgnore] 
     public Committee Committee { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime FinalizedAt { get; set; } 
     
     [JsonIgnore] public List<VotingInfo> VotingResults { get; set; } = new();
     public List<SessionAttendee> Attendees { get; set; } = new();

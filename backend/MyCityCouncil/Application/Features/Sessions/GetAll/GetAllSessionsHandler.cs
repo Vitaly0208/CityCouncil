@@ -21,6 +21,7 @@ public class GetAllSessionsHandler : IRequestHandler<GetAllSessionsQuery, List<S
             Title: s.Title,
             HeldAt: s.HeldAt,
             Location: s.Location,
+            CommitteeId:s.CommitteeId,
             CommitteeName: s.Committee?.Name ?? "Не указано",
             IsCompleted: s.IsCompleted,
             InitiativesCount: s.VotingResults?.Count ?? 0

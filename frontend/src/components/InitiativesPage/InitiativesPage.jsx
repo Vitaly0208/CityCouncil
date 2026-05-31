@@ -4,9 +4,11 @@ import { useInitiatives, useCreateInitiative } from "../../hooks/useInitiatives.
 import styles from './InitiativesPage.module.css';
 import { useState } from "react";
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
+import {useAuthRedirect} from "../../hooks/useAuthRedirect.js";
 
 const InitiativesPage = () => {
     const navigate = useNavigate();
+    const requireAuth = useAuthRedirect();
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ title: '', description: '' });
 
@@ -16,6 +18,10 @@ const InitiativesPage = () => {
     const handleLogout = () => {
         tokenService.clearTokens();
         navigate('/login');
+    };
+
+    const handleCreateClick = () => {
+        requireAuth(() => navigate("/initiatives/create"));
     };
 
     const handleSubmit = async (e) => {
@@ -57,8 +63,16 @@ const InitiativesPage = () => {
             <div className={styles.container}>
                 <main className={styles.main}>
                     <div className={styles.topBar}>
-                        <h2>Активные и принятые инициативы</h2>
-                        <button className={styles.primaryBtn} onClick={() => setShowForm(!showForm)}>
+                        <header className={styles.pageHeader}>
+                            <h1 className={styles.pageTitle}>Инициативы</h1>
+                            <p className={styles.pageSubtitle}>
+                                Утвержденные и активные инициативы
+                            </p>
+                        </header>
+                        <button
+                            className={styles.primaryBtn}
+                            onClick={() => requireAuth(() => setShowForm(prev => !prev))}
+                        >
                             {showForm ? 'Скрыть форму' : '+ Предложить инициативу'}
                         </button>
                     </div>
@@ -99,9 +113,15 @@ const InitiativesPage = () => {
                         <div className={styles.list}>
                             {initiatives.map(init => (
                                 <article key={init.id} className={styles.card}>
+                                    <div className={styles.cardImageWrapper}>
+                                        <img
+                                            src={init.imageUrl || '/initiative.png'}
+                                            alt={init.title}
+                                            className={styles.cardImage}
+                                        />
+                                    </div>
                                     <div className={styles.cardContent}>
                                         <div className={styles.cardHeader}>
-                                            {getStatusBadge(init.status)}
                                             <h3 className={styles.cardTitle}>{init.title}</h3>
                                         </div>
                                         <p className={styles.cardDesc}>{init.description}</p>

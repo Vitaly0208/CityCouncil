@@ -30,6 +30,8 @@ export const authService = {
 export const userService = {
     getProfile: (id) => axiosInstance.get(ENDPOINTS.USERS.PROFILE(id)),
     getMyProfile: () => axiosInstance.get(ENDPOINTS.USERS.ME),
+    updateProfile: (id, data) =>
+        axiosInstance.put(ENDPOINTS.USERS.UPDATE(id), data),
     getAll: (params = {}) => {
         const cleanParams = Object.fromEntries(
             Object.entries(params).filter(([_, v]) => v != null && v !== '')
@@ -44,7 +46,6 @@ export const userService = {
         axiosInstance.delete(`${ENDPOINTS.COMMITTEES.MEMBERS(committeeId)}/${userId}`),
 };
 
-// ============ COMMITTEES ============
 export const committeeService = {
     getAll: () => axiosInstance.get(ENDPOINTS.COMMITTEES.BASE),
     getById: (id) => axiosInstance.get(ENDPOINTS.COMMITTEES.DETAILS(id)),
@@ -59,6 +60,20 @@ export const committeeService = {
         axiosInstance.delete(`${ENDPOINTS.COMMITTEES.MEMBERS(committeeId)}/${userId}`),
 };
 
+export const partyService = {
+    getAll: () => axiosInstance.get(ENDPOINTS.PARTIES.BASE),
+    getById: (id) => axiosInstance.get(ENDPOINTS.PARTIES.DETAILS(id)),
+    create: (data) => axiosInstance.post(ENDPOINTS.PARTIES.BASE, data),
+    delete: (id) => axiosInstance.delete(ENDPOINTS.PARTIES.DETAILS(id)),
+    update: (id, data) => axiosInstance.put(ENDPOINTS.PARTIES.DETAILS(id), data),
+    addMember: (partyId, userId) =>
+        axiosInstance.post(ENDPOINTS.PARTIES.MEMBERS(partyId), { userId }),
+    removeMember: (partyId, userId) =>
+        axiosInstance.delete(`${ENDPOINTS.PARTIES.MEMBERS(partyId)}/${userId}`),
+    getUserParties: (userId) =>
+        axiosInstance.get(ENDPOINTS.PARTIES.USER_PARTIES(userId)),
+};
+
 export const initiativeService = {
     getAll: (params) => axiosInstance.get(ENDPOINTS.INITIATIVES.BASE, { params }),
     create: (data) => axiosInstance.post(ENDPOINTS.INITIATIVES.CREATE, data),
@@ -70,6 +85,7 @@ export const sessionService = {
     getById: (id) => axiosInstance.get(ENDPOINTS.SESSIONS.DETAILS(id)),
     create: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE, data),
     createWithQueue: (data) => axiosInstance.post(ENDPOINTS.SESSIONS.CREATE_WITH_QUEUE, data),
+    getProtocol: (id) => axiosInstance.get(ENDPOINTS.SESSIONS.PROTOCOL(id)),
     join: (sessionId) =>
         axiosInstance.post(ENDPOINTS.SESSIONS.JOIN(sessionId)),
     getAttendees: (sessionId) =>

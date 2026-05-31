@@ -1,4 +1,5 @@
-﻿using MyCityCouncil.Domain.Enums;
+﻿using MyCityCouncil.Application.Features.UsersS.GetProfile;
+using MyCityCouncil.Domain.Enums;
 using MyCityCouncil.Domain.Models;
 
 namespace MyCityCouncil.Domain.Interfaces;
@@ -16,8 +17,16 @@ public interface IInitiativeRepository
     
     Task<List<Initiative>> GetQueueAsync(int limit = 25, CancellationToken ct = default);
     
-    Task<List<Initiative>> GetTopQueueInitiativesAsync(int count = 3, CancellationToken ct = default);
+    Task<List<Initiative>> GetTopQueueByCommitteeAsync(Guid committeeId, int count, CancellationToken ct = default);
+    Task<List<Initiative>> GetAcceptedByUserIdAsync(Guid userId, CancellationToken ct = default);
     
     Task<bool> ExistsAsync(Guid id, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
+    Task<List<Initiative>> GetAllFilteredAsync(
+        string? searchTerm,
+        InitiativeStatus? status,
+        Guid? authorId,
+        int page,
+        int pageSize,
+        CancellationToken ct = default);
 }

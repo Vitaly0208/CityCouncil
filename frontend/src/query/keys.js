@@ -20,9 +20,15 @@ export const queryKeys = {
         list: (filters) => [...queryKeys.initiatives.lists(), { filters }],
     },
     sessions: {
-        all: ['sessions'],                                    // ['sessions']
-        list: (filters) => [...queryKeys.sessions.all, filters], // ['sessions', {filters}]
-        details: (id) => [...queryKeys.sessions.all, id],     // ['sessions', id] ← ДОЛЖНА БЫТЬ ФУНКЦИЕЙ!
+        all: ['sessions'],
+        list: (filters) => [...queryKeys.sessions.all, filters],
+        details: (id) => [...queryKeys.sessions.all, id],
+        protocol: (id) => [...queryKeys.sessions.all, 'protocol', id],
+    },
+    parties: {
+        all: () => ['parties'],
+        detail: (id) => [...queryKeys.parties.all(), id],
+        byUser: (userId) => [...queryKeys.parties.all(), 'user', userId],
     },
     voting: {
         results: (sessionId) => ['voting', 'results', sessionId],

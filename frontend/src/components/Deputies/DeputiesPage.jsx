@@ -96,7 +96,7 @@ const DeputiesPage = () => {
                         {filteredUsers.map(user => (
                             <Link
                                 key={user.id}
-                                to={`/deputies/${user.id}`}
+                                to={`/profile/${user.id}`}
                                 className={styles.card}
                             >
                                 <div className={styles.cardImageWrapper}>

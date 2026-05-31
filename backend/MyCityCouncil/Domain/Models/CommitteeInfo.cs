@@ -6,6 +6,7 @@ namespace MyCityCouncil.Domain.Models;
 public class CommitteeInfo
 {       
     public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
     public Statuses CStatus { get; set; } = Statuses.Active;
     public DateTime AppointedAt { get; set; } = DateTime.UtcNow;
     public DateTime? DismissedAt { get; set; }

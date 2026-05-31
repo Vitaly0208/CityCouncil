@@ -10,10 +10,12 @@ public class VotingInfo
     public string SessionTitle { get; set; } = string.Empty;
     public string InitiativeTitle { get; set; } = string.Empty;
     public InitiativeStatus Status { get; set; }
+    public string InitiativeDescription { get; set; } = string.Empty;
+    public string InitiativeAuthor { get; set; } = string.Empty;
     public DateTime InitiativeCreatedAt { get; set; }
-    public Guid AuthorId { get; set; }
     public DateTime VotedAt { get; set; } = DateTime.UtcNow;
     public bool IsFinalized { get; set; } = false;
+    public int HearingRound { get; set; } = 1; 
     
     public Guid SessionId { get; set; }
     [JsonIgnore] public Session Session { get; set; } = null!;

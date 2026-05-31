@@ -1,19 +1,42 @@
-/* ===== Основные стили ===== */
+:root {
+    --bg: #0d1117;
+    --card-bg: #161b22;
+    --border: #30363d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --text-tertiary: #6e7681;
+    --accent: #cf222e;
+    --accent-hover: #a41926;
+    --accent-light: rgba(207, 34, 46, 0.15);
+    --success: #cf222e;
+}
 .container {
     margin: 0 auto;
     padding: 2rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Roboto Slab', serif;
     color: #e5e7eb;
-    background: #0d1117; /* Темный фон страницы */
+    background: #0d1117;
     min-height: 100vh;
 }
-
-/* ===== Шапка заседания ===== */
+.container button,
+.container input,
+.container select,
+.container textarea,
+.container a,
+.container span,
+.container p,
+.container label {
+    font-family: inherit;
+}
+.container h1, .container h2, .container h3, .container h4, .container h5, .container h6
+{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
 .header {
-    background: #161b22; /* Темный фон карточек */
+    background: #161b22;
     padding: 2rem;
     border-radius: 8px;
-    border: 1px solid #30363d; /* Серая граница */
+    border: 1px solid #30363d;
     margin-bottom: 2rem;
 }
 
@@ -26,13 +49,13 @@
 }
 
 .backLink {
-    color: #8b949e; /* Серый текст */
+    color: #8b949e;
     text-decoration: none;
     font-size: 0.875rem;
 }
 
 .backLink:hover {
-    color: #c9d1d9; /* Светлее при наведении */
+    color: #c9d1d9;
 }
 
 .title {
@@ -48,25 +71,29 @@
     gap: 2rem;
     margin-bottom: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #30363d; /* Исправлено на #30363d */
+    border-top: 1px solid #30363d;
+    align-items: center;
+    text-align: center;
 }
 
 .infoItem {
     display: flex;
     flex-direction: column;
     gap: 0.40rem;
+    align-items: center;
 }
 
 .infoLabel {
     font-size: 0.75rem;
-    color: #8b949e; /* Серый текст меток */
+    color: #e2e8f0;
+
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .infoValue {
     font-size: 0.95rem;
-    color: #e2e8f0;
+    color: #8b949e;
     font-weight: 500;
 }
 
@@ -83,22 +110,22 @@
 }
 
 .status.active {
-    color: #22c55e;
-    border-color: #22c55e;
+    color: #ffffff;
+    border-color: #ffffff;
     background: transparent;
 }
 
 .status.completed {
-    color: #ef4444;
-    border-color: #ef4444;
-    background: transparent;
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid var(--accent);
 }
 
 .finalizeBtn {
-    background: transparent; /* GitHub Red */
-    color: #da3633;
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid var(--accent);
     padding: 0.75rem 1.5rem;
-    border-color: #da3633;
     border-radius: 6px;
     font-weight: 600;
     font-size: 0.875rem;
@@ -110,7 +137,6 @@
     cursor: not-allowed;
 }
 
-/* ===== Основной контент ===== */
 .main {
     display: grid;
     grid-template-columns: 320px 1fr 320px;
@@ -122,11 +148,11 @@
     margin: 0 0 1.25rem;
     color: #f8fafc;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid #30363d; /* Исправлено */
+    border-bottom: 1px solid #30363d;
     font-weight: 600;
 }
 
-/* ===== Левая колонка - Инициативы ===== */
+
 .initiativesList {
     display: flex;
     flex-direction: column;
@@ -148,7 +174,7 @@
 
 .initiativeCard.selected {
     border-color: #ef4444;
-    background: #21262d; /* Чуть светлее фона для выделения */
+    background: #21262d;
 }
 
 .initiativeName {
@@ -180,7 +206,7 @@
 }
 
 .detailMeta {
-    background: #0d1117; /* Фон страницы для контраста внутри карточки */
+    background: rgba(139, 148, 158, 0.05);
     padding: 1.25rem;
     border-radius: 6px;
     margin-bottom: 2rem;
@@ -190,7 +216,8 @@
 .metaItem {
     margin-bottom: 0.75rem;
     font-size: 0.9rem;
-    color: #e2e8f0;
+    color: #8b949e;
+
 }
 
 .metaItem:last-child {
@@ -198,7 +225,7 @@
 }
 
 .metaItem strong {
-    color: #8b949e; /* Серый для лейблов */
+    color: #e2e8f0;
     margin-right: 0.5rem;
     font-weight: 500;
 }
@@ -206,13 +233,14 @@
 .description h3 {
     font-size: 1rem;
     margin: 0 0 1rem;
-    color: #f8fafc;
+    color: #c9d1d9;
+
     font-weight: 600;
 }
 
 .description p {
     line-height: 1.6;
-    color: #c9d1d9; /* Чуть мягче белый */
+    color: #f8fafc;
     font-size: 0.9rem;
 }
 
@@ -220,7 +248,7 @@
 .votingSection {
     margin: 2rem 0;
     padding: 1.5rem;
-    background: #0d1117; /* Фон страницы */
+    background: rgba(139, 148, 158, 0.05);
     border-radius: 6px;
     border: 1px solid #30363d; /* Выровнено */
 }
@@ -249,13 +277,15 @@
 }
 
 .voteFor {
-    background: #238636; /* GitHub Green */
-    color: white;
+    background: rgba(46, 125, 50, 0.15);
+    color: #2e7d32;
+    border: 1px solid #2e7d32;
 }
 
 .voteAgainst {
-    background: #da3633; /* GitHub Red */
-    color: white;
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid var(--accent);
 }
 
 .voteFor:disabled,
@@ -266,8 +296,8 @@
 
 .alreadyVoted {
     padding: 1rem;
-    background: rgba(35, 134, 54, 0.15); /* Прозрачный зеленый */
-    color: #3fb950;
+    background: rgb(173 182 174 / 0.15); /* Прозрачный зеленый */
+    color: #dcdcdc;
     border-radius: 6px;
     text-align: center;
     font-weight: 500;
@@ -352,7 +382,6 @@
     color: #8b949e;
 }
 
-/* ===== Модалка ===== */
 .modalOverlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -466,4 +495,42 @@
 .error {
     color: #ef4444;
     border-color: #ef4444;
+}
+.hearingBadge {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.6rem;
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.infoValueLink {
+    color: var(--accent);
+    text-decoration: none;
+}
+.infoValueLink:hover {
+    text-decoration: underline;
+}
+.descriptionBlock {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(139, 148, 158, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+.descriptionBlock h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+.modalWarning {
+    color: #ff7b72;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 1rem;
+    padding: 0.5rem;
+    background: rgba(207, 34, 46, 0.1);
+    border-radius: 4px;
 }

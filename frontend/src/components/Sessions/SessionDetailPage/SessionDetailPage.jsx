@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useSessionDetails, useCastVote, useFinalizeSession, useJoinSession } from '../../../hooks/useSessions';
+import { useSessionDetails, useCastVote, useFinalizeSession } from '../../../hooks/useSessions';
 import { getUserId, getUserRole } from '../../../utils/jwt';
 import { tokenService } from "../../../../api/tokenService.js";
 import Navbar from "../../Layout/NaVbar/NavBar.jsx";
@@ -9,38 +9,24 @@ import styles from './SessionDetailPage.module.css';
 const SessionDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const currentUserId = getUserId();
+    const userRole = getUserRole();
+    const isAdmin = userRole === 'Admin';
 
     const [selectedInitiative, setSelectedInitiative] = useState(null);
-    const [showJoinModal, setShowJoinModal] = useState(true);
-    const [isJoined, setIsJoined] = useState(false);
     const [voteError, setVoteError] = useState('');
 
     const { data: session, isLoading, isError, error } = useSessionDetails(id);
     const castVote = useCastVote();
     const finalizeSession = useFinalizeSession();
-    const joinSession = useJoinSession();
-
-    const userRole = getUserRole();
-    const currentUserId = getUserId();
 
     const handleLogout = () => {
         tokenService.clearTokens();
         navigate('/login');
     };
 
-    const handleJoin = async () => {
-        try {
-            await joinSession.mutateAsync(id);
-            setIsJoined(true);
-            setShowJoinModal(false);
-        } catch (err) {
-            alert('Ошибка присоединения: ' + err.message);
-        }
-    };
-
     const handleVote = async (voteType) => {
-        if (!selectedInitiative || session?.isCompleted || !isJoined) return;
-
+        if (!selectedInitiative || session?.isCompleted) return;
         try {
             setVoteError('');
             await castVote.mutateAsync({
@@ -56,10 +42,14 @@ const SessionDetailPage = () => {
 
     const handleFinalize = async () => {
         if (!confirm('Завершить заседание? Это действие необратимо.')) return;
-
         try {
-            await finalizeSession.mutateAsync(id);
-            alert('Заседание завершено');
+            const result = await finalizeSession.mutateAsync(id);
+            if (result?.nextSessionId) {
+                alert('Заседание завершено. Переход ко второму слушанию...');
+                navigate(`/sessions/${result.nextSessionId}`);
+            } else {
+                alert('Заседание завершено');
+            }
         } catch (err) {
             alert('Ошибка: ' + err.message);
         }
@@ -67,7 +57,6 @@ const SessionDetailPage = () => {
 
     const getVoteCounts = (initiative) => {
         const votes = Array.isArray(initiative?.votes) ? initiative.votes : [];
-
         return {
             for: votes.filter(v => v?.voteType === 'For' || v?.voteType === 0).length,
             against: votes.filter(v => v?.voteType === 'Against' || v?.voteType === 1).length,
@@ -80,18 +69,23 @@ const SessionDetailPage = () => {
         return votes.some(v => v?.voterId === currentUserId);
     };
 
+    const isAttendee = session?.attendees?.some(a => a.id === currentUserId);
+
     const formatDate = (isoString) => {
         if (!isoString) return '—';
         return new Date(isoString).toLocaleString('ru-RU', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: '2-digit', month: 'long', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
         });
     };
 
-    // Загрузка
+    const formatShortDate = (isoString) => {
+        if (!isoString) return '—';
+        return new Date(isoString).toLocaleDateString('ru-RU', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+    };
+
     if (isLoading) {
         return (
             <>
@@ -101,7 +95,6 @@ const SessionDetailPage = () => {
         );
     }
 
-    // Ошибка
     if (isError || !session) {
         return (
             <>
@@ -109,7 +102,7 @@ const SessionDetailPage = () => {
                 <div className={styles.error}>
                     <h2>Ошибка загрузки</h2>
                     <p>{error?.message || 'Не удалось загрузить заседание'}</p>
-                    <Link to="/sessions">← Назад к списку</Link>
+                    <Link to="/sessions">Назад к списку</Link>
                 </div>
             </>
         );
@@ -118,14 +111,16 @@ const SessionDetailPage = () => {
     return (
         <>
             <Navbar onLogout={handleLogout} />
-
             <div className={styles.container}>
-                {/* Шапка */}
                 <header className={styles.header}>
                     <div className={styles.headerTop}>
-                        <h1 className={styles.title}>{session.title}</h1>
-
-                        {userRole === 'Admin' && !session.isCompleted && (
+                        <div>
+                            <h1 className={styles.title}>{session.title}</h1>
+                            <span className={styles.hearingBadge}>
+                                {session.hearingRound <= 1 ? 'Первое слушание' : 'Второе слушание'}
+                            </span>
+                        </div>
+                        {isAdmin && !session.isCompleted && (
                             <button
                                 className={styles.finalizeBtn}
                                 onClick={handleFinalize}
@@ -135,7 +130,6 @@ const SessionDetailPage = () => {
                             </button>
                         )}
                     </div>
-
                     <div className={styles.headerInfo}>
                         <div className={styles.infoItem}>
                             <span className={styles.infoLabel}>Дата:</span>
@@ -147,7 +141,9 @@ const SessionDetailPage = () => {
                         </div>
                         <div className={styles.infoItem}>
                             <span className={styles.infoLabel}>Комиссия:</span>
-                            <span className={styles.infoValue}>{session.committeeName}</span>
+                            <Link to={`/committees/${session.committeeId}`} className={styles.infoValueLink}>
+                                {session.committeeName}
+                            </Link>
                         </div>
                         <div className={styles.infoItem}>
                             <span className={styles.infoLabel}>Статус:</span>
@@ -158,9 +154,7 @@ const SessionDetailPage = () => {
                     </div>
                 </header>
 
-                {/* Основной контент - 3 колонки */}
                 <main className={styles.main}>
-                    {/* Левая колонка - Инициативы */}
                     <aside className={styles.leftColumn}>
                         <h2 className={styles.columnTitle}>Повестка</h2>
                         <div className={styles.initiativesList}>
@@ -170,16 +164,13 @@ const SessionDetailPage = () => {
                                     className={`${styles.initiativeCard} ${selectedInitiative?.id === init.id ? styles.selected : ''}`}
                                     onClick={() => setSelectedInitiative(init)}
                                 >
-                                    <h3 className={styles.initiativeName}>
-                                        {init.initiativeTitle || init.title}
-                                    </h3>
+                                    <h3 className={styles.initiativeName}>{init.initiativeTitle}</h3>
                                     <span className={styles.initiativeStatus}>{init.status}</span>
                                 </button>
                             ))}
                         </div>
                     </aside>
 
-                    {/* Центральная колонка - Детали и голосование */}
                     <section className={styles.centerColumn}>
                         {!selectedInitiative ? (
                             <div className={styles.placeholder}>
@@ -187,36 +178,30 @@ const SessionDetailPage = () => {
                             </div>
                         ) : (
                             <div className={styles.initiativeDetail}>
-                                <h2 className={styles.detailTitle}>
-                                    {selectedInitiative.initiativeTitle || selectedInitiative.title}
-                                </h2>
+                                <h2 className={styles.detailTitle}>{selectedInitiative.initiativeTitle}</h2>
 
                                 <div className={styles.detailMeta}>
                                     <div className={styles.metaItem}>
-                                        <strong>Автор:</strong> {selectedInitiative.authorId || 'Неизвестный'}
+                                        <strong>Автор:</strong> {selectedInitiative.initiativeAuthor || 'Не указан'}
                                     </div>
                                     <div className={styles.metaItem}>
-                                        <strong>Дата создания:</strong> {formatDate(selectedInitiative.initiativeCreatedAt)}
+                                        <strong>Дата создания:</strong> {formatShortDate(selectedInitiative.initiativeCreatedAt)}
                                     </div>
                                     <div className={styles.metaItem}>
-                                        <strong>Статус:</strong> {selectedInitiative.status}
+                                        <strong>Статус:</strong> {selectedInitiative.status === 2 ? 'На первом слушании' : selectedInitiative.status}
                                     </div>
                                 </div>
 
-                                <div className={styles.description}>
+                                <div className={styles.descriptionBlock}>
                                     <h3>Описание</h3>
-                                    <p>{selectedInitiative.description || 'Описание отсутствует'}</p>
+                                    <p>{selectedInitiative.initiativeDescription || 'Описание не предоставлено'}</p>
                                 </div>
 
-                                {/* Голосование */}
-                                {!session.isCompleted && isJoined && (
+                                {!session.isCompleted && isAttendee ? (
                                     <div className={styles.votingSection}>
                                         <h3>Голосование</h3>
-
                                         {hasVoted(selectedInitiative) ? (
-                                            <div className={styles.alreadyVoted}>
-                                                Вы уже проголосовали
-                                            </div>
+                                            <div className={styles.alreadyVoted}>Вы уже проголосовали</div>
                                         ) : (
                                             <div className={styles.voteButtons}>
                                                 <button
@@ -235,19 +220,20 @@ const SessionDetailPage = () => {
                                                 </button>
                                             </div>
                                         )}
-
-                                        {voteError && (
-                                            <div className={styles.error}>{voteError}</div>
-                                        )}
+                                        {voteError && <div className={styles.error}>{voteError}</div>}
                                     </div>
+                                ) : (
+                                    !session.isCompleted && (
+                                        <div className={styles.notJoinedNotice}>
+                                            Вы не участвуете в этом заседании. Голосование недоступно.
+                                        </div>
+                                    )
                                 )}
 
-                                {/* Результаты */}
                                 <div className={styles.resultsSection}>
                                     <h3>Результаты голосования</h3>
                                     {(() => {
                                         const { for: forCount, against: againstCount, total } = getVoteCounts(selectedInitiative);
-
                                         return (
                                             <div className={styles.results}>
                                                 <div className={styles.resultItem}>
@@ -270,10 +256,9 @@ const SessionDetailPage = () => {
                         )}
                     </section>
 
-                    {/* Правая колонка - Присутствующие */}
                     <aside className={styles.rightColumn}>
                         <h2 className={styles.columnTitle}>
-                            Присутствующие ({session.attendees?.length || 0})
+                            Участники заседания ({session.attendees?.length || 0})
                         </h2>
                         <div className={styles.attendeesList}>
                             {session.attendees?.map((attendee) => (
@@ -289,33 +274,6 @@ const SessionDetailPage = () => {
                     </aside>
                 </main>
             </div>
-
-            {/* Модалка присоединения */}
-            {showJoinModal && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modal}>
-                        <h2 className={styles.modalTitle}>Присоединиться к заседанию?</h2>
-                        <p className={styles.modalText}>
-                            Вы собираетесь присоединиться к заседанию <strong>{session.title}</strong>
-                        </p>
-                        <div className={styles.modalActions}>
-                            <button
-                                className={styles.cancelBtn}
-                                onClick={() => navigate('/sessions')}
-                            >
-                                Отмена
-                            </button>
-                            <button
-                                className={styles.joinBtn}
-                                onClick={handleJoin}
-                                disabled={joinSession.isPending}
-                            >
-                                {joinSession.isPending ? 'Присоединение...' : 'Присоединиться'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </>
     );
 };

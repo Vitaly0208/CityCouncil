@@ -15,7 +15,6 @@ namespace MyCityCouncil.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class CommitteesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -24,6 +23,7 @@ public class CommitteesController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(List<CommitteesListDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous] 
     public async Task<ActionResult<List<CommitteesListDto>>> GetAll(CancellationToken ct)
     {
         var query = new GetCommitteesListQuery();
@@ -53,6 +53,7 @@ public class CommitteesController : ControllerBase
     }
     
     [HttpPost("{id}/members")]
+    [Authorize]
     [ProducesResponseType(typeof(MembershipDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<MembershipDto>> AddMember(Guid id, [FromBody] AddMemberCommand command, CancellationToken ct)
@@ -94,7 +95,7 @@ public class CommitteesController : ControllerBase
     }
 
     [HttpDelete("{id}/members/{userId}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DismissMember(Guid id, Guid userId, CancellationToken ct)

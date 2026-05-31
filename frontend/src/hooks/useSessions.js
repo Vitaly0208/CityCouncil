@@ -103,3 +103,12 @@ export const useSessionAttendees = (sessionId) => {
         staleTime: 30 * 1000
     });
 };
+
+export const useSessionProtocol = (sessionId) => {
+    return useQuery({
+        queryKey: queryKeys.sessions.protocol(sessionId),
+        queryFn: () => sessionService.getProtocol(sessionId).then(res => res.data),
+        enabled: !!sessionId,
+        staleTime: 5 * 60 * 1000,
+    });
+};

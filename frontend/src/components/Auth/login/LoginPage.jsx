@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../../../../api/apiService';
-import { tokenService} from "../../../../api/tokenService.js";
+import { tokenService } from "../../../../api/tokenService.js";
 import styles from './LoginPage.module.css';
 
 const LoginPage = () => {
@@ -28,14 +28,17 @@ const LoginPage = () => {
         }
     };
 
+    const handleGuestContinue = () => {
+        navigate('/dashboard');
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.card}>
-
                 <div className={styles.logoContainer}>
                     <img
-                        src="/gerb2.png"
-                        alt="Логотип Думы"
+                        src="/gerb.png"
+                        alt="Логотип"
                         className={styles.logoImage}
                     />
                 </div>
@@ -47,7 +50,6 @@ const LoginPage = () => {
                 <form onSubmit={handleSubmit} className={styles.form}>
                     {error && <div className={styles.error}>{error}</div>}
 
-                    {/* Поле Email с иконкой */}
                     <div className={styles.inputGroup}>
                         <input
                             id="email"
@@ -60,7 +62,6 @@ const LoginPage = () => {
                         />
                     </div>
 
-                    {/* Поле Password с иконкой */}
                     <div className={styles.inputGroup}>
                         <input
                             id="password"
@@ -79,8 +80,15 @@ const LoginPage = () => {
                 </form>
 
                 <div className={styles.footer}>
-                    <span>First time here? </span>
-                    <Link to="/register" className={styles.link}>Sign up.</Link>
+                    <Link to="/register" className={styles.link}>Зарегестрироваться.</Link>
+                    <span className={styles.divider}>|</span>
+                    <button
+                        type="button"
+                        onClick={handleGuestContinue}
+                        className={styles.guestLink}
+                    >
+                        Продолжить как гость
+                    </button>
                 </div>
             </div>
         </div>

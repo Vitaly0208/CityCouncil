@@ -20,7 +20,8 @@ public class SessionRepository : ISessionRepository
             .Include(s => s.VotingResults)
                 .ThenInclude(vr => vr.Initiative)
             .Include(s => s.VotingResults)
-                .ThenInclude(vr => vr.Votes) 
+                .ThenInclude(vr => vr.Votes)
+                    .ThenInclude(v => v.Voter)
             .Include(s => s.Attendees)
                 .ThenInclude(a => a.User)
                     .ThenInclude(u => u.Role)
@@ -46,6 +47,24 @@ public class SessionRepository : ISessionRepository
             .Where(s => s.HeldAt >= from)
             .OrderBy(s => s.HeldAt)
             .ToListAsync(ct);
+    
+    public async Task<List<Session>> GetSessionsByUserCommitteesAsync(Guid userId, CancellationToken ct = default)
+    {
+        var committeeIds = await _dbContext.CommitteeInfos
+            .Where(m => m.UserId == userId && m.DismissedAt == null)
+            .Select(m => m.CommitteeId)
+            .ToListAsync(ct);
+
+        if (!committeeIds.Any()) return new List<Session>();
+
+        return await _dbContext.Sessions
+            .AsNoTracking()
+            .Where(s => committeeIds.Contains(s.CommitteeId))
+            .Include(s => s.Committee)
+            .Include(s => s.Attendees)
+            .OrderByDescending(s => s.HeldAt)
+            .ToListAsync(ct);
+    }
 
     public void Update(Session session) => _dbContext.Sessions.Update(session);
     public void Delete(Session session) => _dbContext.Sessions.Remove(session);

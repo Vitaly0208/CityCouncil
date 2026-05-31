@@ -3,7 +3,9 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { tokenService } from "../../../api/tokenService.js";
 import { useInitiatives } from "../../hooks/useInitiatives.js";
 import { useSessions } from "../../hooks/useSessions.js";
+import { useUserProfile } from "../../hooks/useUserProfile.js";
 import styles from './DashboardPage.module.css';
+import SearchBar from "../SearchBar/SearchBar.jsx";
 
 const NEWS = [
     { id: 1, date: '28 апреля 2026', title: 'Утверждён новый бюджет на 2027 год', text: 'Депутаты большинством голосов поддержали проект бюджета...' },
@@ -15,7 +17,8 @@ const DashboardPage = () => {
     const navigate = useNavigate();
     const { initiatives, isLoading, isError } = useInitiatives({ status: 'Accepted' });
     const { data: sessions, isLoading: loadSessions, isError: sessionsError } = useSessions();
-
+    const isAuth = tokenService.isAuthenticated();
+    const { profile } = isAuth ? useUserProfile() : { profile: null };
     const now = new Date();
     const [viewDate, setViewDate] = useState({ month: now.getMonth(), year: now.getFullYear() });
 
@@ -74,30 +77,46 @@ const DashboardPage = () => {
         <div className={styles.container}>
             <header className={styles.header}>
                 <div className={styles.headerLeft}>
-                    <div>
-                        <h1 className={styles.headerTitle}>Городская Дума</h1>
-                        <span className={styles.headerSubtitle}>Система обеспечения законодательной деятельности</span>
+                    <div className={styles.logoContainer}>
+                        <img
+                            src="/gerb.png"
+                            alt="Логотип"
+                            className={styles.logoImage}
+                        />
                     </div>
+                    <div className={styles.headerTitle}>Городской совет</div>
                 </div>
 
-                <div className={styles.searchBar}>
-                    <input type="text" placeholder="Поиск инициатив, депутатов..." />
-                </div>
+                <SearchBar className={styles.dashboardSearch} />
 
                 <div className={styles.headerRight}>
-                    <span className={styles.userName}>Иванов И. И.</span>
-                    <span className={styles.userRole}>Комиссия по образованию</span>
-                    <Link to="/profile" className={styles.logoutBtn}>Профиль</Link>
-                    <button className={styles.logoutBtn} onClick={handleLogout}>Выйти</button>
+                    {isAuth && profile ? (
+                        <>
+                            <span className={styles.userName}>{profile.fullName}</span>
+                        </>
+                    ) : (
+                        <span className={styles.userName}>Гость</span>
+                    )}
+
+                    {isAuth && (
+                        <Link to="/profile" className={styles.logoutBtn}>
+                            Профиль
+                        </Link>
+                    )}
+                    <button
+                        className={styles.logoutBtn}
+                        onClick={isAuth ? handleLogout : () => navigate('/login')}
+                    >
+                        {isAuth ? 'Выйти' : 'Войти'}
+                    </button>
                 </div>
             </header>
 
             <main className={styles.gridLayout}>
                 <nav className={`${styles.card} ${styles.subNavCard}`}>
-                    <NavLink to="/news" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Новости</NavLink>
-                    <NavLink to="/committees" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Комиссии</NavLink>
-                    <NavLink to="/sessions" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Заседания</NavLink>
                     <NavLink to="/initiatives" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Инициативы</NavLink>
+                    <NavLink to="/sessions" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Заседания</NavLink>
+                    <NavLink to="/committees" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Комиссии</NavLink>
                     <NavLink to="/parties" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Партии</NavLink>
                     <NavLink to="/deputies" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}>Депутаты</NavLink>
                 </nav>
@@ -108,8 +127,7 @@ const DashboardPage = () => {
                     </div>
                     <div className={styles.welcomeContent}>
                         <p className={styles.welcomeText}>
-                            Вы вошли в систему Городской Думы. Здесь вы можете отслеживать работу комиссий,
-                            участвовать в голосованиях, просматривать протоколы заседаний и знакомиться с принятыми инициативами.
+                            Вы вошли в систему Городского Совета. Вы можете отслеживать работу комиссий, просматривать протоколы заседаний и знакомиться с принятыми инициативами.
                             Используйте навигацию или поиск для быстрого доступа к нужным разделам.
                         </p>
                     </div>
@@ -117,8 +135,7 @@ const DashboardPage = () => {
 
                 <section className={styles.card}>
                     <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}>Новости</h2>
-                        <a href="#" className={styles.cardLink}>Все новости →</a>
+                        <h2 className={styles.sectionTitle}>Новости</h2>
                     </div>
                     <div className={styles.list}>
                         {NEWS.map((item) => (
@@ -134,8 +151,8 @@ const DashboardPage = () => {
 
                 <section className={styles.card}>
                     <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}>Ближайшие заседания</h2>
-                        <Link to="/sessions" className={styles.cardLink}>Расписание →</Link>
+                        <h2 className={styles.sectionTitle}>Ближайшие заседания</h2>
+                        <Link to="/sessions" className={styles.cardLink}>Расписание</Link>
                     </div>
                     <div className={styles.list}>
                         {loadSessions ? (
@@ -147,7 +164,12 @@ const DashboardPage = () => {
                                 const date = new Date(s.heldAt);
                                 const isNext = idx === 0;
                                 return (
-                                    <article key={s.id} className={`${styles.sessionItem} ${isNext ? styles.sessionItemFeatured : ''}`}>
+                                    <article
+                                        key={s.id}
+                                        className={`${styles.sessionItem} ${isNext ? styles.sessionItemFeatured : ''}`}
+                                        onClick={() => navigate(`/sessions/${s.id}`)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
                                         <div className={`${styles.dateBadge} ${isNext ? styles.dateBadgeFeatured : ''}`}>
                                             <span className={styles.dateDay}>{date.getDate().toString().padStart(2, '0')}</span>
                                             <span className={styles.dateMonth}>{date.toLocaleDateString('ru-RU', { month: 'short' })}</span>
@@ -157,7 +179,7 @@ const DashboardPage = () => {
                                                 {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                             <h3 className={`${styles.sessionTitle} ${isNext ? styles.sessionTitleFeatured : ''}`}>{s.title}</h3>
-                                            <Link to={`/sessions/${s.id}`} className={styles.sessionLink}>Повестка →</Link>
+                                            <span className={styles.sessionLink}>Перейти к повестке →</span>
                                         </div>
                                     </article>
                                 );
@@ -204,26 +226,57 @@ const DashboardPage = () => {
                 </header>
 
                 <div className={styles.initiativesList}>
-                    {isLoading && <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Загрузка инициатив...</span></div>}
-                    {isError && <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Не удалось загрузить инициативы</span></div>}
-                    {!isLoading && !isError && initiatives.length === 0 && (
-                        <div className={styles.initiativeRow}><span className={styles.initiativeTitle}>Принятых инициатив пока нет</span></div>
+                    {isLoading && (
+                        <div className={styles.card}>
+                            <div className={styles.cardContent}>
+                                <p className={styles.cardDesc}>Загрузка инициатив...</p>
+                            </div>
+                        </div>
                     )}
-                    {!isLoading && !isError && initiatives.map((item, index) => (
+
+                    {isError && (
+                        <div className={styles.card}>
+                            <div className={styles.cardContent}>
+                                <p className={styles.cardDesc}>Не удалось загрузить инициативы</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {!isLoading && !isError && initiatives.length === 0 && (
+                        <div className={styles.card}>
+                            <div className={styles.cardContent}>
+                                <p className={styles.cardDesc}>Принятых инициатив пока нет</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {!isLoading && !isError && initiatives.map((item) => (
                         <Link
                             key={item.id}
                             to={`/initiatives/${item.id}`}
-                            className={`${styles.initiativeRow} ${index % 2 === 0 ? styles.even : styles.odd}`}
+                            className={styles.cardInit}
                         >
-                            <div className={styles.initiativeContent}>
-                                <h3 className={styles.initiativeTitle}>{item.title}</h3>
-                                <div className={styles.initiativeMeta}>
-                                    <span className={styles.metaItem}>{item.authorName || 'Неизвестный автор'}</span>
-                                    <span className={styles.metaDivider}>•</span>
-                                    <span className={styles.metaItem}>{formatDate(item.createdAt)}</span>
-                                </div>
+                            <div className={styles.cardImageWrapper}>
+                                <img
+                                    src={item.imageUrl || '/initiative.png'}
+                                    alt={item.title}
+                                    className={styles.cardImage}
+                                    loading="lazy"
+                                />
                             </div>
-                            <span className={styles.arrow}>→</span>
+                            <div className={styles.cardContentInit}>
+                                <div className={styles.cardHeaderInit}>
+                                    <h3 className={styles.cardTitleInit}>{item.title}</h3>
+                                </div>
+                                {item.description && (
+                                    <p className={styles.cardDescInit}>{item.description}</p>
+                                )}
+                            </div>
+                            <div className={styles.cardMetaInit}>
+                                <span className={styles.author}>{item.authorName || 'Неизвестный автор'}</span>
+                                <span className={styles.metaDivider}>•</span>
+                                <time className={styles.date}>{formatDate(item.createdAt)}</time>
+                            </div>
                         </Link>
                     ))}
                 </div>

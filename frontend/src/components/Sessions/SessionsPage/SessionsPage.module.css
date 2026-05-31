@@ -12,13 +12,27 @@
     min-height: 100vh;
     background: var(--bg);
     color: var(--text-primary);
-    font-family: system-ui, -apple-system, sans-serif;
-    padding: 2rem;
+    font-family: 'Roboto Slab', serif;
+    padding-bottom: 3rem;
 }
-
+.container button,
+.container input,
+.container select,
+.container textarea,
+.container a,
+.container span,
+.container p,
+.container label {
+    font-family: inherit;
+}
+.container h1, .container h2, .container h3, .container h4, .container h5, .container h6
+{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
 .pageHeader {
-    margin-bottom: 2.5rem;
-    padding-bottom: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 2rem 1.5rem;
     border-bottom: 1px solid var(--border);
 }
 
@@ -35,14 +49,15 @@
     margin: 0;
 }
 
-/* === Сетка 3 колонки === */
 .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
+    max-width: 1400px;
+    margin: auto;
+    padding: 2rem;
 }
 
-/* === Карточка === */
 .card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -106,7 +121,6 @@
     border: 1px solid rgba(207, 34, 46, 0.3);
 }
 
-/* Картинка */
 .cardImageWrapper {
     width: 100%;
     height: 200px;
@@ -170,7 +184,6 @@
     color: var(--accent);
 }
 
-/* Утилиты */
 .loading, .error, .empty {
     text-align: center;
     padding: 4rem 1rem;
@@ -180,16 +193,159 @@
 
 .error { color: var(--accent); }
 
-/* Адаптив (на случай маленьких экранов, но сохраняем строгость) */
-@media (max-width: 1100px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.cardJoined {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+}
+.modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
 }
 
-@media (max-width: 700px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
-    .container { padding: 1rem; }
+.modal {
+    background: var(--card-bg);
+    border-radius: 6px;
+    padding: 1.5rem;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.modalTitle {
+    font-size: 1.1rem;
+    margin: 0 0 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.modalText {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0 0 1.25rem;
+    line-height: 1.5;
+}
+
+.modalText strong {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.modalHint {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    margin: 0 0 1.25rem;
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 4px;
+    border-left: 2px solid var(--border);
+}
+
+.modalActions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.cancelBtn,
+.joinBtn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.cancelBtn {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+
+.cancelBtn:hover {
+    background: var(--border);
+    color: var(--text-primary);
+}
+
+.joinBtn {
+    color: rgba(207, 34, 46, 0.3);
+    background: var(--accent-light);
+    border: 1px solid rgba(207, 34, 46, 0.3);
+}
+
+.joinBtn:hover:not(:disabled) {
+    color: var(--accent);
+    background: rgba(207, 34, 46, 0.25);
+    border-color: var(--accent);
+}
+
+.joinBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.toggleCompletedBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggleCompletedBtn:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+.cardCompleted {
+    opacity: 0.7;
+}
+
+.cardCompleted:hover {
+    opacity: 1;
+}
+
+.pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
