@@ -47,15 +47,6 @@ public class UserRepository : IUserRepository
             .AsNoTracking()
             .ToListAsync(ct);
 
-    public async Task<List<User>> SearchAsync(string searchTerm, CancellationToken ct = default) =>
-        await _dbContext.Users
-            .Include(u => u.Role)
-            .Where(u => 
-                u.FirstName.Contains(searchTerm) || 
-                u.LastName.Contains(searchTerm) || 
-                u.Email.Contains(searchTerm))
-            .AsNoTracking()
-            .ToListAsync(ct);
     
     public async Task<bool> HasActivePartyAsync(Guid userId, CancellationToken ct = default) =>
         await _dbContext.PartiesInfos.AnyAsync(p => p.UserId == userId && p.DismissedAt == null, ct);
@@ -73,6 +64,16 @@ public class UserRepository : IUserRepository
         _dbContext.Users.Update(user);
         await Task.CompletedTask;
     }
+    public string? GetCurrentPartyName(User user) =>
+        user.PartyMemberships
+            ?.FirstOrDefault(m => m.IsActive)?.Party?.Name;
+
+
+    public List<string> GetActiveCommitteeNames(User user) =>
+        user.CommitteesMemberships
+            ?.Where(m => m.DismissedAt == null)
+            .Select(m => m.Committee?.Name ?? "Неизвестная комиссия")
+            .ToList() ?? new List<string>();
     public async Task<List<User>> GetAllFilteredAsync(
         string? searchTerm,
         string? role,
@@ -84,6 +85,8 @@ public class UserRepository : IUserRepository
         var query = _dbContext.Users
             .AsNoTracking()
             .Include(u => u.Role)
+            .Include(u => u.PartyMemberships).ThenInclude(pm => pm.Party)   
+            .Include(u => u.CommitteesMemberships).ThenInclude(cm => cm.Committee)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))

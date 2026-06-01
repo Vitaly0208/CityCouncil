@@ -9,15 +9,14 @@ public class Initiative
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public InitiativeStatus Status { get; set; } = InitiativeStatus.PendingReview;
-    
     public Guid UserId { get; set; }
     [JsonIgnore] 
     public User User { get; set; }
-    
+    public Guid? CommitteeId { get; set; }
+    [JsonIgnore] public Committee? Committee { get; set; } 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ApprovedAt { get; set; }
     public DateTime? FinalizedAt { get; set; }
-    
     [JsonIgnore] public List<VotingInfo> VotingHistory { get; set; } = new();
 }
 

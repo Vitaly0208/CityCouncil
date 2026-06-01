@@ -9,6 +9,8 @@ public record InitiativeDto(
     InitiativeStatus Status,
     Guid UserId,
     string AuthorName,
+    Guid? CommitteeId,
+    string CommitteeName,
     DateTime CreatedAt,
     DateTime? ApprovedAt,
     DateTime? FinalizedAt

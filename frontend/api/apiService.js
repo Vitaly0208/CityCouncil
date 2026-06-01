@@ -88,6 +88,7 @@ export const sessionService = {
     getProtocol: (id) => axiosInstance.get(ENDPOINTS.SESSIONS.PROTOCOL(id)),
     join: (sessionId) =>
         axiosInstance.post(ENDPOINTS.SESSIONS.JOIN(sessionId)),
+    leave: (sessionId) => axiosInstance.patch(ENDPOINTS.SESSIONS.LEAVE(sessionId)),
     getAttendees: (sessionId) =>
         axiosInstance.get(ENDPOINTS.SESSIONS.ATTENDEES(sessionId)),
 };

@@ -4,7 +4,7 @@ import { tokenService} from "../../../../api/tokenService.js";
 import { getUserId} from "../../../utils/jwt.js";
 import Navbar from "../../Layout/NaVbar/NavBar.jsx";
 import styles from './PartyDetailsPage.module.css';
-import {useEffect} from "react";
+
 
 const formatDate = (dateString) => {
     if (!dateString) return '—';
@@ -17,14 +17,6 @@ const PartyDetailsPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { party, isLoading, isError, error } = usePartyDetails(id);
-    useEffect(() => {
-        console.log('🔍 PartyDetailsPage debug:');
-        console.log('📦 id from URL:', id, typeof id);
-        console.log('⏳ isLoading:', isLoading);
-        console.log('❌ isError:', isError);
-        console.log('💥 error object:', error);
-        console.log('📄 party data:', party);
-    }, [id, isLoading, isError, error, party]);
     const joinParty = useJoinParty();
     const leaveParty = useLeaveParty();
     const currentUserId = getUserId();

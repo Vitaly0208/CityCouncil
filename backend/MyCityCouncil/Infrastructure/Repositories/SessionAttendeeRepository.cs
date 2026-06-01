@@ -47,4 +47,10 @@ public class SessionAttendeeRepository : ISessionAttendeeRepository
         return await _dbContext.SessionAttendees
             .AnyAsync(sa => sa.SessionId == sessionId && sa.UserId == userId, ct);
     }
+    public async Task SetAttendanceStatusAsync(Guid sessionId, Guid userId, bool isOnline, CancellationToken ct = default)
+    {
+        await _dbContext.SessionAttendees
+            .Where(a => a.SessionId == sessionId && a.UserId == userId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(a => a.IsCurrentlyOnSession, isOnline), ct);
+    }
 }

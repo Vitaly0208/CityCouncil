@@ -8,6 +8,4 @@ public record RegisterCommand : IRequest<RegisterDto>
     public string FirstName { get; set; }
     public string MiddleName { get; set; }
     public string LastName { get; set; }
-    public string WorkPhone { get; set; }
-    public string HomePhone { get; set; } 
 }

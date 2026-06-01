@@ -13,7 +13,7 @@ public interface ISessionRepository
     
     void Update(Session session);
     void Delete(Session session);
-    
+    Task<List<Session>> GetSessionsAfterCommitteeJoinAsync(Guid userId, CancellationToken ct = default);
     Task<bool> ExistsAsync(Guid id, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
 }

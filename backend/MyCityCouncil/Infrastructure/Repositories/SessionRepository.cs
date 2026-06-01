@@ -74,4 +74,31 @@ public class SessionRepository : ISessionRepository
 
     public async Task SaveChangesAsync(CancellationToken ct = default) =>
         await _dbContext.SaveChangesAsync(ct);
+    
+    public async Task<List<Session>> GetSessionsAfterCommitteeJoinAsync(Guid userId, CancellationToken ct = default)
+    {
+        return await _dbContext.Sessions
+            .AsNoTracking()
+            .Include(s => s.Committee)
+            // 👇 Убрали .Include(s => s.Attendees) — не нужно для подзапроса
+            .Where(s => _dbContext.CommitteeInfos.Any(cm =>
+                cm.UserId == userId &&
+                cm.CommitteeId == s.CommitteeId &&
+                cm.DismissedAt == null &&
+                s.HeldAt >= cm.AppointedAt))
+            .Select(s => new Session // 👈 Временная проекция для вычисления WasAttended
+            {
+                Id = s.Id,
+                Title = s.Title,
+                HeldAt = s.HeldAt,
+                CommitteeId = s.CommitteeId,
+                Committee = s.Committee,
+                // 👇 Вычисляем WasAttended через подзапрос к БД
+                Attendees = _dbContext.SessionAttendees
+                    .Where(a => a.SessionId == s.Id && a.UserId == userId)
+                    .ToList()
+            })
+            .OrderByDescending(s => s.HeldAt)
+            .ToListAsync(ct);
+    }
 }

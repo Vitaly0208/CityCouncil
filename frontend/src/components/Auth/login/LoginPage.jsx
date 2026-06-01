@@ -44,7 +44,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className={styles.header}>
-                    <h1>Log In</h1>
+                    <h1>Войти</h1>
                 </div>
 
                 <form onSubmit={handleSubmit} className={styles.form}>
@@ -75,7 +75,7 @@ const LoginPage = () => {
                     </div>
 
                     <button type="submit" disabled={loading} className={styles.button}>
-                        {loading ? 'Loading...' : 'Log in'}
+                        {loading ? 'Загрузка...' : 'Войти'}
                     </button>
                 </form>
 

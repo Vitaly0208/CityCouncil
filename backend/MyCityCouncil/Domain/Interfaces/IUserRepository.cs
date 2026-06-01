@@ -12,9 +12,11 @@ public interface IUserRepository
     
     Task<List<User>> GetAllAsync(CancellationToken ct = default);
     Task<List<User>> GetByCommitteeIdAsync(Guid committeeId, CancellationToken ct = default);
-    Task<List<User>> SearchAsync(string searchTerm, CancellationToken ct = default);
+
     Task<bool> HasActivePartyAsync(Guid userId, CancellationToken ct = default);
     Task<User?> GetByIdWithRelationsAsync(Guid id, CancellationToken ct = default);
+    string? GetCurrentPartyName(User user);
+    List<string> GetActiveCommitteeNames(User user);
     Task<List<User>> GetAllFilteredAsync(
         string? searchTerm,
         string? role,

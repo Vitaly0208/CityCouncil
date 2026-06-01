@@ -7,5 +7,7 @@ public record CreateInitiativeResponseDto(
     string Title,
     string Description,
     InitiativeStatus Status,
+    Guid? CommitteeId,
+    string? CommitteeName,
     DateTime CreatedAt
 );

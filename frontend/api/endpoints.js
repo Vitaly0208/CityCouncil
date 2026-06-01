@@ -37,6 +37,7 @@ export const ENDPOINTS = {
         CREATE: '/api/sessions/create',
         CREATE_WITH_QUEUE: '/api/sessions/create-with-queue',
         JOIN: (id) => `/api/sessions/${id}/join`,
+        LEAVE: (id) => `/api/sessions/${id}/leave`,
         ATTENDEES: (id) => `/api/sessions/${id}/attendees`,
         PROTOCOL: (id) => `/api/sessions/${id}/protocol`,
     },

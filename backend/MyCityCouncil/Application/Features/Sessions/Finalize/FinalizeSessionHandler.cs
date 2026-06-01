@@ -54,8 +54,7 @@ public class FinalizeSessionHandler : IRequestHandler<FinalizeSessionCommand, Fi
             
             votingInfo.IsFinalized = true;
             votingInfo.Status = init.Status;
-            _votingRepo.Update(votingInfo);
-            _initiativeRepo.Update(init);
+                
         }
         
         Guid? nextSessionId = null;

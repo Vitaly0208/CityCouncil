@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCityCouncil.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260530121235_AddVotingAndSessionUpdates")]
-    partial class AddVotingAndSessionUpdates
+    [Migration("20260531224217_FixVotingAndCommitteeUpdates")]
+    partial class FixVotingAndCommitteeUpdates
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

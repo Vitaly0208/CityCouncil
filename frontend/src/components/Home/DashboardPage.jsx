@@ -99,7 +99,7 @@ const DashboardPage = () => {
                     )}
 
                     {isAuth && (
-                        <Link to="/profile" className={styles.logoutBtn}>
+                        <Link to="/profile" className={styles.profileBtn}>
                             Профиль
                         </Link>
                     )}
@@ -167,7 +167,6 @@ const DashboardPage = () => {
                                     <article
                                         key={s.id}
                                         className={`${styles.sessionItem} ${isNext ? styles.sessionItemFeatured : ''}`}
-                                        onClick={() => navigate(`/sessions/${s.id}`)}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         <div className={`${styles.dateBadge} ${isNext ? styles.dateBadgeFeatured : ''}`}>

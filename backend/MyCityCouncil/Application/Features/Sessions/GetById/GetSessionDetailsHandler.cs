@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using MyCityCouncil.Application.Features.Sessions;
 using MyCityCouncil.Application.Features.Voting;
 using MyCityCouncil.Domain.Interfaces;
 
@@ -50,7 +49,8 @@ public class GetSessionDetailsHandler : IRequestHandler<GetSessionDetailsQuery, 
                 Name: a.User != null 
                     ? $"{a.User.LastName} {a.User.FirstName} {a.User.MiddleName}".Trim() 
                     : string.Empty,
-                Role: a.User?.Role?.Name ?? "Депутат"
+                Role: a.User?.Role?.Name ?? "Депутат",
+                IsCurrentlyOnSession: a.IsCurrentlyOnSession
             )).ToList() ?? new List<AttendeeDto>()
         );
     }

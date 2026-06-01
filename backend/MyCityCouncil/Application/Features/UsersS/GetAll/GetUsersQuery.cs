@@ -18,5 +18,7 @@ public record UserSearchDto(
     string LastName,
     string? MiddleName,
     string Email,
-    string RoleName
+    string RoleName,
+    string? CurrentPartyName,
+    List<string> ActiveCommitteeNames
 );

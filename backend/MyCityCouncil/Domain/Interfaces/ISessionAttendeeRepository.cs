@@ -8,4 +8,5 @@ public interface ISessionAttendeeRepository
     Task<List<SessionAttendee>> GetBySessionAsync(Guid sessionId, CancellationToken ct = default);
     Task AddAsync(SessionAttendee attendee, CancellationToken ct = default);
     Task<bool> IsUserAttendingAsync(Guid sessionId, Guid userId, CancellationToken ct = default);
+    Task SetAttendanceStatusAsync(Guid sessionId, Guid userId, bool isOnline, CancellationToken ct = default);
 }

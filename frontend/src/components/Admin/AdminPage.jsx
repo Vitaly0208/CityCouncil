@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { tokenService } from '../../../api/tokenService';
-import { useInitiatives, useReviewInitiative } from "../../hooks/useInitiatives.js";
-import { useCreateSessionWithQueue } from "../../hooks/useSessions.js";
-import { useCommittees, useCreateCommittee, useDeleteCommittee, useAppointChairman } from "../../hooks/useCommittees.js";
-import { useUsers, useUsersByCommittee, useAddUserToCommittee, useRemoveUserFromCommittee } from "../../hooks/UseUsers.js";
-import { useParties, useCreateParty, useDeleteParty, useJoinParty, useLeaveParty } from "../../hooks/useParties.js";
+import { tokenService} from "../../../api/tokenService.js";
+import { useInitiatives, useReviewInitiative} from "../../hooks/useInitiatives.js";
+import { useCreateSessionWithQueue} from "../../hooks/useSessions.js";
+import { useCommittees, useCreateCommittee, useDeleteCommittee, useAppointChairman} from "../../hooks/useCommittees.js";
+import { useUsers, useUsersByCommittee, useAddUserToCommittee, useRemoveUserFromCommittee} from "../../hooks/UseUsers.js";
+import { useParties, useCreateParty, useDeleteParty, useJoinParty, useLeaveParty} from "../../hooks/useParties.js";
 import styles from './AdminPage.module.css';
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
 
@@ -14,14 +14,12 @@ const AdminPage = () => {
     const [activeTab, setActiveTab] = useState('moderation');
 
     const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedPartyUser, setSelectedPartyUser] = useState(null);
 
     const [showCommissionModal, setShowCommissionModal] = useState(false);
     const [showChairmanModal, setShowChairmanModal] = useState(false);
     const [showChairmanSelectModal, setShowChairmanSelectModal] = useState(false);
 
     const [showPartyModal, setShowPartyModal] = useState(false);
-    const [showPartyMemberModal, setShowPartyMemberModal] = useState(false);
     const [showPartyLeaderSelectModal, setShowPartyLeaderSelectModal] = useState(false);
 
     const [news, setNews] = useState(() => {
@@ -76,8 +74,14 @@ const AdminPage = () => {
                 u.email?.toLowerCase().includes(q)
             );
         }
+        if (userFilter.committeeId) {
+            const committeeName = committees?.find(c => c.id === userFilter.committeeId)?.name;
+            if (committeeName) {
+                users = users.filter(u => u.activeCommitteeNames?.includes(committeeName));
+            }
+        }
         return users;
-    }, [allUsers, committeeUsers, userFilter]);
+    }, [allUsers, committeeUsers, userFilter, committees]);
 
     const displayedUsers = filteredUsers.slice(0, visibleUsers);
 
@@ -217,16 +221,6 @@ const AdminPage = () => {
         }
     };
 
-    const handleAppointPartyLeader = async (userId, partyId) => {
-        try {
-            await joinParty.mutateAsync({ userId, partyId });
-            setShowPartyMemberModal(false);
-            alert('Пользователь назначен лидером партии');
-        } catch (err) {
-            alert('Ошибка: ' + (err.message || 'Не удалось назначить'));
-        }
-    };
-
     const handleSelectChairman = (userId, fullName) => {
         setCommitteeForm(prev => ({ ...prev, chairmanId: userId, chairmanName: fullName }));
         setShowChairmanSelectModal(false);
@@ -274,6 +268,12 @@ const AdminPage = () => {
         return <span className={`${styles.badge} ${s.class}`}>{s.text}</span>;
     };
 
+    const getCommitteeName = (committeeId) => {
+        if (!committeeId || !committees) return 'Не указана';
+        const committee = committees.find(c => c.id === committeeId);
+        return committee?.name || 'Неизвестная комиссия';
+    };
+
     if (loadPending || loadCommittees || loadParties) {
         return <div className={styles.container}><div className={styles.loading}>Загрузка панели...</div></div>;
     }
@@ -307,7 +307,12 @@ const AdminPage = () => {
                                             <div className={styles.reviewInfo}>
                                                 <h3>{init.title}</h3>
                                                 <p>{init.description}</p>
-                                                <span className={styles.meta}>Автор: {init.authorName} • {new Date(init.createdAt).toLocaleDateString('ru-RU')}</span>
+                                                <span className={styles.meta}>
+                                                    Автор: {init.authorName} • {new Date(init.createdAt).toLocaleDateString('ru-RU')}
+                                                </span>
+                                                <span className={styles.meta}>
+                                                    Комиссия: {getCommitteeName(init.committeeId)}
+                                                </span>
                                             </div>
                                             <div className={styles.reviewActions}>
                                                 <button className={styles.approveBtn} onClick={() => handleReview(init.id, true)}>Одобрить</button>
@@ -528,11 +533,6 @@ const AdminPage = () => {
                                             <div className={styles.usersList}>
                                                 {displayedUsers.map(u => {
                                                     const isSelected = selectedUser?.id === u.id;
-                                                    const isInCommittee = userFilter.committeeId &&
-                                                        (u.committeesMemberships?.some(m =>
-                                                            m.committeeId === userFilter.committeeId && !m.dismissedAt
-                                                        ) || committeeUsers?.some(cu => cu.id === u.id));
-
                                                     return (
                                                         <button
                                                             key={u.id}
@@ -576,77 +576,33 @@ const AdminPage = () => {
                                                         <span className={styles.userMiddleName}>{selectedUser.middleName}</span>
                                                     )}
                                                 </div>
-                                                <span className={styles.roleBadge}>{selectedUser.role?.name || 'Пользователь'}</span>
+                                                <span className={styles.roleBadge}>{selectedUser.roleName || 'Пользователь'}</span>
                                             </div>
 
                                             <dl className={styles.userDetailInfo}>
                                                 <dt>Email</dt>
                                                 <dd>{selectedUser.email}</dd>
 
-                                                {(selectedUser.homePhone || selectedUser.workPhone) && (
-                                                    <>
-                                                        <dt>Телефоны</dt>
-                                                        <dd className={styles.phoneList}>
-                                                            {selectedUser.homePhone && (
-                                                                <span className={styles.phoneItem}>Home: {selectedUser.homePhone}</span>
-                                                            )}
-                                                            {selectedUser.workPhone && (
-                                                                <span className={styles.phoneItem}>Work: {selectedUser.workPhone}</span>
-                                                            )}
-                                                        </dd>
-                                                    </>
-                                                )}
-
-                                                {selectedUser.committeesMemberships?.length > 0 && (
+                                                {selectedUser.activeCommitteeNames?.length > 0 && (
                                                     <>
                                                         <dt>Комиссии</dt>
                                                         <dd className={styles.commissionList}>
-                                                            {selectedUser.committeesMemberships
-                                                                .filter(m => !m.dismissedAt)
-                                                                .map(m => (
-                                                                    <span
-                                                                        key={m.committeeId}
-                                                                        className={`${styles.commissionTag} ${m.isChairman ? styles.chairmanTag : ''}`}
-                                                                    >
-                                                                        {m.committee?.name}
-                                                                        {m.isChairman && ' (пред.)'}
-                                                                    </span>
-                                                                ))}
+                                                            {selectedUser.activeCommitteeNames.map((name, idx) => (
+                                                                <span key={idx} className={styles.commissionTag}>
+                                                                    {name}
+                                                                </span>
+                                                            ))}
                                                         </dd>
                                                     </>
                                                 )}
 
-                                                {selectedUser.partyMemberships?.length > 0 && (
+                                                {selectedUser.currentPartyName && (
                                                     <>
-                                                        <dt>Партии</dt>
+                                                        <dt>Партия</dt>
                                                         <dd className={styles.commissionList}>
-                                                            {selectedUser.partyMemberships
-                                                                .filter(m => !m.dismissedAt)
-                                                                .map(m => (
-                                                                    <span key={m.partyId} className={styles.commissionTag}>
-                                                                        {m.party?.name}
-                                                                    </span>
-                                                                ))}
-                                                        </dd>
-                                                    </>
-                                                )}
-
-                                                {selectedUser.initiatives?.filter(i => i.status === 'Accepted')?.length > 0 && (
-                                                    <>
-                                                        <dt>Принятые инициативы</dt>
-                                                        <dd className={styles.initiativeList}>
-                                                            {selectedUser.initiatives
-                                                                .filter(i => i.status === 'Accepted')
-                                                                .slice(0, 5)
-                                                                .map(i => (
-                                                                    <Link
-                                                                        key={i.id}
-                                                                        to={`/initiatives/${i.id}`}
-                                                                        className={styles.initiativeLink}
-                                                                    >
-                                                                        {i.title}
-                                                                    </Link>
-                                                                ))}
+                                                            <span className={styles.commissionTag}>
+                                                                {selectedUser.currentPartyName}
+                                                            </span>
                                                         </dd>
                                                     </>
                                                 )}
@@ -666,11 +622,11 @@ const AdminPage = () => {
                                                     Управление партиями
                                                 </button>
 
-                                                {selectedUser.committeesMemberships?.some(m => !m.dismissedAt) && (
+                                                {selectedUser.activeCommitteeNames?.length > 0 && (
                                                     <button
                                                         className={styles.chairmanBtn}
                                                         onClick={() => setShowChairmanModal(true)}
-                                                        disabled={!selectedUser.committeesMemberships?.some(m => !m.dismissedAt && !m.isChairman)}
+                                                        disabled={appointChairman.isPending}
                                                     >
                                                         Сделать председателем
                                                     </button>
@@ -688,20 +644,15 @@ const AdminPage = () => {
 
                                         <div className={styles.modalCommissionList}>
                                             {committees?.map(c => {
-                                                const membership = selectedUser.committeesMemberships?.find(
-                                                    m => m.committeeId === c.id && !m.dismissedAt
-                                                );
-                                                const isChairman = membership?.isChairman;
+                                                const isMember = selectedUser.activeCommitteeNames?.includes(c.name);
 
                                                 return (
                                                     <div key={c.id} className={styles.modalCommissionItem}>
                                                         <span className={styles.modalCommissionName}>{c.name}</span>
                                                         <div className={styles.modalCommissionActions}>
-                                                            {membership ? (
+                                                            {isMember ? (
                                                                 <>
-                                                                    <span className={styles.memberBadge}>
-                                                                        {isChairman ? 'Председатель' : 'Участник'}
-                                                                    </span>
+                                                                    <span className={styles.memberBadge}>Участник</span>
                                                                     <button
                                                                         className={styles.removeSmallBtn}
                                                                         onClick={() => handleRemoveUserFromCommittee(selectedUser.id, c.id)}
@@ -744,15 +695,13 @@ const AdminPage = () => {
 
                                         <div className={styles.modalCommissionList}>
                                             {parties?.map(p => {
-                                                const membership = selectedUser.partyMemberships?.find(
-                                                    m => m.partyId === p.id && !m.dismissedAt
-                                                );
+                                                const isMember = selectedUser.currentPartyName === p.name;
 
                                                 return (
                                                     <div key={p.id} className={styles.modalCommissionItem}>
                                                         <span className={styles.modalCommissionName}>{p.name}</span>
                                                         <div className={styles.modalCommissionActions}>
-                                                            {membership ? (
+                                                            {isMember ? (
                                                                 <>
                                                                     <span className={styles.memberBadge}>Участник</span>
                                                                     <button
@@ -799,16 +748,16 @@ const AdminPage = () => {
                                         </p>
 
                                         <div className={styles.chairmanSelectList}>
-                                            {selectedUser.committeesMemberships
-                                                ?.filter(m => !m.dismissedAt && !m.isChairman)
-                                                .map(m => (
+                                            {committees
+                                                ?.filter(c => selectedUser.activeCommitteeNames?.includes(c.name))
+                                                .map(c => (
                                                     <button
-                                                        key={m.committeeId}
+                                                        key={c.id}
                                                         className={styles.chairmanSelectItem}
-                                                        onClick={() => handleAppointChairman(selectedUser.id, m.committeeId)}
+                                                        onClick={() => handleAppointChairman(selectedUser.id, c.id)}
                                                         disabled={appointChairman.isPending}
                                                     >
-                                                        {m.committee?.name}
+                                                        {c.name}
                                                     </button>
                                                 ))}
                                         </div>
@@ -866,6 +815,7 @@ const AdminPage = () => {
                                             <div className={styles.initiativeInfo}>
                                                 <h4>{init.title}</h4>
                                                 <span className={styles.meta}>Автор: {init.authorName}</span>
+                                                <span className={styles.meta}>Комиссия: {getCommitteeName(init.committeeId)}</span>
                                             </div>
                                             {getStatusBadge(init.status)}
                                         </div>

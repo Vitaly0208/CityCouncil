@@ -8,7 +8,7 @@ public class GetUserProfileHandler : IRequestHandler<GetUserProfileQuery, UserPr
 {
     private readonly IUserRepository _userRepository;
     private readonly IInitiativeRepository _initiativeRepository;
-    private  readonly ISessionRepository _sessionRepository;
+    private readonly ISessionRepository _sessionRepository;
 
     public GetUserProfileHandler(
         IUserRepository userRepository,
@@ -25,7 +25,7 @@ public class GetUserProfileHandler : IRequestHandler<GetUserProfileQuery, UserPr
         var user = await _userRepository.GetByIdWithRelationsAsync(request.UserId, ct)
             ?? throw new KeyNotFoundException($"Пользователь с ID {request.UserId} не найден");
         
-        var fullName = $"{user.LastName} {user.FirstName} {user.MiddleName} ";
+        var fullName = $"{user.LastName} {user.FirstName} {user.MiddleName} ".Trim();
         var roleName = user.Role?.Name ?? "Депутат";
         
         var activeMembership = user.PartyMemberships?.FirstOrDefault(m => m.IsActive);
@@ -59,12 +59,14 @@ public class GetUserProfileHandler : IRequestHandler<GetUserProfileQuery, UserPr
                 Id: i.Id,
                 Title: i.Title,
                 Description: i.Description,
-                ApprovedAt: i.ApprovedAt ?? i.CreatedAt
+                ApprovedAt: i.ApprovedAt ?? i.CreatedAt,
+                CommitteeId:  i.CommitteeId,
+                CommitteeName: i.Committee.Name 
             ))
             .ToList();
         
         var sessionsEntities = await _sessionRepository
-            .GetSessionsByUserCommitteesAsync(user.Id, ct);
+            .GetSessionsAfterCommitteeJoinAsync(user.Id, ct);
 
         var sessionAttendance = sessionsEntities.Select(s => new SessionAttendanceDto(
             SessionId: s.Id,

@@ -3,5 +3,6 @@
 public record AttendeeDto(
     Guid Id,
     string Name,
-    string Role
+    string Role,
+    bool IsCurrentlyOnSession 
 );

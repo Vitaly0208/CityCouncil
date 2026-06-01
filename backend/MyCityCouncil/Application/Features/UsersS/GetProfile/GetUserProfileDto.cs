@@ -35,7 +35,9 @@ public record AcceptedInitiativeDto(
     Guid Id,
     string Title,
     string Description,
-    DateTime ApprovedAt
+    DateTime ApprovedAt,
+    Guid? CommitteeId,
+    string CommitteeName
 );
 
 public record SessionAttendanceDto(

@@ -7,6 +7,7 @@ using MyCityCouncil.Application.Features.Sessions.Create;
 using MyCityCouncil.Application.Features.Sessions.GetAll;
 using MyCityCouncil.Application.Features.Sessions.GetById;
 using MyCityCouncil.Application.Features.Sessions.JoinSession;
+using MyCityCouncil.Application.Features.Sessions.LeaveSession;
 using MyCityCouncil.Application.Features.Sessions.Protocol;
 
 namespace MyCityCouncil.Api.Controllers;
@@ -90,7 +91,34 @@ public class SessionsController : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpPatch("{id}/leave")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> LeaveSession(Guid id, CancellationToken ct)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return BadRequest("Не удалось определить пользователя");
+
+        try
+        {
+            await _mediator.Send(new LeaveSessionCommand(id, userId), ct);
+            return Ok(new { message = "Вы покинули заседание" });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     [HttpGet("{id}/attendees")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AttendeeDto>))]

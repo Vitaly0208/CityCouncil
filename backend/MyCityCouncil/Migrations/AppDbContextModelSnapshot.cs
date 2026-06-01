@@ -121,6 +121,9 @@ namespace MyCityCouncil.Migrations
                     b.Property<DateTime?>("ApprovedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("CommitteeId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -148,6 +151,8 @@ namespace MyCityCouncil.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CommitteeId");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_Initiatives_Status");
@@ -304,6 +309,9 @@ namespace MyCityCouncil.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsCurrentlyOnSession")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("JoinedAt")
                         .HasColumnType("timestamp with time zone");
@@ -502,11 +510,17 @@ namespace MyCityCouncil.Migrations
 
             modelBuilder.Entity("MyCityCouncil.Domain.Models.Initiative", b =>
                 {
+                    b.HasOne("MyCityCouncil.Domain.Models.Committee", "Committee")
+                        .WithMany()
+                        .HasForeignKey("CommitteeId");
+
                     b.HasOne("MyCityCouncil.Domain.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Committee");
 
                     b.Navigation("User");
                 });

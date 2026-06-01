@@ -41,6 +41,8 @@ public class ReviewInitiativeHandler : IRequestHandler<ReviewInitiativeCommand, 
             Status: initiative.Status,
             UserId: initiative.UserId,
             AuthorName: initiative.User?.LastName + " " + initiative.User?.FirstName ?? "Неизвестный",
+            CommitteeId: initiative.CommitteeId,
+            CommitteeName: initiative.Committee.Name,
             CreatedAt: initiative.CreatedAt,
             ApprovedAt: initiative.ApprovedAt,
             FinalizedAt: initiative.FinalizedAt

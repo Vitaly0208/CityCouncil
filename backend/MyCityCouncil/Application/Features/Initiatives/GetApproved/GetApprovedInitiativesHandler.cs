@@ -23,6 +23,8 @@ public class GetApprovedInitiativesHandler : IRequestHandler<GetApprovedInitiati
             Status: i.Status,
             UserId: i.UserId,
             AuthorName: FormatAuthorName(i.User),
+            CommitteeId: i.CommitteeId,
+            CommitteeName: i.Committee.Name,
             CreatedAt: i.CreatedAt,
             ApprovedAt: i.ApprovedAt,
             FinalizedAt: i.FinalizedAt

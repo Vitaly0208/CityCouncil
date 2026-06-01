@@ -27,7 +27,9 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserSea
             LastName: u.LastName,
             MiddleName: u.MiddleName,
             Email: u.Email,
-            RoleName: u.Role?.Name ?? "Пользователь"
+            RoleName: u.Role?.Name ?? "Пользователь",
+            CurrentPartyName: _userRepository.GetCurrentPartyName(u),
+            ActiveCommitteeNames: _userRepository.GetActiveCommitteeNames(u)
         )).ToList();
     }
 }

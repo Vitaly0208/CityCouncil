@@ -39,9 +39,7 @@ public class RegisterHandler : IRequestHandler<RegisterCommand, RegisterDto>
             Email = request.Email,
             FirstName = request.FirstName,
             MiddleName = request.MiddleName,
-            LastName = request.LastName,
-            WorkPhone = request.WorkPhone,
-            HomePhone = request.HomePhone
+            LastName = request.LastName
         };  
         
         var hashedPassword = _passwordHasher.Generate(request.Password);

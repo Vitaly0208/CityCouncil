@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCityCouncil.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260529204515_AddVotingInfoDetails")]
-    partial class AddVotingInfoDetails
+    [Migration("20260601201102_AddCommitteeToInitiativeAndOnlineFlagToAttendee")]
+    partial class AddCommitteeToInitiativeAndOnlineFlagToAttendee
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,6 +86,10 @@ namespace MyCityCouncil.Migrations
                     b.Property<bool>("IsChairman")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -120,6 +124,9 @@ namespace MyCityCouncil.Migrations
                     b.Property<DateTime?>("ApprovedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("CommitteeId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -147,6 +154,8 @@ namespace MyCityCouncil.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CommitteeId");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_Initiatives_Status");
@@ -266,6 +275,12 @@ namespace MyCityCouncil.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
 
+                    b.Property<DateTime>("FinalizedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("HearingRound")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("HeldAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -297,6 +312,9 @@ namespace MyCityCouncil.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsCurrentlyOnSession")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("JoinedAt")
                         .HasColumnType("timestamp with time zone");
@@ -401,6 +419,8 @@ namespace MyCityCouncil.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("VoterId");
+
                     b.HasIndex("VotingInfoId", "VoterId")
                         .IsUnique();
 
@@ -412,6 +432,9 @@ namespace MyCityCouncil.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<int>("HearingRound")
+                        .HasColumnType("integer");
 
                     b.Property<string>("InitiativeAuthor")
                         .IsRequired()
@@ -490,11 +513,17 @@ namespace MyCityCouncil.Migrations
 
             modelBuilder.Entity("MyCityCouncil.Domain.Models.Initiative", b =>
                 {
+                    b.HasOne("MyCityCouncil.Domain.Models.Committee", "Committee")
+                        .WithMany()
+                        .HasForeignKey("CommitteeId");
+
                     b.HasOne("MyCityCouncil.Domain.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Committee");
 
                     b.Navigation("User");
                 });
@@ -572,11 +601,19 @@ namespace MyCityCouncil.Migrations
 
             modelBuilder.Entity("MyCityCouncil.Domain.Models.Vote", b =>
                 {
+                    b.HasOne("MyCityCouncil.Domain.Models.User", "Voter")
+                        .WithMany()
+                        .HasForeignKey("VoterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MyCityCouncil.Domain.Models.VotingInfo", "VotingInfo")
                         .WithMany("Votes")
                         .HasForeignKey("VotingInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Voter");
 
                     b.Navigation("VotingInfo");
                 });

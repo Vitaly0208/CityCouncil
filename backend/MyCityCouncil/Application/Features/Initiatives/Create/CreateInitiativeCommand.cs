@@ -5,5 +5,6 @@ namespace MyCityCouncil.Application.Features.Initiatives.Create;
 public record CreateInitiativeCommand(
     string Title,
     string Description,
-    Guid UserId
+    Guid UserId,
+    Guid CommitteeId
 ) : IRequest<CreateInitiativeResponseDto>;

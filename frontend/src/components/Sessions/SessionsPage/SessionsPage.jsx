@@ -84,7 +84,8 @@ const SessionsPage = () => {
             setJoinedSessionIds(prev => new Set([...prev, joiningSessionId]));
             navigate(`/sessions/${joiningSessionId}`);
         } catch (err) {
-            alert('Ошибка присоединения: ' + err.message);
+            const message = err.response?.data?.error || err.message || 'Ошибка присоединения';
+            alert(message);
         }
     };
 

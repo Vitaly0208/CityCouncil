@@ -95,6 +95,17 @@ export const useJoinSession = () => {
     });
 };
 
+export const useLeaveSession = () => {
+    const qc = useQueryClient();
+
+    return useMutation({
+        mutationFn: (sessionId) => sessionService.leave(sessionId),
+        onSuccess: (_, sessionId) => {
+            qc.invalidateQueries({ queryKey: queryKeys.sessions.details(sessionId) });
+            qc.invalidateQueries({ queryKey: ['profile'] });
+        }
+    });
+};
 export const useSessionAttendees = (sessionId) => {
     return useQuery({
         queryKey: ['sessions', sessionId, 'attendees'],

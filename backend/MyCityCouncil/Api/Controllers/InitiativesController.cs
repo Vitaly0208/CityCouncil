@@ -58,7 +58,7 @@ public class InitiativesController : ControllerBase
             return BadRequest(new { message = "Ошибка авторизации: некорректный токен." });
         }
         
-        var command = new CreateInitiativeCommand(request.Title, request.Description, userId);
+        var command = new CreateInitiativeCommand(request.Title, request.Description, userId, request.CommitteeId);
 
         try
         {
