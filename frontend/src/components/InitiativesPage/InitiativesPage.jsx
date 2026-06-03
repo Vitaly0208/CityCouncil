@@ -1,19 +1,28 @@
 import { useNavigate } from 'react-router-dom';
 import { tokenService } from '../../../api/tokenService';
 import { useInitiatives, useCreateInitiative } from "../../hooks/useInitiatives.js";
+import { useCommittees } from "../../hooks/useCommittees.js"; // 👈 Новый импорт
+import { getUserId } from '../../utils/jwt'; // 👈 Получаем ID из токена
 import styles from './InitiativesPage.module.css';
 import { useState } from "react";
 import Navbar from "../Layout/NaVbar/NavBar.jsx";
-import {useAuthRedirect} from "../../hooks/useAuthRedirect.js";
+import { useAuthRedirect } from "../../hooks/useAuthRedirect.js";
 
 const InitiativesPage = () => {
     const navigate = useNavigate();
     const requireAuth = useAuthRedirect();
     const [showForm, setShowForm] = useState(false);
-    const [formData, setFormData] = useState({ title: '', description: '' });
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        committeeId: '' // 👈 Добавили поле для комиссии
+    });
 
     const { initiatives, isLoading, isError, error } = useInitiatives({ status: 'Accepted' });
     const createMutation = useCreateInitiative();
+    const { committees, isLoading: loadCommittees } = useCommittees(); // 👈 Загружаем комиссии
+
+    const currentUserId = getUserId(); // 👈 ID текущего пользователя из JWT
 
     const handleLogout = () => {
         tokenService.clearTokens();
@@ -27,11 +36,18 @@ const InitiativesPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await createMutation.mutateAsync(formData);
-            setFormData({ title: '', description: '' });
+            // 👈 Отправляем userId и committeeId вместе с формой
+            await createMutation.mutateAsync({
+                title: formData.title,
+                description: formData.description,
+                userId: currentUserId,
+                committeeId: formData.committeeId || undefined
+            });
+            setFormData({ title: '', description: '', committeeId: '' });
             setShowForm(false);
         } catch (err) {
             console.error('Ошибка создания:', err);
+            alert(err.response?.data?.error || err.message || 'Не удалось создать инициативу');
         }
     };
 
@@ -80,6 +96,22 @@ const InitiativesPage = () => {
                     {showForm && (
                         <form onSubmit={handleSubmit} className={styles.formCard}>
                             <h3>Новая инициатива</h3>
+
+                            {/* 👇 Выбор комиссии */}
+                            <select
+                                value={formData.committeeId}
+                                onChange={e => setFormData({ ...formData, committeeId: e.target.value })}
+                                className={styles.selectInput}
+                                required
+                            >
+                                <option value="">-- Выберите комиссию --</option>
+                                {loadCommittees ? (
+                                    <option value="" disabled>Загрузка комиссий...</option>
+                                ) : committees?.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                            </select>
+
                             <input
                                 type="text"
                                 placeholder="Название"
@@ -123,6 +155,12 @@ const InitiativesPage = () => {
                                     <div className={styles.cardContent}>
                                         <div className={styles.cardHeader}>
                                             <h3 className={styles.cardTitle}>{init.title}</h3>
+                                            {/* 👇 Отображаем комиссию на карточке */}
+                                            {init.committeeName && (
+                                                <span className={styles.committeeBadge}>
+                                                    {init.committeeName}
+                                                </span>
+                                            )}
                                         </div>
                                         <p className={styles.cardDesc}>{init.description}</p>
                                     </div>

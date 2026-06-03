@@ -174,3 +174,31 @@
     object-fit: cover;
     padding: 0.1rem
 }
+.selectInput {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    color: var(--text-primary, #111827);
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.selectInput:focus {
+    outline: none;
+    border-color: var(--accent, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.committeeBadge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--accent-light, #e0f2fe);
+    color: var(--accent, #0369a1);
+    border-radius: 9999px;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}

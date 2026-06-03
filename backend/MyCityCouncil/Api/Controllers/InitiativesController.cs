@@ -43,33 +43,60 @@ public class InitiativesController : ControllerBase
         return Ok(result);
     }
     
+    
     [HttpPost]
     [Authorize]
     [ProducesResponseType(typeof(CreateInitiativeResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<CreateInitiativeResponseDto>> Create([FromBody] CreateInitiativeCommand request, CancellationToken ct)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CreateInitiativeResponseDto>> Create(
+        [FromBody] CreateInitiativeRequest request, 
+        CancellationToken ct)
     {
+        // Получаем UserId из токена, а не из тела запроса
         var userIdClaim = User.FindFirstValue("userId") 
-                       ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+                          ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (string.IsNullOrWhiteSpace(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
         {
-            return BadRequest(new { message = "Ошибка авторизации: некорректный токен." });
+            return Unauthorized(new { message = "Ошибка авторизации" });
         }
-        
-        var command = new CreateInitiativeCommand(request.Title, request.Description, userId, request.CommitteeId);
+
+        var command = new CreateInitiativeCommand(
+            request.Title, 
+            request.Description, 
+            userId, 
+            request.CommitteeId
+        );
 
         try
         {
             var result = await _mediator.Send(command, ct);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
+        catch (KeyNotFoundException ex)
+        {
+            // Комиссия не найдена → 404
+            return NotFound(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Пользователь не состоит в комиссии → 400
+            return BadRequest(new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Внутренняя ошибка сервера." });
+            // Всё остальное → 500 с текстом ошибки для отладки
+            return StatusCode(500, new { message = $"Внутренняя ошибка: {ex.Message}" });
         }
     }
+
+   
+    public record CreateInitiativeRequest(
+        string Title,
+        string Description,
+        Guid? CommitteeId // Nullable, чтобы разрешить создание без комиссии
+    );
     
     [HttpPut("{id}/review")]
     [Authorize(Roles = "Admin")]

@@ -42,7 +42,7 @@ public class ReviewInitiativeHandler : IRequestHandler<ReviewInitiativeCommand, 
             UserId: initiative.UserId,
             AuthorName: initiative.User?.LastName + " " + initiative.User?.FirstName ?? "Неизвестный",
             CommitteeId: initiative.CommitteeId,
-            CommitteeName: initiative.Committee.Name,
+            CommitteeName: initiative.Committee?.Name ?? "не указана",
             CreatedAt: initiative.CreatedAt,
             ApprovedAt: initiative.ApprovedAt,
             FinalizedAt: initiative.FinalizedAt

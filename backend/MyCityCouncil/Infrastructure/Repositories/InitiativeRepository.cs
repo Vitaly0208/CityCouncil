@@ -19,6 +19,7 @@ public class InitiativeRepository : IInitiativeRepository
         await _dbContext.Initiatives
             .AsNoTracking()
             .Include(i => i.User)
+            .Include(i => i.Committee) 
             .Include(i => i.VotingHistory)
             .FirstOrDefaultAsync(i => i.Id == id, ct);
 
@@ -26,6 +27,7 @@ public class InitiativeRepository : IInitiativeRepository
         await _dbContext.Initiatives
             .AsNoTracking()
             .Include(i => i.User)
+            .Include(i => i.Committee) 
             .ToListAsync(ct);
 
     public void Update(Initiative initiative) => _dbContext.Initiatives.Update(initiative);
@@ -35,12 +37,14 @@ public class InitiativeRepository : IInitiativeRepository
         await _dbContext.Initiatives
             .AsNoTracking()
             .Where(i => i.UserId == userId)
+            .Include(i => i.Committee) 
             .OrderByDescending(i => i.CreatedAt)
             .ToListAsync(ct);
 
     public async Task<List<Initiative>> GetByStatusAsync(InitiativeStatus status, CancellationToken ct = default) =>
         await _dbContext.Initiatives
             .AsNoTracking()
+            .Include(i => i.Committee) 
             .Include(i => i.User)
             .Where(i => i.Status == status)
             .OrderByDescending(i => i.ApprovedAt ?? i.CreatedAt)
@@ -65,6 +69,7 @@ public class InitiativeRepository : IInitiativeRepository
 
         return await _dbContext.Initiatives
             .Include(i => i.User)
+            .Include(i => i.Committee) 
             .Where(i => i.Status == InitiativeStatus.InQueue && activeMemberIds.Contains(i.UserId))
             .OrderBy(i => i.ApprovedAt)
             .Take(count)
@@ -73,6 +78,7 @@ public class InitiativeRepository : IInitiativeRepository
     public async Task<List<Initiative>> GetAcceptedByUserIdAsync(Guid userId, CancellationToken ct = default) =>
         await _dbContext.Initiatives
             .AsNoTracking()
+            .Include(i => i.Committee) 
             .Where(i => i.UserId == userId && i.Status == InitiativeStatus.Accepted)
             .OrderByDescending(i => i.ApprovedAt)
             .ToListAsync(ct);
@@ -94,6 +100,7 @@ public class InitiativeRepository : IInitiativeRepository
         var query = _dbContext.Initiatives
             .AsNoTracking()
             .Include(i => i.User)
+            .Include(i => i.Committee) 
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))

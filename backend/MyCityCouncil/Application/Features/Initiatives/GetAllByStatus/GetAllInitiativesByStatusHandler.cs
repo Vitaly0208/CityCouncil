@@ -53,7 +53,7 @@ public class GetInitiativesHandler : IRequestHandler<GetAllInitiativesByStatusQu
             UserId: i.UserId,
             AuthorName: FormatAuthorName(i.User),
             CommitteeId: i.CommitteeId,
-            CommitteeName: i.Committee.Name,
+            CommitteeName: i.Committee?.Name ?? "Не указана", 
             CreatedAt: i.CreatedAt,
             ApprovedAt: i.ApprovedAt,
             FinalizedAt: i.FinalizedAt

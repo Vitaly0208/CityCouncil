@@ -10,7 +10,7 @@ public record InitiativeDto(
     Guid UserId,
     string AuthorName,
     Guid? CommitteeId,
-    string CommitteeName,
+    string? CommitteeName,
     DateTime CreatedAt,
     DateTime? ApprovedAt,
     DateTime? FinalizedAt
