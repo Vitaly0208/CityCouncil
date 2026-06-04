@@ -49,14 +49,21 @@ public class PartiesController : ControllerBase
         [FromBody] AddPartyMemberRequest request,
         CancellationToken ct)
     {
-        var command = new AddMemberCommand(partyId, request.UserId);
-        var result = await _mediator.Send(command, ct);
-        
-        return CreatedAtAction(
-            nameof(GetMember),
-            new { partyId, userId = result.UserId },
-            result
-        );
+        try
+        {
+            var command = new AddMemberCommand(partyId, request.UserId);
+            var result = await _mediator.Send(command, ct);
+
+            return CreatedAtAction(
+                nameof(GetMember),
+                new { partyId, userId = result.UserId },
+                result
+            );
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id}/members/{userId}")]

@@ -22,23 +22,22 @@ public class CreateInitiativeHandler : IRequestHandler<CreateInitiativeCommand, 
     {
         string committeeName = "Не указана";
         Guid? finalCommitteeId = null;
-
-        // Проверяем комиссию только если она указана (не Guid.Empty и не null)
+        
         if (request.CommitteeId.HasValue && request.CommitteeId.Value != Guid.Empty)
         {
             var committee = await _committeeRepository.GetByIdAsync(request.CommitteeId.Value, ct)
                 ?? throw new KeyNotFoundException("Указанная комиссия не найдена");
 
             var isMember = await _committeeRepository.IsUserActiveMemberAsync(
-                request.UserId, 
-                request.CommitteeId.Value, 
+                committeeId: request.CommitteeId.Value,
+                userId: request.UserId,    
                 ct);
             
             if (!isMember)
                 throw new InvalidOperationException("Вы не состоите в выбранной комиссии");
 
             finalCommitteeId = request.CommitteeId.Value;
-            committeeName = committee.Name; // Берем имя из загруженного объекта
+            committeeName = committee.Name;
         }
 
         var initiative = new Initiative
@@ -60,7 +59,7 @@ public class CreateInitiativeHandler : IRequestHandler<CreateInitiativeCommand, 
             Description: initiative.Description,
             Status: initiative.Status,
             CommitteeId: finalCommitteeId,
-            CommitteeName: committeeName, // Используем переменную, а не навигацию
+            CommitteeName: committeeName,
             CreatedAt: initiative.CreatedAt
         );
     }

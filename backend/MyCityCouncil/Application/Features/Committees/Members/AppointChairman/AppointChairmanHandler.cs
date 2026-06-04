@@ -17,6 +17,12 @@ public class AppointChairmanHandler : IRequestHandler<AppointChairmanCommand, Me
 
     public async Task<MembershipDto> Handle(AppointChairmanCommand request, CancellationToken ct)
     {
+        var isAlreadyChairman = await _repo.IsCurrentChairmanAsync(request.CommitteeId, request.UserId, ct);
+        
+        if (isAlreadyChairman)
+        {
+            throw new InvalidOperationException("Этот пользователь уже является председателем данной комиссии.");
+        }
         var membership = await _repo.AppointChairmanAsync(request.CommitteeId, request.UserId, ct);
         
         await _unitOfWork.SaveAsync(ct);

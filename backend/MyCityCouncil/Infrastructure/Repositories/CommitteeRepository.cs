@@ -48,6 +48,8 @@ public class CommitteeRepository : ICommitteeRepository
     public async Task<List<Committee>> GetAllAsync(CancellationToken ct = default) => 
         await _dbContext.Committees
             .Where(c => !c.IsArchived)
+            .Include(c => c.Memberships) 
+            .ThenInclude(m => m.User)  
             .ToListAsync(ct);
 
     public async Task<List<Committee>> GetBySpecializationAsync(string specialization, CancellationToken ct = default) =>
@@ -207,8 +209,7 @@ public class CommitteeRepository : ICommitteeRepository
         await _dbContext.CommitteeInfos.AnyAsync(m => 
             m.CommitteeId == committeeId 
             && m.UserId == userId 
-            && m.DismissedAt == null 
-            && m.CStatus == Statuses.Active, ct);
+            && m.DismissedAt == null,ct);
     
     public async Task<bool> HasActiveChairmanAsync(Guid committeeId, CancellationToken ct = default) =>
         await _dbContext.CommitteeInfos.AnyAsync(m => 

@@ -27,21 +27,23 @@ const DeputiesPage = () => {
 
     const filteredUsers = useMemo(() => {
         return users.filter(user => {
-            const matchesCommittee = !filters.committeeId ||
-                user.committeesMemberships?.some(m =>
-                    m.committeeId === filters.committeeId && !m.dismissedAt
-                );
+            const matchesCommittee = !filters.committeeId || (() => {
+                const selectedCommittee = committees.find(c => c.id === filters.committeeId);
+                if (!selectedCommittee) return false;
+                return user.activeCommitteeNames?.includes(selectedCommittee.name);
+            })();
 
-            const matchesParty = !filters.party ||
-                user.party?.toLowerCase() === filters.party.toLowerCase();
+            const matchesParty = !filters.party || user.currentPartyName === filters.party;
 
             return matchesCommittee && matchesParty;
         });
-    }, [users, filters]);
+    }, [users, filters, committees]);
 
     const parties = useMemo(() => {
-        const partySet = new Set(users.map(u => u.party).filter(Boolean));
-        return Array.from(partySet);
+        const partySet = new Set(
+            users.map(u => u.currentPartyName).filter(Boolean)
+        );
+        return Array.from(partySet).sort();
     }, [users]);
 
     return (
@@ -93,43 +95,48 @@ const DeputiesPage = () => {
                     <div className={styles.empty}>Депутаты не найдены</div>
                 ) : (
                     <div className={styles.grid}>
-                        {filteredUsers.map(user => (
-                            <Link
-                                key={user.id}
-                                to={`/profile/${user.id}`}
-                                className={styles.card}
-                            >
-                                <div className={styles.cardImageWrapper}>
-                                    <img
-                                        src="/deputy3.png"
-                                        alt=""
-                                        className={styles.cardImage}
-                                    />
-                                </div>
+                        {filteredUsers.map(user => {
+                            const activeCommitteesCount = user.activeCommitteeNames?.length || 0;
+                            const userParty = user.currentPartyName;
 
-                                <div className={styles.cardBody}>
-                                    <h2 className={styles.fullName}>
-                                        {user.lastName} {user.firstName} {user.middleName}
-                                    </h2>
+                            return (
+                                <Link
+                                    key={user.id}
+                                    to={`/profile/${user.id}`}
+                                    className={styles.card}
+                                >
+                                    <div className={styles.cardImageWrapper}>
+                                        <img
+                                            src="/deputy3.png"
+                                            alt=""
+                                            className={styles.cardImage}
+                                        />
+                                    </div>
 
-                                    {user.party && (
-                                        <span className={styles.partyBadge}>{user.party}</span>
-                                    )}
+                                    <div className={styles.cardBody}>
+                                        <h2 className={styles.fullName}>
+                                            {user.lastName} {user.firstName} {user.middleName}
+                                        </h2>
 
-                                    <div className={styles.userEmail}>{user.email}</div>
+                                        {userParty && (
+                                            <span className={styles.partyBadge}>{userParty}</span>
+                                        )}
 
-                                    {user.committeesMemberships?.filter(m => !m.dismissedAt).length > 0 && (
-                                        <div className={styles.committeesCount}>
-                                            {user.committeesMemberships.filter(m => !m.dismissedAt).length} комиссий
-                                        </div>
-                                    )}
-                                </div>
+                                        <div className={styles.userEmail}>{user.email}</div>
 
-                                <div className={styles.cardFooter}>
-                                    <span className={styles.moreDetails}>Подробнее →</span>
-                                </div>
-                            </Link>
-                        ))}
+                                        {activeCommitteesCount > 0 && (
+                                            <div className={styles.committeesCount}>
+                                                {activeCommitteesCount} комиссий
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className={styles.cardFooter}>
+                                        <span className={styles.moreDetails}>Подробнее →</span>
+                                    </div>
+                                </Link>
+                            );
+                        })}
                     </div>
                 )}
             </div>

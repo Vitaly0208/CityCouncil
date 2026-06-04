@@ -1,10 +1,10 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { usePartyDetails, useJoinParty, useLeaveParty} from "../../../hooks/useParties.js";
-import { tokenService} from "../../../../api/tokenService.js";
-import { getUserId} from "../../../utils/jwt.js";
+import { usePartyDetails, useJoinParty, useLeaveParty } from "../../../hooks/useParties.js";
+import { useUserProfile } from "../../../hooks/useUserProfile.js";
+import { tokenService } from "../../../../api/tokenService.js";
+import { getUserId } from "../../../utils/jwt.js";
 import Navbar from "../../Layout/NaVbar/NavBar.jsx";
 import styles from './PartyDetailsPage.module.css';
-
 
 const formatDate = (dateString) => {
     if (!dateString) return '—';
@@ -17,6 +17,7 @@ const PartyDetailsPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { party, isLoading, isError, error } = usePartyDetails(id);
+    const { profile } = useUserProfile();
     const joinParty = useJoinParty();
     const leaveParty = useLeaveParty();
     const currentUserId = getUserId();
@@ -32,13 +33,17 @@ const PartyDetailsPage = () => {
             navigate('/login');
             return;
         }
+
         if (!confirm(`Вступить в партию "${party.name}"?`)) return;
 
         try {
             await joinParty.mutateAsync({ partyId: id, userId: currentUserId });
             alert(`Вы вступили в партию "${party.name}"`);
         } catch (err) {
-            alert('Ошибка: ' + (err.message || 'Не удалось вступить'));
+            const backendMessage = err.response?.data?.message;
+            const fallbackMessage = err.message || 'Не удалось вступить в партию';
+
+            alert(`Ошибка: ${backendMessage || fallbackMessage}`);
         }
     };
 
@@ -53,11 +58,14 @@ const PartyDetailsPage = () => {
             await leaveParty.mutateAsync({ partyId: id, userId: currentUserId });
             alert(`Вы покинули партию "${party.name}"`);
         } catch (err) {
-            alert('Ошибка: ' + (err.message || 'Не удалось покинуть'));
+            const backendMessage = err.response?.data?.message;
+            const fallbackMessage = err.message || 'Не удалось покинуть партию';
+
+            alert(`Ошибка: ${backendMessage || fallbackMessage}`);
         }
     };
 
-    const isMember = party?.members?.some(m => m.userId === currentUserId);
+    const isMember = party?.members?.some(m => m.userId === currentUserId && !m.dismissedAt);
     const isPending = joinParty.isPending || leaveParty.isPending;
 
     if (isLoading) {
@@ -113,7 +121,6 @@ const PartyDetailsPage = () => {
                         </div>
                     </header>
 
-
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>О партии</h2>
                         <div className={styles.infoGrid}>
@@ -125,7 +132,7 @@ const PartyDetailsPage = () => {
                                     </div>
                                     <div className={styles.infoRow}>
                                         <dt>Участников</dt>
-                                        <dd>{party.members?.length ?? 0}</dd>
+                                        <dd>{party.members?.filter(m => !m.dismissedAt).length ?? 0}</dd>
                                     </div>
                                 </dl>
                             </div>
@@ -140,9 +147,9 @@ const PartyDetailsPage = () => {
 
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>Участники партии</h2>
-                        {party.members?.length > 0 ? (
+                        {party.members?.filter(m => !m.dismissedAt).length > 0 ? (
                             <div className={styles.membersGrid}>
-                                {party.members.map((member) => (
+                                {party.members.filter(m => !m.dismissedAt).map((member) => (
                                     <div key={member.userId} className={styles.memberCard}>
                                         <div className={styles.memberHeader}>
                                             <span className={styles.memberName}>{member.fullName}</span>

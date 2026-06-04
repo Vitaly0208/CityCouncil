@@ -24,7 +24,7 @@ public class JoinPartyHandler : IRequestHandler<AddMemberCommand, MembershipJoin
     {
         var hasActiveParty = await _userRepository.HasActivePartyAsync(request.UserId, ct);
         if (hasActiveParty)
-            throw new InvalidOperationException("Пользователь уже состоит в другой партии. Сначала покиньте текущую.");
+            throw new InvalidOperationException("Вы уже состоите в другой партии. Сначала покиньте текущую.");
         
         var membership = await _repo.AddMemberAsync(request.PartyId, request.UserId, ct);
         await _uow.SaveAsync(ct);

@@ -84,6 +84,7 @@ public class UserRepository : IUserRepository
     {
         var query = _dbContext.Users
             .AsNoTracking()
+            .Where(u => u.IsBlocked != true)
             .Include(u => u.Role)
             .Include(u => u.PartyMemberships).ThenInclude(pm => pm.Party)   
             .Include(u => u.CommitteesMemberships).ThenInclude(cm => cm.Committee)

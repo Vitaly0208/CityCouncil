@@ -24,11 +24,10 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                {/*  Авторизация (без футера или с ним, как у вас) */}
+
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
-                {/* 🌍 Публичные маршруты (гостевой доступ) */}
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/initiatives" element={<InitiativesPage />} />
                 <Route path="/sessions" element={<SessionsPage />} />
@@ -39,13 +38,11 @@ function App() {
                 <Route path="/parties" element={<PartiesPage />} />
                 <Route path="/parties/:id" element={<PartyDetailsPage />} />
 
-                {/* 🔒 Защищённые маршруты (только для авторизованных) */}
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-                <Route path="/profile/:userId" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-                <Route path="/deputies" element={<ProtectedRoute><DeputiesPage /></ProtectedRoute>} />
+                <Route path="/profile/:userId" element={<ProfilePage />} />
+                <Route path="/deputies" element={<DeputiesPage />} />
                 <Route path="/admin" element={<ProtectedRoute requiredRole="Admin"><AdminPage /></ProtectedRoute>} />
 
-                {/* 🔄 Fallback: перенаправляем на главную публичную страницу, а не на логин */}
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
 

@@ -8,6 +8,6 @@ public record CreateInitiativeResponseDto(
     string Description,
     InitiativeStatus Status,
     Guid? CommitteeId,
-    string CommitteeName, // Не nullable, всегда есть значение по умолчанию
+    string CommitteeName,
     DateTime CreatedAt
 );

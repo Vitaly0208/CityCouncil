@@ -43,7 +43,6 @@ public class InitiativesController : ControllerBase
         return Ok(result);
     }
     
-    
     [HttpPost]
     [Authorize]
     [ProducesResponseType(typeof(CreateInitiativeResponseDto), StatusCodes.Status201Created)]
@@ -53,7 +52,6 @@ public class InitiativesController : ControllerBase
         [FromBody] CreateInitiativeRequest request, 
         CancellationToken ct)
     {
-        // Получаем UserId из токена, а не из тела запроса
         var userIdClaim = User.FindFirstValue("userId") 
                           ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -61,14 +59,12 @@ public class InitiativesController : ControllerBase
         {
             return Unauthorized(new { message = "Ошибка авторизации" });
         }
-
         var command = new CreateInitiativeCommand(
             request.Title, 
             request.Description, 
             userId, 
             request.CommitteeId
         );
-
         try
         {
             var result = await _mediator.Send(command, ct);
@@ -76,26 +72,21 @@ public class InitiativesController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
-            // Комиссия не найдена → 404
             return NotFound(new { message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
-            // Пользователь не состоит в комиссии → 400
             return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
-            // Всё остальное → 500 с текстом ошибки для отладки
             return StatusCode(500, new { message = $"Внутренняя ошибка: {ex.Message}" });
         }
     }
-
-   
     public record CreateInitiativeRequest(
         string Title,
         string Description,
-        Guid? CommitteeId // Nullable, чтобы разрешить создание без комиссии
+        Guid? CommitteeId
     );
     
     [HttpPut("{id}/review")]

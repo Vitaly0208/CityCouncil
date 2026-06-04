@@ -64,7 +64,6 @@ export const useDeleteParty = () => {
     });
 };
 
-
 export const useJoinParty = () => {
     const queryClient = useQueryClient();
 
@@ -74,6 +73,7 @@ export const useJoinParty = () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.parties.detail(partyId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.parties.byUser(userId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.parties.all() });
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
         },
     });
 };
@@ -87,6 +87,7 @@ export const useLeaveParty = () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.parties.detail(partyId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.parties.byUser(userId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.parties.all() });
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
         },
     });
 };

@@ -23,7 +23,7 @@ export const useSearch = (query, debounceMs = 300) => {
                         params: { searchTerm: query, page: 1, pageSize: 5 }
                     }),
                     axiosInstance.get('/api/initiatives', {
-                        params: { searchTerm: query, page: 1, pageSize: 5 }
+                        params: {status: 'Accepted', searchTerm: query, page: 1, pageSize: 5 }
                     })
                 ]);
 

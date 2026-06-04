@@ -73,6 +73,15 @@ const DashboardPage = () => {
             .slice(0, 4);
     }, [sessions, now]);
 
+    const formatNameToInitials = (fullName) => {
+        if (!fullName) return 'Гость';
+        const parts = fullName.trim().split(/\s+/);
+
+        if (parts.length === 1) return parts[0];
+        if (parts.length === 2) return `${parts[0]} ${parts[1][0]}.`;
+        return `${parts[0]} ${parts[1][0]}. ${parts[2][0]}.`;
+    };
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -92,7 +101,9 @@ const DashboardPage = () => {
                 <div className={styles.headerRight}>
                     {isAuth && profile ? (
                         <>
-                            <span className={styles.userName}>{profile.fullName}</span>
+                            <span className={styles.userName}>
+                                {formatNameToInitials(profile.fullName)}
+                            </span>
                         </>
                     ) : (
                         <span className={styles.userName}>Гость</span>

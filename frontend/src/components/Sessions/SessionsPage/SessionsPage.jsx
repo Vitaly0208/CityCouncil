@@ -11,7 +11,8 @@ const SESSION_IMAGE_URL = '/session2.png';
 
 const SessionsPage = () => {
     const navigate = useNavigate();
-    const userRole = getUserRole();
+    const isAuth = tokenService.isAuthenticated();
+    const userRole = getUserRole() || 'Guest';
     const isAdmin = userRole === 'Admin';
 
     const { data: sessions, isLoading: loadSessions, isError, error } = useSessions();
@@ -41,6 +42,7 @@ const SessionsPage = () => {
 
         let result = [...sessions];
 
+        // Если пользователь не админ, показываем только заседания его комиссий
         if (!isAdmin) {
             const commissions = profile?.commissions || profile?.Commissions || [];
             const userCommitteeIds = new Set(
@@ -107,6 +109,30 @@ const SessionsPage = () => {
                 return s.isCompleted;
             }).length || 0
         , [sessions, profile, isAdmin]);
+
+    if (!isAuth) {
+        return (
+            <>
+                <Navbar onLogout={handleLogout} />
+                <div className={styles.container}>
+                    <header className={styles.pageHeader}>
+                        <h1 className={styles.pageTitle}>Заседания</h1>
+                    </header>
+                    <div className={styles.empty}>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>
+                            Для просмотра расписания и протоколов заседаний необходимо авторизоваться.
+                        </p>
+                        <button
+                            className={styles.primaryBtn}
+                            onClick={() => navigate('/login')}
+                        >
+                            Войти в систему
+                        </button>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     if (isLoading) {
         return (

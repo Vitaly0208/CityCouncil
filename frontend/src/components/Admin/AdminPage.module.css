@@ -135,7 +135,7 @@
     gap: 0.75rem;
     background: var(--card-bg);
     border: 1px solid var(--border);
-    padding: 1.5rem;
+    padding: 1rem 1.5rem;
     border-radius: 8px;
     margin-bottom: 2rem;
 }
@@ -143,7 +143,7 @@
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
-    padding: 1.5rem;
+    padding: 1rem 1.5rem;
     border: 1px solid var(--border);
     border-radius: 8px;
 }
@@ -610,7 +610,12 @@ input:focus, textarea:focus, select:focus {
 .addSmallBtn:hover, .removeSmallBtn:hover { background: rgba(207, 34, 46, 0.25); }
 .addSmallBtn:disabled, .removeSmallBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.chairmanSelectList { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+.chairmanSelectList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
 
 .chairmanSelectItem {
     padding: 0.75rem; background: var(--bg); border: 1px solid var(--border);
@@ -625,14 +630,13 @@ input:focus, textarea:focus, select:focus {
     padding: 0.6rem 1.5rem; background: var(--card-bg); border: 1px solid var(--border);
     color: var(--text-primary); border-radius: 6px; font-weight: 600; cursor: pointer;
 }
-.modalCloseBtn:hover { border-color: var(--accent); }
+.modalCloseBtn:hover { border-color: #ffffff; }
 
 .hint { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; }
 .loading, .empty { text-align: center; padding: 2rem; color: var(--text-secondary); }
 .searchBar input { width: 100%; margin-bottom: 1rem; }
 
 .chairmanSelectWrapper {
-    margin: 1rem 0;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
