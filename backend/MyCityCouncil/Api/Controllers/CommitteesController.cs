@@ -10,7 +10,6 @@ using MyCityCouncil.Application.Features.Committees.Members.AddMember;
 using MyCityCouncil.Application.Features.Committees.Members.AppointChairman;
 using MyCityCouncil.Application.Features.Committees.Members.Dismiss;
 
-
 namespace MyCityCouncil.Api.Controllers;
 
 [ApiController]
@@ -31,7 +30,7 @@ public class CommitteesController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(CommitteeDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -52,7 +51,7 @@ public class CommitteesController : ControllerBase
         return CreatedAtAction(nameof(GetDetails), new { id = result.Id }, result);
     }
     
-    [HttpPost("{id}/members")]
+    [HttpPost("{id:guid}/members")]
     [Authorize]
     [ProducesResponseType(typeof(MembershipDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,7 +61,7 @@ public class CommitteesController : ControllerBase
         return CreatedAtAction(nameof(GetMember), new { committeeId = id, userId = result.UserId }, result);
     }
     
-    [HttpPost("{id}/chairman")]
+    [HttpPost("{id:guid}/chairman")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(MembershipDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -72,29 +71,18 @@ public class CommitteesController : ControllerBase
         return Ok(result);
     }
     
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
-        try
-        {
-            await _mediator.Send(new DeleteCommitteeCommand(id), ct);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound(new { error = "Комиссия не найдена" });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        await _mediator.Send(new DeleteCommitteeCommand(id), ct);
+        return NoContent();
     }
 
-    [HttpDelete("{id}/members/{userId}")]
+    [HttpDelete("{id:guid}/members/{userId:guid}")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -105,7 +93,7 @@ public class CommitteesController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("{committeeId}/members/{userId}")]
+    [HttpGet("{committeeId:guid}/members/{userId:guid}")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public ActionResult<MembershipDto> GetMember(Guid committeeId, Guid userId) => 
         NotFound();

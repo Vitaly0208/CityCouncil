@@ -9,6 +9,7 @@ public class Committee
     public string Specialization { get; set; } = string.Empty;
     public string? Description { get; set; }
     public bool IsArchived { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ArchivedAt { get; set; }
     
     [JsonIgnore]

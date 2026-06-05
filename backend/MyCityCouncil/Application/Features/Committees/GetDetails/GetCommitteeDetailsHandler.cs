@@ -25,7 +25,7 @@ public class GetCommitteeDetailsHandler : IRequestHandler<GetCommitteeDetailsQue
         var currentMembersDto = currentMembers
             .Select(m => new CommitteeMemberDto(
                 m.UserId,
-                $"{m.User.FirstName} {m.User.MiddleName} {m.User.LastName}",
+                $"{m.User.LastName} {m.User.FirstName} {m.User.MiddleName}",
                 m.IsChairman,
                 m.AppointedAt))
             .OrderByDescending(m => m.IsChairman)
@@ -66,6 +66,7 @@ public class GetCommitteeDetailsHandler : IRequestHandler<GetCommitteeDetailsQue
             committee.Specialization,
             committee.Description,
             committee.IsArchived,
+            committee.CreatedAt,
             currentMembersDto,
             historyDto,
             initiativesDto,

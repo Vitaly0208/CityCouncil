@@ -12,7 +12,6 @@ namespace MyCityCouncil.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
-
 {
     private readonly IMediator _mediator;
     
@@ -22,12 +21,12 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("register")]
+    [AllowAnonymous]
     public async Task<ActionResult<RegisterDto>> Register([FromBody] RegisterCommand command, CancellationToken token)
     {
         var result = await _mediator.Send(command, token);
         return Ok(result);
     }
-
     
     [HttpPost("login")]
     [AllowAnonymous]
@@ -41,19 +40,21 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Logout(CancellationToken ct)
     {
-        var userIdClaim = User.FindFirstValue("userId");
-        if (string.IsNullOrEmpty(userIdClaim))
-            throw new UnauthorizedAccessException("User ID claim not found");
+        var userIdClaim = User.FindFirstValue("userId") 
+                          ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+        
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(new { error = "Не удалось определить пользователя" });
 
-        var userId = Guid.Parse(userIdClaim);
         await _mediator.Send(new LogoutCommand { UserId = userId }, ct);
-        return NoContent(); 
+        return NoContent();
     }
     
     [HttpPost("refresh")]
+    [AllowAnonymous]
     public async Task<ActionResult<RefreshTokenDto>> Refresh([FromBody] RefreshTokenCommand command, CancellationToken token)
     {
-        var res = await _mediator.Send(command, token);
-        return Ok(res);
+        var result = await _mediator.Send(command, token);
+        return Ok(result);
     }
 }

@@ -17,10 +17,10 @@ namespace MyCityCouncil.Api.Controllers;
 public class SessionsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    
     public SessionsController(IMediator mediator) => _mediator = mediator;
     
-    
-    [HttpPost("create")]
+    [HttpPost]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(SessionDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<SessionDto>> Create([FromBody] CreateSessionWithQueueCommand command, CancellationToken ct)
@@ -29,20 +29,9 @@ public class SessionsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
     
-    [HttpPost("create-with-queue")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(SessionDto), StatusCodes.Status201Created)]
-    public async Task<ActionResult<SessionDto>> CreateWithQueue(
-        [FromBody] CreateSessionWithQueueCommand command, 
-        CancellationToken ct)
-    {
-        var result = await _mediator.Send(command, ct);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-    }
-        
     [HttpGet]
     [AllowAnonymous] 
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<SessionListDto>))]
+    [ProducesResponseType(typeof(List<SessionListDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] Guid? committeeId,
         [FromQuery] bool? isCompleted,
@@ -55,8 +44,8 @@ public class SessionsController : ControllerBase
         return Ok(sessions);
     }
     
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SessionDetailDto))]
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(SessionDetailDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [AllowAnonymous] 
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
@@ -67,61 +56,36 @@ public class SessionsController : ControllerBase
         return session is null ? NotFound() : Ok(session);
     }
     
-    [HttpPost("{id}/join")]
+    [HttpPost("{id:guid}/join")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinSession(Guid id, CancellationToken ct)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = GetUserIdFromToken();
         
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-            return BadRequest("Не удалось определить пользователя");
-
-        try
-        {
-            var command = new JoinSessionCommand(id, userId);
-            await _mediator.Send(command, ct);
-            
-            return Ok(new { message = "Вы успешно присоединились к заседанию" });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var command = new JoinSessionCommand(id, userId);
+        await _mediator.Send(command, ct);
+        
+        return Ok(new { message = "Вы успешно присоединились к заседанию" });
     }
 
-    [HttpPatch("{id}/leave")]
+    [HttpPatch("{id:guid}/leave")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LeaveSession(Guid id, CancellationToken ct)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-            return BadRequest("Не удалось определить пользователя");
-
-        try
-        {
-            await _mediator.Send(new LeaveSessionCommand(id, userId), ct);
-            return Ok(new { message = "Вы покинули заседание" });
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var userId = GetUserIdFromToken();
+        
+        await _mediator.Send(new LeaveSessionCommand(id, userId), ct);
+        return Ok(new { message = "Вы покинули заседание" });
     }
 
-    [HttpGet("{id}/attendees")]
+    [HttpGet("{id:guid}/attendees")]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AttendeeDto>))]
+    [ProducesResponseType(typeof(List<AttendeeDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAttendees(Guid id, CancellationToken ct)
     {
@@ -140,9 +104,19 @@ public class SessionsController : ControllerBase
     public async Task<IActionResult> GetProtocol(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetSessionProtocolQuery(id), ct);
-        if (result == null) return NotFound("Заседание не найдено или ещё не завершено");
-        
-        return Ok(result);
+        return result == null ? NotFound("Заседание не найдено или ещё не завершено") : Ok(result);
     }
     
+    private Guid GetUserIdFromToken()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) 
+                       ?? User.FindFirstValue("userId");
+        
+        if (string.IsNullOrWhiteSpace(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("Не удалось определить пользователя из токена");
+        }
+        
+        return userId;
+    }
 }

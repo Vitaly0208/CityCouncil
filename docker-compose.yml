@@ -6,6 +6,8 @@
     container_name: mycitycouncilproject-api
     ports:
       - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - JwtOptions__SecretKey=${JwtOptions__SecretKey}

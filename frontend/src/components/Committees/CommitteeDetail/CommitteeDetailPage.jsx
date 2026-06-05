@@ -154,7 +154,7 @@ const CommitteeDetailsPage = () => {
                                         <div className = {styles.memberDesc}>
                                             <p className={styles.memberRole}>{member.isChairman ? 'Председатель' : 'Участник'}</p>
                                             {member.appointedAt && (
-                                                <span className={styles.memberSince}>с {formatDate(member.appointedAt)}</span>
+                                                <span className={styles.memberSince}> с {formatDate(member.appointedAt)}</span>
                                             )}
                                         </div>
 

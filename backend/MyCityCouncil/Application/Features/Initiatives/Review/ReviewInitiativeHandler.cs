@@ -8,9 +8,12 @@ namespace MyCityCouncil.Application.Features.Initiatives.Review;
 public class ReviewInitiativeHandler : IRequestHandler<ReviewInitiativeCommand, InitiativeDto>
 {
     private readonly IInitiativeRepository _initiativeRepository;
+    
 
-    public ReviewInitiativeHandler(IInitiativeRepository initiativeRepository) =>
+    public ReviewInitiativeHandler(IInitiativeRepository initiativeRepository)
+    {
         _initiativeRepository = initiativeRepository;
+    }
 
     public async Task<InitiativeDto> Handle(ReviewInitiativeCommand request, CancellationToken ct)
     {
@@ -33,6 +36,8 @@ public class ReviewInitiativeHandler : IRequestHandler<ReviewInitiativeCommand, 
 
         _initiativeRepository.Update(initiative);
         await _initiativeRepository.SaveChangesAsync(ct);
+        
+        
         
         return new InitiativeDto(
             Id: initiative.Id,

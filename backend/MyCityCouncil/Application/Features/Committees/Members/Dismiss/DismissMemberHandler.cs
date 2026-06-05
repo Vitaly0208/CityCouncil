@@ -9,11 +9,16 @@ public class DismissMemberHandler : IRequestHandler<DismissMemberCommand, Member
 {
     private readonly ICommitteeRepository _repo;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<DismissMemberHandler> _logger;
 
-    public DismissMemberHandler(ICommitteeRepository repo, IUnitOfWork unitOfWork)
+    public DismissMemberHandler(
+        ICommitteeRepository repo, 
+        IUnitOfWork unitOfWork,
+        ILogger<DismissMemberHandler> logger)
     {
         _repo = repo;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<MembershipDto> Handle(DismissMemberCommand request, CancellationToken ct)
@@ -21,9 +26,11 @@ public class DismissMemberHandler : IRequestHandler<DismissMemberCommand, Member
         var membership = await _repo.DismissMemberAsync(request.CommitteeId, request.UserId, ct);
         
         if (membership is null)
-            throw new InvalidOperationException($"User {request.UserId} is not an active member of committee {request.CommitteeId}.");
-
-        // Фиксируем изменения в БД
+            throw new InvalidOperationException($"Пользователь {request.UserId} не является активным участником комиссии {request.CommitteeId}.");
+        
+        _logger.LogInformation("ВЫХОД ИЗ КОМИССИИ: UserId={UserId} покинул комиссию CommitteeId={CommitteeId}", 
+            request.UserId, request.CommitteeId);
+        
         await _unitOfWork.SaveAsync(ct);
 
         return new MembershipDto(
@@ -31,7 +38,7 @@ public class DismissMemberHandler : IRequestHandler<DismissMemberCommand, Member
             membership.UserId,
             membership.CommitteeId,
             membership.AppointedAt,
-            membership.IsChairman // После увольнения всегда false
+            membership.IsChairman
         );
     }
 }

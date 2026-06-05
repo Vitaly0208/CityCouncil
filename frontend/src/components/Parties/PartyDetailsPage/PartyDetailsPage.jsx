@@ -38,9 +38,9 @@ const PartyDetailsPage = () => {
 
         try {
             await joinParty.mutateAsync({ partyId: id, userId: currentUserId });
-            alert(`Вы вступили в партию "${party.name}"`);
+            alert(`Вы успешно вступили в партию "${party.name}"`);
         } catch (err) {
-            const backendMessage = err.response?.data?.message;
+            const backendMessage = err.response?.data?.error;
             const fallbackMessage = err.message || 'Не удалось вступить в партию';
 
             alert(`Ошибка: ${backendMessage || fallbackMessage}`);
@@ -58,7 +58,7 @@ const PartyDetailsPage = () => {
             await leaveParty.mutateAsync({ partyId: id, userId: currentUserId });
             alert(`Вы покинули партию "${party.name}"`);
         } catch (err) {
-            const backendMessage = err.response?.data?.message;
+            const backendMessage = err.response?.data?.error;
             const fallbackMessage = err.message || 'Не удалось покинуть партию';
 
             alert(`Ошибка: ${backendMessage || fallbackMessage}`);
@@ -155,7 +155,7 @@ const PartyDetailsPage = () => {
                                             <span className={styles.memberName}>{member.fullName}</span>
                                         </div>
                                         <div className={styles.memberDesc}>
-                                            <p className={styles.memberRole}>Участник</p>
+                                            <p className={styles.memberRole}>Участник </p>
                                             {member.appointedAt && (
                                                 <span className={styles.memberSince}>
                                                     с {formatDate(member.appointedAt)}

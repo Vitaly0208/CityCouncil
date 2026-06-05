@@ -190,12 +190,11 @@
     display: inline-block;
 }
 
-/* ===== Центральная колонка ===== */
 .initiativeDetail {
-    background: #161b22; /* Выровнено с хедером */
+    background: #161b22;
     border-radius: 8px;
     padding: 2rem;
-    border: 1px solid #30363d; /* Выровнено */
+    border: 1px solid #30363d;
 }
 
 .detailTitle {
@@ -210,7 +209,7 @@
     padding: 1.25rem;
     border-radius: 6px;
     margin-bottom: 2rem;
-    border: 1px solid #30363d; /* Выровнено */
+    border: 1px solid #30363d;
 }
 
 .metaItem {
@@ -244,13 +243,12 @@
     font-size: 0.9rem;
 }
 
-/* ===== Голосование ===== */
 .votingSection {
     margin: 2rem 0;
     padding: 1.5rem;
     background: rgba(139, 148, 158, 0.05);
     border-radius: 6px;
-    border: 1px solid #30363d; /* Выровнено */
+    border: 1px solid #30363d;
 }
 
 .votingSection h3 {
@@ -296,19 +294,17 @@
 
 .alreadyVoted {
     padding: 1rem;
-    background: rgb(173 182 174 / 0.15); /* Прозрачный зеленый */
+    background: rgb(173 182 174 / 0.15);
     color: #dcdcdc;
     border-radius: 6px;
     text-align: center;
     font-weight: 500;
     font-size: 0.9rem;
 }
-
-/* ===== Результаты ===== */
 .resultsSection {
     margin-top: 2rem;
     padding-top: 2rem;
-    border-top: 1px solid #30363d; /* Выровнено */
+    border-top: 1px solid #30363d;
 }
 
 .resultsSection h3 {
@@ -327,7 +323,7 @@
 .resultItem {
     text-align: center;
     padding: 1.25rem;
-    background: #21262d; /* Чуть светлее карточки */
+    background: #21262d;
     border-radius: 6px;
     border: 1px solid #30363d;
 }
@@ -347,8 +343,6 @@
     letter-spacing: 0.05em;
     font-weight: 600;
 }
-
-/* ===== Правая колонка - Присутствующие ===== */
 .attendeesList {
     display: flex;
     flex-direction: column;
@@ -551,8 +545,8 @@
 }
 
 .leaveBtn:hover:not(:disabled) {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: #ffffff;
+    color: #ffffff;
 }
 
 .modalOverlay {
@@ -581,8 +575,13 @@
     border-radius: 6px; cursor: pointer;
 }
 .confirmLeaveBtn {
-    background: var(--accent); color: #fff; border: none;
-    padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
 }
 .cancelBtn:hover { background: var(--bg); }
 .confirmLeaveBtn:hover { background: var(--accent-hover); }

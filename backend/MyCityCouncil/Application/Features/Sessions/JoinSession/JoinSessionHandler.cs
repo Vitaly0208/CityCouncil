@@ -11,17 +11,20 @@ public class JoinSessionHandler : IRequestHandler<JoinSessionCommand, Unit>
     private readonly ISessionAttendeeRepository _attendeeRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserRepository _userRepository;
+    private readonly ILogger<JoinSessionHandler> _logger;
 
     public JoinSessionHandler(
         ISessionRepository sessionRepository,
         ISessionAttendeeRepository attendeeRepository,
         IUnitOfWork unitOfWork,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        ILogger<JoinSessionHandler> logger)
     {
         _sessionRepository = sessionRepository;
         _attendeeRepository = attendeeRepository;
         _unitOfWork = unitOfWork;
         _userRepository = userRepository;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(JoinSessionCommand request, CancellationToken ct)
@@ -50,23 +53,23 @@ public class JoinSessionHandler : IRequestHandler<JoinSessionCommand, Unit>
 
         if (isAttending)
         {
-            // 👇 Запись уже есть (пользователь выходил и вернулся) → просто включаем онлайн-статус
             await _attendeeRepository.SetAttendanceStatusAsync(request.SessionId, request.UserId, true, ct);
             return Unit.Value;
         }
         
-        //  Записи нет → создаём новую СРАЗУ со статусом присутствия
         var attendee = new SessionAttendee
         {
             Id = Guid.NewGuid(),
             SessionId = request.SessionId,
             UserId = request.UserId,
-            IsCurrentlyOnSession = true, // 👈 ОБЯЗАТЕЛЬНО
+            IsCurrentlyOnSession = true,
             JoinedAt = DateTime.UtcNow
         };
 
         await _attendeeRepository.AddAsync(attendee, ct);
         await _unitOfWork.SaveAsync(ct);
+        _logger.LogInformation("ПОСЕЩЕНИЕ ЗАСЕДАНИЯ: UserId={UserId} присоединился к SessionId={SessionId}", 
+            request.UserId, request.SessionId);
 
         return Unit.Value;
     }

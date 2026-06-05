@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using MyCityCouncil.Api.Controllers.Requests;
 using MyCityCouncil.Application.Features.Parties;
 using MyCityCouncil.Application.Features.Parties.Create;
 using MyCityCouncil.Application.Features.Parties.Delete;
@@ -23,14 +22,14 @@ public class PartiesController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CreatePartyCommand command, CancellationToken ct)
     {
         var id = await _mediator.Send(command, ct);
-        return CreatedAtAction(nameof(GetAll), new { id });
+        return CreatedAtAction(nameof(GetById), new { id });
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -39,7 +38,8 @@ public class PartiesController : ControllerBase
         await _mediator.Send(new DeletePartyCommand(id), ct);
         return NoContent();
     }
-    [HttpPost("{partyId}/members")]
+
+    [HttpPost("{partyId:guid}/members")]
     [Authorize]
     [ProducesResponseType(typeof(MembershipJoinDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -49,24 +49,17 @@ public class PartiesController : ControllerBase
         [FromBody] AddPartyMemberRequest request,
         CancellationToken ct)
     {
-        try
-        {
-            var command = new AddMemberCommand(partyId, request.UserId);
-            var result = await _mediator.Send(command, ct);
+        var command = new AddMemberCommand(partyId, request.UserId);
+        var result = await _mediator.Send(command, ct);
 
-            return CreatedAtAction(
-                nameof(GetMember),
-                new { partyId, userId = result.UserId },
-                result
-            );
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        return CreatedAtAction(
+            nameof(GetMember),
+            new { partyId, userId = result.UserId },
+            result
+        );
     }
 
-    [HttpDelete("{id}/members/{userId}")]
+    [HttpDelete("{id:guid}/members/{userId:guid}")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -91,30 +84,24 @@ public class PartiesController : ControllerBase
     [AllowAnonymous] 
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
-        try
-        {
-            var result = await _mediator.Send(new GetPartyByIdQuery(id), ct);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
+        var result = await _mediator.Send(new GetPartyByIdQuery(id), ct);
+        return Ok(result);
     }
 
     [HttpGet("user/{userId:guid}")]
     [ProducesResponseType(typeof(List<PartyDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<IActionResult> GetUserParties(Guid userId, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetAllUserPartiesQuery(userId), ct);
         return Ok(result);
     }
     
-    [HttpGet("{partyId}/members/{userId}")]
+    [HttpGet("{partyId:guid}/members/{userId:guid}")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public ActionResult<MembershipJoinDto> GetMember(Guid partyId, Guid userId) =>
-        NotFound();
+    public ActionResult<MembershipJoinDto> GetMember(Guid partyId, Guid userId)
+    {
+        return NotFound(); 
+    }
 }
-
-public record AddMemberRequest(Guid UserId);
-
+public record AddPartyMemberRequest(Guid UserId);

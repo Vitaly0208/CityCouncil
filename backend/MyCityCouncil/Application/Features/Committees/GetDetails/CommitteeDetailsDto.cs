@@ -6,6 +6,7 @@ public record CommitteeDetailsDto(
     string Specialization,
     string? Description,
     bool IsArchived,
+    DateTime CreatedAt,
     List<CommitteeMemberDto> CurrentMembers,
     List<CommitteeHistoryEntryDto> History,
     List<InitiativeSummaryDto> AcceptedInitiatives, 

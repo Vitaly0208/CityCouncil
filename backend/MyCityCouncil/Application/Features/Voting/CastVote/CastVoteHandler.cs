@@ -12,17 +12,20 @@ public class CastVoteHandler : IRequestHandler<CastVoteCommand, Unit>
     private readonly IVotingRepository _votingRepo;
     private readonly IVoteRepository _voteRepo;
     private readonly IUnitOfWork _uow;
+    private readonly ILogger<CastVoteHandler> _logger;
 
     public CastVoteHandler(
         ISessionRepository sessionRepo, 
         IVotingRepository votingRepo, 
         IVoteRepository voteRepo, 
-        IUnitOfWork uow)
+        IUnitOfWork uow,
+        ILogger<CastVoteHandler> logger)
     {
         _sessionRepo = sessionRepo; 
         _votingRepo = votingRepo; 
         _voteRepo = voteRepo; 
         _uow = uow;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(CastVoteCommand request, CancellationToken ct)
@@ -51,6 +54,9 @@ public class CastVoteHandler : IRequestHandler<CastVoteCommand, Unit>
 
         await _voteRepo.AddAsync(vote, ct);
         await _uow.SaveAsync(ct);
+        _logger.LogInformation("ГОЛОСОВАНИЕ: UserId={UserId} проголосовал {VoteType} за InitiativeId={InitiativeId} в SessionId={SessionId}", 
+            request.VoterId, request.VoteType, request.InitiativeId, request.SessionId);
+        
         return Unit.Value;
     }
 }

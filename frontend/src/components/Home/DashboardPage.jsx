@@ -189,7 +189,7 @@ const DashboardPage = () => {
                                                 {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                             <h3 className={`${styles.sessionTitle} ${isNext ? styles.sessionTitleFeatured : ''}`}>{s.title}</h3>
-                                            <span className={styles.sessionLink}>Перейти к повестке →</span>
+                                            <span className={styles.sessionLink}>Перейти к повестке</span>
                                         </div>
                                     </article>
                                 );

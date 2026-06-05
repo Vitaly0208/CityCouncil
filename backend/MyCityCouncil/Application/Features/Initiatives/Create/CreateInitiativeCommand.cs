@@ -6,5 +6,5 @@ public record CreateInitiativeCommand(
     string Title,
     string Description,
     Guid UserId,
-    Guid? CommitteeId // Nullable для безопасности
+    Guid? CommitteeId
 ) : IRequest<CreateInitiativeResponseDto>;

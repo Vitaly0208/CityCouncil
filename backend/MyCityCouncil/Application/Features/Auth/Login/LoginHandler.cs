@@ -10,18 +10,21 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginDto>
     private readonly IPasswordHasher _passwordHasher;
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<LoginHandler> _logger;
     
     public LoginHandler(
         IJwtService jwtService, 
         IPasswordHasher passwordHasher, 
         IUserRepository userRepository,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        ILogger<LoginHandler> logger
         )
     {
         _jwtService = jwtService;
         _passwordHasher = passwordHasher;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<LoginDto> Handle(LoginCommand request, CancellationToken ct)
@@ -38,7 +41,9 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginDto>
         
         if (string.IsNullOrEmpty(tokens.RefreshToken) || string.IsNullOrEmpty(tokens.AccessToken))
             throw new InvalidOperationException("JWT token generation failed.");
+        
         await _unitOfWork.SaveAsync(ct);
+        _logger.LogInformation("УСПЕШНЫЙ ВХОД: User={Email}, IP={IpAddress}", request.Email, "N/A"); 
         
         return LoginDto.Map(user, tokens.AccessToken, tokens.RefreshToken);
     }

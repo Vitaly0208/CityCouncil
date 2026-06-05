@@ -9,13 +9,16 @@ public class CreateInitiativeHandler : IRequestHandler<CreateInitiativeCommand, 
 {
     private readonly IInitiativeRepository _initiativeRepository;
     private readonly ICommitteeRepository _committeeRepository;
+    private readonly ILogger<CreateInitiativeHandler> _logger;
 
     public CreateInitiativeHandler(
         IInitiativeRepository initiativeRepository, 
-        ICommitteeRepository committeeRepository)
+        ICommitteeRepository committeeRepository,
+        ILogger<CreateInitiativeHandler> logger)
     {
         _initiativeRepository = initiativeRepository;
         _committeeRepository = committeeRepository;
+        _logger = logger;
     }
 
     public async Task<CreateInitiativeResponseDto> Handle(CreateInitiativeCommand request, CancellationToken ct)
@@ -52,6 +55,9 @@ public class CreateInitiativeHandler : IRequestHandler<CreateInitiativeCommand, 
 
         await _initiativeRepository.AddAsync(initiative, ct);
         await _initiativeRepository.SaveChangesAsync(ct);
+        
+        _logger.LogInformation("СОЗДАНИЕ ИНИЦИАТИВЫ: UserId={UserId}, InitiativeId={Id}, Title='{Title}'", 
+            request.UserId, initiative.Id, initiative.Title);
 
         return new CreateInitiativeResponseDto(
             Id: initiative.Id,
