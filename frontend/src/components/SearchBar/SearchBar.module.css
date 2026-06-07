@@ -9,15 +9,11 @@
     display: flex;
     align-items: center;
     background: #161b22;
-    border: 1px solid var(--border);
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
     transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.inputWrapper:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .searchIcon {
@@ -39,7 +35,7 @@
 }
 
 .input::placeholder {
-    color: var(--text-tertiary);
+    color: var(--text-primary);
 }
 
 .clearBtn {

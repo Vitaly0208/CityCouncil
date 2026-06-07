@@ -12,6 +12,7 @@ public class User
     public string Email { get; set; }
     public string HomePhone { get; set; }
     public string WorkPhone { get; set; }
+    public int RatingScore { get; set; } = 0;
     public bool IsBlocked { get; set; } = false;
     
     public DateTime CreatedAt { get; set; }

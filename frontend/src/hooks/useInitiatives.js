@@ -2,17 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { initiativeService} from "../../api/apiService.js";
 import { queryKeys } from '../query/keys';
 
-/**
- * @typedef {Object} Initiative
- * @property {string} id
- * @property {string} title
- * @property {string} description
- * @property {string} status
- * @property {string} authorName
- * @property {string} createdAt
- * @property {string|null} approvedAt
- * @property {string|null} finalizedAt
- */
 
 export const useInitiatives = (filters = {}) => {
     const query = useQuery({

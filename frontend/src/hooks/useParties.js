@@ -68,7 +68,7 @@ export const useJoinParty = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ partyId, userId }) => partyService.addMember(partyId, userId),
+            mutationFn: ({ partyId, userId }) => partyService.addMember(partyId, userId),
         onSuccess: (_, { partyId, userId }) => {
             queryClient.invalidateQueries({ queryKey: queryKeys.parties.detail(partyId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.parties.byUser(userId) });

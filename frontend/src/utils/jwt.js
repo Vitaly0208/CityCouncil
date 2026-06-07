@@ -1,12 +1,6 @@
-// src/utils/jwt.js
+
 import { tokenService } from "../../api/tokenService.js";
 
-/**
- * Безопасно декодирует payload JWT (без проверки подписи)
- * Корректно обрабатывает UTF-8 (кириллицу в ролях/именах)
- * @param {string} token
- * @returns {object | null}
- */
 const decodePayload = (token) => {
     try {
         if (!token) return null;

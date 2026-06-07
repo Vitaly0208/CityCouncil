@@ -2,42 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { committeeService} from "../../api/apiService.js";
 import { queryKeys } from '../query/keys';
 
-/**
- * @typedef {Object} CommitteeMember
- * @property {string} userId
- * @property {string} fullName
- * @property {boolean} isChairman
- * @property {string} appointedAt
- */
-
-/**
- * @typedef {Object} InitiativeSummary
- * @property {string} id
- * @property {string} title
- * @property {string} authorName
- * @property {string} createdAt
- */
-
-/**
- * @typedef {Object} SessionSummary
- * @property {string} id
- * @property {string} title
- * @property {string} heldAt
- * @property {string} location
- */
-
-/**
- * @typedef {Object} CommitteeDetail
- * @property {string} id
- * @property {string} name
- * @property {string} specialization
- * @property {string} description
- * @property {boolean} isArchived
- * @property {CommitteeMember[]} currentMembers
- * @property {CommitteeMember[]} history
- * @property {InitiativeSummary[]} acceptedInitiatives
- * @property {SessionSummary[]} upcomingSessions
- */
 
 
 export const useCommittee = (committeeId) => {

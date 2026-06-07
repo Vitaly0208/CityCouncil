@@ -8,6 +8,7 @@ public record UserProfileDto(
     DateTime MemberSince,
     string HomePhone,
     string WorkPhone,
+    int RatingScore,
     List<CommissionMembershipDto> Commissions,
     PartyMembershipDto? CurrentParty,
     List<AcceptedInitiativeDto> AcceptedInitiatives,

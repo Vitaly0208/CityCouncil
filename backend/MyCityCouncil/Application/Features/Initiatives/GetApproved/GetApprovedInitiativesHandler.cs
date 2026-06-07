@@ -9,8 +9,10 @@ public class GetApprovedInitiativesHandler : IRequestHandler<GetApprovedInitiati
 {
     private readonly IInitiativeRepository _initiativeRepository;
 
-    public GetApprovedInitiativesHandler(IInitiativeRepository initiativeRepository) =>
+    public GetApprovedInitiativesHandler(IInitiativeRepository initiativeRepository)
+    {
         _initiativeRepository = initiativeRepository;
+    }
 
     public async Task<List<InitiativeDto>> Handle(GetApprovedInitiativesQuery request, CancellationToken ct)
     {

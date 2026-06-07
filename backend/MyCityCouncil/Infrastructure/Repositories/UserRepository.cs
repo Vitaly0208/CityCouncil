@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyCityCouncil.Application.Features.UsersS.GetRating;
 using MyCityCouncil.Domain.Interfaces;
 using MyCityCouncil.Domain.Models;
 using MyCityCouncil.Infrastructure.Persistence;
@@ -115,6 +116,29 @@ public class UserRepository : IUserRepository
             .ThenBy(u => u.FirstName)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .ToListAsync(ct);
+    }
+    
+    public async Task AddRatingPointsAsync(Guid userId, int points, CancellationToken ct = default)
+    {
+        await _dbContext.Users
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.RatingScore, u => u.RatingScore + points), ct);
+    }
+
+    public async Task<List<UserRatingDto>> GetTopRatedDeputiesAsync(int limit, CancellationToken ct = default)
+    {
+        return await _dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.RatingScore > 0)
+            .OrderByDescending(u => u.RatingScore)
+            .ThenBy(u => u.LastName)
+            .Take(limit)
+            .Select(u => new UserRatingDto(
+                u.Id,
+                $"{u.LastName} {u.FirstName} {u.MiddleName}".Trim(),
+                u.RatingScore
+            ))
             .ToListAsync(ct);
     }
 }

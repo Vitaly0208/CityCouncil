@@ -1,4 +1,5 @@
-﻿using MyCityCouncil.Domain.Models;
+﻿using MyCityCouncil.Application.Features.UsersS.GetRating;
+using MyCityCouncil.Domain.Models;
 
 namespace MyCityCouncil.Domain.Interfaces;
 
@@ -24,4 +25,7 @@ public interface IUserRepository
         int page,
         int pageSize,
         CancellationToken ct = default);
+    
+    Task AddRatingPointsAsync(Guid userId, int points, CancellationToken ct = default);
+    Task<List<UserRatingDto>> GetTopRatedDeputiesAsync(int limit, CancellationToken ct = default);
 }

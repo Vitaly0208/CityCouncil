@@ -85,6 +85,7 @@ public class GetUserProfileHandler : IRequestHandler<GetUserProfileQuery, UserPr
             MemberSince: user.CreatedAt,
             HomePhone: user.HomePhone ?? string.Empty,
             WorkPhone: user.WorkPhone ?? string.Empty,
+            RatingScore : user.RatingScore,
             Commissions: commissions,
             CurrentParty: currentParty,
             AcceptedInitiatives: acceptedInitiatives,

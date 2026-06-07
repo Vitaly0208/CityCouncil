@@ -67,9 +67,11 @@ public class JoinSessionHandler : IRequestHandler<JoinSessionCommand, Unit>
         };
 
         await _attendeeRepository.AddAsync(attendee, ct);
+        await _userRepository.AddRatingPointsAsync(request.UserId, 1, ct);
         await _unitOfWork.SaveAsync(ct);
         _logger.LogInformation("ПОСЕЩЕНИЕ ЗАСЕДАНИЯ: UserId={UserId} присоединился к SessionId={SessionId}", 
             request.UserId, request.SessionId);
+        _logger.LogInformation("РЕЙТИНГ: Начислен 1 балл UserId={UserId} за посещение заседания", request.UserId);
 
         return Unit.Value;
     }

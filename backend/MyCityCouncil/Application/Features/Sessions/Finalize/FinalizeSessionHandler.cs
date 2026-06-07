@@ -12,13 +12,23 @@ public class FinalizeSessionHandler : IRequestHandler<FinalizeSessionCommand, Fi
     private readonly IInitiativeRepository _initiativeRepo;
     private readonly IVotingRepository _votingRepo;
     private readonly ICommitteeRepository _committeeRepo;
+    private readonly IUserRepository _userRepo;
     private readonly IUnitOfWork _uow;
 
-    public FinalizeSessionHandler(ISessionRepository sessionRepo, IInitiativeRepository initiativeRepo, 
-                                  IVotingRepository votingRepo, ICommitteeRepository committeeRepo, IUnitOfWork uow)
+    public FinalizeSessionHandler(
+        ISessionRepository sessionRepo, 
+        IInitiativeRepository initiativeRepo, 
+        IVotingRepository votingRepo, 
+        ICommitteeRepository committeeRepo, 
+        IUserRepository userRepository,
+        IUnitOfWork uow)
     {
-        _sessionRepo = sessionRepo; _initiativeRepo = initiativeRepo;
-        _votingRepo = votingRepo; _committeeRepo = committeeRepo; _uow = uow;
+        _sessionRepo = sessionRepo; 
+        _initiativeRepo = initiativeRepo;
+        _votingRepo = votingRepo;
+        _userRepo = userRepository;
+        _committeeRepo = committeeRepo; 
+        _uow = uow;
     }
 
     public async Task<FinalizeSessionResult> Handle(FinalizeSessionCommand request, CancellationToken ct)
@@ -88,9 +98,15 @@ public class FinalizeSessionHandler : IRequestHandler<FinalizeSessionCommand, Fi
                     HearingRound = 2
                 };
                 await _votingRepo.AddAsync(votingInfo, ct);
+                if (init.Status == InitiativeStatus.Accepted)
+                {
+                    await _userRepo.AddRatingPointsAsync(init.UserId, 10, ct);
+                }
             }
             nextSessionId = round2Session.Id;
         }
+        
+        
 
         await _uow.SaveAsync(ct);
         return new FinalizeSessionResult(true, nextSessionId);

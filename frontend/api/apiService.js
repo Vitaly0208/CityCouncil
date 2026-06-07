@@ -97,3 +97,11 @@ export const votingService = {
     castVote: (data) => axiosInstance.post(ENDPOINTS.VOTING.CAST, data),
     finalize: (sessionId) => axiosInstance.post(ENDPOINTS.VOTING.FINALIZE(sessionId)),
 };
+export const ratingService = {
+    getLeaderboard: async (limit = 100) => {
+        const response = await axiosInstance.get(ENDPOINTS.RATING.LEADERBOARD, {
+            params: { limit }
+        });
+        return response.data;
+    }
+};

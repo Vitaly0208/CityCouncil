@@ -54,4 +54,7 @@ export const ENDPOINTS = {
         FINALIZE: (sessionId) => `/api/voting/finalize/${sessionId}`,
         RESULTS: (sessionId) => `/api/voting/results/${sessionId}`,
     },
+    RATING: {
+        LEADERBOARD: '/api/rating/leaderboard'
+    }
 };
